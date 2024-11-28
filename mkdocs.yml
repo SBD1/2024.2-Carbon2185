@@ -1,0 +1,71 @@
+site_name: Carbon 2185
+site_url: https://sbd1.github.io/2024.2-Carbon-2185/
+theme:
+  name: material
+  logo: img/carbonlogowhite.png
+  favicon: img/favicon-16x16.png
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: pt-br
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline 
+        name: Switch to dark mode
+      primary: blue
+      accent: white 
+    - scheme: slate 
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode    
+      primary: blue
+      accent: white
+
+nav:
+  - Menu: index.md
+  - Entrega 01:
+    - Apresentação: entrega-1/Apresentação.md
+    - Modelo Entidade Relacionamento: entrega-1/MER.md
+    - Diagrama Entidade Relacionamento: entrega-1/DER.md
+    - Modelo Relacional: entrega-1/ModeloRelacional.md
+    - Dicionário de Dados: entrega-1/DD.md
+
+extra_css:
+  - css/extra.css
+
+plugins:
+  - social
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/SBD1/2024.2-Carbon-2185
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+copyright: |
+  &copy; 2024 <a href="https://github.com/SBD1/2024.2-Carbon-2185"  target="_blank" rel="noopener">Grupo 8 da disciplina Sistema de Banco de Dados 1, ministrada pelo professor Maurício Serrano.</a>
