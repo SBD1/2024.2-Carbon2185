@@ -14,7 +14,7 @@ theme:
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
-  language: pt-br
+  language: pt
   palette:
     - scheme: default
       toggle:
