@@ -1,0 +1,53 @@
+/* Aplica justificação global ao conteúdo principal */
+.md-content {
+    text-align: justify;
+}
+
+/* Muda o fundo do header para preto */
+.md-header {
+    background-color: #000 !important;
+}
+
+/* Opcional: altera a cor do texto para melhorar o contraste */
+.md-header a {
+    color: #fff !important;
+}
+
+/* Muda o fundo da barra de navegação */
+.md-tabs {
+    background-color: #000 !important; /* Preto */
+}
+
+/* Opcional: altera a cor do texto dos itens da barra */
+.md-tabs a {
+    color: #fff !important; /* Branco */
+}
+
+/* Opcional: altera a cor do texto do item ativo */
+.md-tabs .md-tab--active a {
+    color: #ffcc00 !important; /* Amarelo */
+    font-weight: bold; /* Destacar o item ativo */
+}
+
+/* Opcional: remover borda ou alterar estilo */
+.md-tabs {
+    border-bottom: none !important;
+}
+
+
+.highlighted-text {
+/* Altere a cor conforme necessário */
+    font-weight: bold; /* Deixa o texto eX'm negrito */
+}
+
+/* CSS para rolagem horizontal em tabelas e código */
+.md-typeset table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.md-typeset pre {
+    overflow-x: auto;
+}
+
