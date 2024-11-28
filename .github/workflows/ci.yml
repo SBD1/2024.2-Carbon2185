@@ -2,6 +2,10 @@ name: ci
 on:
   push:
     branches:
+<<<<<<< HEAD
+=======
+      - master 
+>>>>>>> 550750504f7922317ae277e9d738b435c445bf90
       - main
 permissions:
   contents: write

@@ -1,7 +1,10 @@
 # <center>Apresentação</center>
 
+<<<<<<< HEAD
 # **Apresentação**
 
+=======
+>>>>>>> 550750504f7922317ae277e9d738b435c445bf90
 Segue abaixo a apresentação em vídeo do Trabalho 1, elabadorado pelo Grupo 8.
 
 #
