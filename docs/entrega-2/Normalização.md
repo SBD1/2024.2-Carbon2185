@@ -81,7 +81,7 @@ Resolver problemas em que várias relações independentes são representadas na
 #
 
 ### Tabela PC:
-
+    
 ### Tabela NPC:
 
 ### Tabela Personagem:

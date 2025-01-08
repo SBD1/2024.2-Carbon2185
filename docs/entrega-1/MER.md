@@ -14,45 +14,48 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
 - Missão
 - Diálogo
 - Item
-    - Coletável
     - Equipamento
         - Armadura
         - Arma
         - Implante cibernético
+- Instância Item
 - Facção
+    - Yazuka
+    - Triad
 - Classe
+    - Daimyo
+    - Hacker
+    - Scoundrel
 - Distrito
 - Célula do mundo
-- Origem
 - Instância Inimigo
-- Habilidade
-- Background
 - Loja
 
 ## **Atributos**
 
 - Personagem: [<ins>_id_personagem</ins>,tipo_]
-    - PC: [<ins>_id_personagem</ins>,id_celula,id_faccao,id_classe,id_origem,id_background,habilidade_cibernetica,habilidades,forca,destreza,constituicao,
-    inteligencia,tecnologia,carisma,hp,hp_atual,nivel,nome,descricao_]
+    - PC: [<ins>_id_personagem</ins>,id_celula,id_faccao,id_classe,id_inventario,energia,dano,hp,hp_atual,nivel,xp,nome,descricao_]
     - NPC: [_<ins>_id_personagem</ins>,tipo_]
         - Comerciante: [_<ins>id_comerciante</ins>,id_personagem,id_celula,nome,descricao_]
-        - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,id_celula,forca,destreza,constituicao,inteligencia,tecnologia,carisma,nome,descricao_]  
+        - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,id_celula,dano,xp,hp,hp_atual,nome,descricao_]  
 - Missão: [_<ins>id_missao</ins>,nome,descrição,dificuldade,objetivo_]
 - Diálogo: [_<ins>id_interacao</ins>,mensagem_atual,responsavel_mensagem_]
 - Item: [_<ins>id_item</ins>,tipo_]
-    - Coletável: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raridade_]
     - Equipamento: [_<ins>id_item</ins>,tipo_]
-        - Armadura: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,defesa,velocidade_ataque,raridade_]
-        - Arma: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raridade,municao,dano,alcance]
-        - Implante cibernético: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raidade,custo_energia,dano,alcance_]
-- Facção: [_<ins>id_faccao</ins>,nome,descricao,ideologia,nivel_influencia,recursos_]
-- Classe: [_<ins>id_classe</ins>,nome,descricao,pontos_vida_bonus_]
+        - Armadura: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,hp_bonus,raridade_]
+        - Arma: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raridade,municao,dano_]
+        - Implante cibernético: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raridade,custo_energia,dano_]
+- Instância Item: [_<ins>id_instanciaitem</ins>,id_inventario,id_item]
+- Facção: [_<ins>id_faccao</ins>,tipo_]
+    - Yazuka: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
+    - Triad: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
+- Classe: [_<ins>id_classe</ins>,tipo_]
+    - Daimyo [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
+    - Hacker [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
+    - Scoundrel: [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
 - Distrito: [_<ins>id_distrito</ins>,nome,descricao,distritos,range_maximo,quantidade_personagens_]  
 - Célula do mundo: [_<ins>id_celula</ins>,id_disrito,nome,descricao,destino_]
-- Origem: [_<ins>id_origem</ins>,nome,descricao,cultura,bonus_]
 - Instância Inimigo: [_<ins>id_instancia_inimigo</ins>,id_inimigo,id_celula,hp,hp_atual_]
-- Habilidade: [_<ins>id_habilidade</ins>,nome,tipo_habilidade,descricao,descricao,custo_de_uso,dano,velocidade_movimento_]
-- Background: [_<ins>id_backgroud</ins>,salario,habilidades,funcao_]
 - Loja: [_<ins>id_loja</ins>,id_comerciante,id_instancia_item_]
 
 
