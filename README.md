@@ -19,6 +19,18 @@
 • Desenvolver um jogo no estilo Carbon 2185 com mecânicas básicas e ambientação textual, rodando exclusivamente no CMD.
 
 <div align="left">
+  <h2>Entrega dos módulos</h2>
+</div> 
+
+- Entrega do módulo 1
+
+  - [Apresentação](./docs/entrega-1/Apresentação.md)
+  - [Diagrama Entidade-Relacionamento](./docs/entrega-1/DER.md)
+  - [Modelo Entidade-Relacionamento](./docs/entrega-1/MER.md)
+  - [Modelo Relacional](./docs/entrega-1/ModeloRelacional.md)
+  - [Dicionário de Dados](./docs/entrega-1/DD.md)
+
+<div align="left">
   <h2> Colaboradores </h2>
 </div> 
 
@@ -66,6 +78,7 @@
       </a>
     </td>
 </div>
+
 
 
 
