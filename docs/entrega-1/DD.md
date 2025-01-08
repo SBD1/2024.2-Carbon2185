@@ -28,9 +28,6 @@ Dicionário de Dados é um registro detalhado que documenta os elementos de um b
 ![cnpImg](../img/item_dd.png)
 
 
-![cnpImg](../img/coletavel_dd.png)
-
-
 ![cnpImg](../img/equipamento_dd.png)
 
 
@@ -58,10 +55,25 @@ Dicionário de Dados é um registro detalhado que documenta os elementos de um b
 ![cnpImg](../img/classes_dd.png)
 
 
-![cnpImg](../img/origem_dd.png)
+![cnpImg](../img/scoundrel_dd.png)
+
+
+![cnpImg](../img/hacker_dd.png)
+
+
+![cnpImg](../img/daimyo_dd.png)
 
 
 ![cnpImg](../img/faccao_dd.png)
+
+
+![cnpImg](../img/faccao_dd.png)
+
+
+![cnpImg](../img/yazuka_dd.png)
+
+
+![cnpImg](../img/triad_dd.png)
 
 
 ![cnpImg](../img/habilidade_dd.png)

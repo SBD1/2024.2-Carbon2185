@@ -80,52 +80,50 @@ Resolver problemas em que várias relações independentes são representadas na
 
 #
 
-### Tabela PC
+### Tabela PC:
 
-### Tabela NPC
+### Tabela NPC:
 
-### Tabela Personagem
+### Tabela Personagem:
 
-### Tabela Background
+### Tabela Background:
 
-### Tabela Origem
+### Tabela Classes:
 
-### Tabela Classes
+### Tabela Facção:
 
-### Tabela Facção
+### Tabela Habilidade:
 
-### Tabela Habilidade
+### Tabela Inimigo:
 
-### Tabela Inimigo
+### Tabela Distrito:
 
-### Tabela Distrito
+### Tabela Célula:
 
-### Tabela Célula
+### Tabela Inventário:
 
-### Tabela Inventário
+### Tabela Item:
 
-### Tabela Item
+### Tabela Instância item:
 
-### Tabela Instância item
+### Tabela Coletável:
 
-### Tabela Coletável
+### Tabela Equipamento:
 
-### Tabela Equipamento
+### Tabela Armadura:
 
-### Tabela Armadura
+### Tabela Arma:
 
-### Tabela Arma
+### Tabela Implante Cibernético:
 
-### Tabela Implante Cibernético
+### Tabela Comerciante:
 
-### Tabela Comerciante
+### Tabela Loja:
 
-### Tabela Loja
+### Tabela Interação:
 
-### Tabela Interação
+### Tabela Dialogo:
 
-### Tabela Dialogo
-
-### Tabela Instancia inimigo
+### Tabela Instancia inimigo:
 
 
