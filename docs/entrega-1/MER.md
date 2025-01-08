@@ -67,10 +67,6 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - (1,1) Cada Personagem pertence a uma única Facção.
     - (0,N) Uma Facção pode ter vários Personagens associados.
 
-- Personagem e Origem
-    - (1,1) Cada Personagem possui uma única Origem.
-    - (0,N) Uma Origem pode estar associada a vários Personagens.
-
 - Personagem e Classe
 
     - (1,1) Cada Personagem possui uma única Classe.

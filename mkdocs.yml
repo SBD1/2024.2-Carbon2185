@@ -37,6 +37,12 @@ nav:
     - Diagrama Entidade Relacionamento: entrega-1/DER.md
     - Modelo Relacional: entrega-1/ModeloRelacional.md
     - Dicionário de Dados: entrega-1/DD.md
+  - Entrega 02:
+    - Apresentação: entrega-2/Apresentação.md
+    - Normalização: entrega-2/Normalização.md
+    - DDL: entrega-2/DDL.md
+    - DML: entrega-2/DML.md
+    - DQL: entrega-2/DQL.md
 
 extra_css:
   - css/extra.css
