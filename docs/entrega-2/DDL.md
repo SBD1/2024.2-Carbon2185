@@ -9,239 +9,174 @@ A DDL (Data Definition Language) é um subconjunto do SQL que é usado para defi
 BEGIN TRANSACTION;
 
 CREATE TABLE Personagem (
-    id_personagem SERIAL PRIMARY KEY,
-    tipo VARCHAR(50) NOT NULL
+    id_personagem INT PRIMARY KEY,
+    tipo ENUM('pc', 'npc') NOT NULL
 );
 
 CREATE TABLE PC (
     id_personagem INT PRIMARY KEY REFERENCES Personagem(id_personagem),
-    id_celula INT,
-    id_faccao INT,
-    id_classe INT,
-    id_origem INT,
-    id_background INT,
-    habilidade_cibernetica BOOLEAN,
-    habilidades TEXT,
-    forca INT,
-    destreza INT,
-    constituicao INT,
-    inteligencia INT,
-    tecnologia INT,
-    carisma INT,
-    hp INT,
-    hp_atual INT,
-    nivel INT,
-    nome VARCHAR(100),
-    descricao TEXT
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    id_faccao INT REFERENCES Faccao(id_faccao),
+    id_classe INT REFERENCES Classe(id_classe),
+    id_inventario INT REFERENCES Inventario(id_inventario),
+    energia INT NOT NULL,
+    dano INT NOT NULL,
+    hp INT NOT NULL,
+    hp_atual INT NOT NULL,
+    nivel INT NOT NULL,
+    xp INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
 );
 
 CREATE TABLE NPC (
     id_personagem INT PRIMARY KEY REFERENCES Personagem(id_personagem),
-    tipo VARCHAR(50) NOT NULL
+    tipo VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Comerciante (
-    id_comerciante SERIAL PRIMARY KEY,
+    id_comerciante INT PRIMARY KEY,
     id_personagem INT REFERENCES Personagem(id_personagem),
-    id_celula INT,
-    nome VARCHAR(100),
-    descricao TEXT
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Inimigo (
-    id_inimigo SERIAL PRIMARY KEY,
+    id_inimigo INT PRIMARY KEY,
     id_personagem INT REFERENCES Personagem(id_personagem),
-    id_celula INT,
-    forca INT,
-    destreza INT,
-    constituicao INT,
-    inteligencia INT,
-    tecnologia INT,
-    carisma INT,
-    nome VARCHAR(100),
-    descricao TEXT
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    dano INT NOT NULL,
+    xp INT NOT NULL,
+    hp INT NOT NULL,
+    hp_atual INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Missao (
-    id_missao SERIAL PRIMARY KEY,
-    nome VARCHAR(100),
-    descricao TEXT,
-    dificuldade VARCHAR(50),
-    objetivo TEXT
+    id_missao INT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    dificuldade INT NOT NULL,
+    objetivo VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Interacao (
+    id_interacao INT PRIMARY KEY,
+    personagem_origem INT REFERENCES Personagem(id_personagem),
+    personagem_destino INT REFERENCES Personagem(id_personagem)
 );
 
 CREATE TABLE Dialogo (
-    id_interacao SERIAL PRIMARY KEY,
-    mensagem_atual TEXT,
-    responsavel_mensagem VARCHAR(100)
+    id_interacao INT PRIMARY KEY REFERENCES Interacao(id_interacao),
+    mensagem_atual VARCHAR(100) NOT NULL,
 );
 
 CREATE TABLE Item (
-    id_item SERIAL PRIMARY KEY,
-    tipo VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE Coletavel (
-    id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    id_celula INT,
-    nome VARCHAR(100),
-    descricao TEXT,
-    valor DECIMAL,
-    raridade VARCHAR(50)
+    id_item INT PRIMARY KEY,
+    tipo VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Equipamento (
     id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    tipo VARCHAR(50) NOT NULL
+    tipo ENUM('armadura', 'equipamento', 'arma', 'implante_cibernetico') NOT NULL
 );
 
 CREATE TABLE Armadura (
-    id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    id_celula INT,
-    nome VARCHAR(100),
-    descricao TEXT,
-    valor DECIMAL,
-    defesa INT,
-    velocidade_ataque INT,
-    raridade VARCHAR(50)
+    id_item INT PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    valor INT NOT NULL,
+    hp_bonus INT NOT NULL,
+    raridade VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE Arma (
-    id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    id_celula INT,
-    nome VARCHAR(100),
-    descricao TEXT,
-    valor DECIMAL,
-    raridade VARCHAR(50),
-    municao INT,
-    dano INT,
-    alcance INT
+    id_item INT PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    valor INT NOT NULL,
+    raridade VARCHAR(100) NOT NULL,
+    municao INT NOT NULL,
+    dano INT NOT NULL
 );
 
 CREATE TABLE ImplanteCibernetico (
-    id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    id_celula INT,
-    nome VARCHAR(100),
-    descricao TEXT,
-    valor DECIMAL,
-    raridade VARCHAR(50),
-    custo_energia INT,
-    dano INT,
-    alcance INT
-);
-
-CREATE TABLE Faccao (
-    id_faccao SERIAL PRIMARY KEY,
-    nome VARCHAR(100),
-    descricao TEXT,
-    ideologia TEXT,
-    nivel_influencia INT,
-    recursos TEXT
-);
-
-CREATE TABLE Classe (
-    id_classe SERIAL PRIMARY KEY,
-    nome VARCHAR(100),
-    descricao TEXT,
-    pontos_vida_bonus INT
-);
-
-CREATE TABLE Distrito (
-    id_distrito SERIAL PRIMARY KEY,
-    nome VARCHAR(100),
-    descricao TEXT,
-    distritos INT,
-    range_maximo INT,
-    quantidade_personagens INT
-);
-
-CREATE TABLE CelulaDoMundo (
-    id_celula SERIAL PRIMARY KEY,
-    id_distrito INT REFERENCES Distrito(id_distrito),
-    nome VARCHAR(100),
-    descricao TEXT,
-    destino TEXT
-);
-
-CREATE TABLE InstanciaInimigo (
-    id_instancia_inimigo SERIAL PRIMARY KEY,
-    id_inimigo INT REFERENCES Inimigo(id_inimigo),
-    id_celula INT REFERENCES CelulaDoMundo(id_celula),
-    hp INT,
-    hp_atual INT
-);
-
-CREATE TABLE Habilidade (
-    id_habilidade SERIAL PRIMARY KEY,
-    nome VARCHAR(100),
-    tipo_habilidade VARCHAR(50),
-    descricao TEXT,
-    custo_de_uso INT,
-    dano INT,
-    velocidade_movimento INT
-);
-
-CREATE TABLE Loja (
-    id_loja SERIAL PRIMARY KEY,
-    id_comerciante INT REFERENCES Comerciante(id_comerciante),
-    id_instancia_item INT
-);
-
--- Relacionamentos adicionais
-CREATE TABLE PersonagemFacao (
-    id_personagem INT REFERENCES Personagem(id_personagem),
-    id_faccao INT REFERENCES Faccao(id_faccao),
-    PRIMARY KEY (id_personagem, id_faccao)
-);
-
-CREATE TABLE PersonagemHabilidade (
-    id_personagem INT REFERENCES Personagem(id_personagem),
-    id_habilidade INT REFERENCES Habilidade(id_habilidade),
-    PRIMARY KEY (id_personagem, id_habilidade)
-);
-
-CREATE TABLE PCNPC (
-    id_pc INT REFERENCES PC(id_personagem),
-    id_npc INT REFERENCES NPC(id_personagem),
-    PRIMARY KEY (id_pc, id_npc)
-);
-
-CREATE TABLE Negociacao (
-    id_negociacao SERIAL PRIMARY KEY,
-    id_comerciante INT REFERENCES Comerciante(id_comerciante),
-    id_pc INT REFERENCES PC(id_personagem)
-);
-
-CREATE TABLE PCInstanciaInimigo (
-    id_pc INT REFERENCES PC(id_personagem),
-    id_instancia_inimigo INT REFERENCES InstanciaInimigo(id_instancia_inimigo),
-    PRIMARY KEY (id_pc, id_instancia_inimigo)
-);
-
-CREATE TABLE InteracaoDialogo (
-    id_interacao INT REFERENCES Dialogo(id_interacao),
-    id_npc INT REFERENCES NPC(id_personagem),
-    id_pc INT REFERENCES PC(id_personagem),
-    PRIMARY KEY (id_interacao, id_npc, id_pc)
-);
-
-CREATE TABLE Inventario (
-    id_inventario SERIAL PRIMARY KEY,
-    id_personagem INT REFERENCES Personagem(id_personagem)
+    id_item INT PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    valor INT NOT NULL,
+    raridade VARCHAR(100) NOT NULL,
+    custo_energia INT NOT NULL,
+    dano INT NOT NULL
 );
 
 CREATE TABLE InstanciaItem (
-    id_instancia_item SERIAL PRIMARY KEY,
-    id_item INT REFERENCES Item(id_item),
+    id_instancia_item INT PRIMARY KEY,
     id_inventario INT REFERENCES Inventario(id_inventario),
-    id_celula INT REFERENCES CelulaDoMundo(id_celula)
+    id_item INT REFERENCES Item(id_item)
 );
 
-CREATE TABLE PersonagemMissao (
-    id_personagem INT REFERENCES Personagem(id_personagem),
-    id_missao INT REFERENCES Missao(id_missao),
-    PRIMARY KEY (id_personagem, id_missao)
+CREATE TABLE Faccao (
+    id_faccao INT PRIMARY KEY,
+    tipo ENUM('yakuza', 'triad') NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    ideologia VARCHAR(100) NOT NULL
 );
+
+CREATE TABLE Classe (
+    id_classe INT PRIMARY KEY,
+    tipo ENUM('daimyo', 'hacker', 'scoundrel') NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    hp_bonus INT NOT NULL,
+    dano_bonus INT NOT NULL,
+    energia_bonus INT NOT NULL
+);
+
+CREATE TABLE Inventario (
+    id_inventario INT,
+    id_instancia_item INT REFERENCES InstanciaItem(id_instancia_item),
+    PRIMARY KEY (id_inventario, id_instancia_item)
+    quantidade_itens INT NOT NULL,
+    capacidade_maxima INT NOT NULL,
+);
+
+CREATE TABLE Distrito (
+    id_distrito INT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    range_maximo INT NOT NULL,
+    quantidade_personagens INT NOT NULL
+);
+
+CREATE TABLE CelulaMundo (
+    id_celula INT PRIMARY KEY,
+    id_distrito INT REFERENCES Distrito(id_distrito),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    destino VARCHAR(100) NOT NULL,
+);
+
+CREATE TABLE InstanciaInimigo (
+    id_instancia_inimigo INT PRIMARY KEY,
+    id_inimigo INT REFERENCES Inimigo(id_inimigo),
+    id_celula INT REFERENCES CelulaMundo(id_celula),
+    hp INT NOT NULL,
+    hp_atual INT NOT NULL
+);
+
+CREATE TABLE Loja (
+    id_loja INT PRIMARY KEY,
+    id_comerciante INT REFERENCES Comerciante(id_comerciante),
+    id_instancia_item INT REFERENCES InstanciaItem(id_instancia_item)
+);
+
 
 COMMIT;
 
@@ -253,5 +188,6 @@ COMMIT;
 | Versão | Data | Descrição | Autor(es) |
 | :-: | :-: | :-: | :-: | 
 | `1.0`  | 07/01/2025 | Primeira versão do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
+| `1.1`  | 08/01/2025 | Correção do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
 
 </center>
