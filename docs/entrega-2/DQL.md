@@ -2,17 +2,19 @@
 
 ## **DQL**
 
+## **DQL**
+
 A DQL (Data Query Language) é a parte do SQL que se concentra na consulta e recuperação de dados. Ela permite que os usuários solicitem e visualizem dados de tabelas e outros objetos no banco de dados. A DQL é fundamental porque a maior parte da interação com bancos de dados envolve a leitura e extração de informações para relatórios, análises e outros fins. O principal comando da DQL é o SELECT, que pode ser usado de várias maneiras para filtrar, ordenar e agrupar os dados.
 
-
-## 1. Consultar todos os personagens e seus tipos
+```sql
+-- 1. Consultar todos os personagens e seus tipos
 SELECT 
     P.id_personagem, 
     P.tipo 
 FROM 
     Personagem AS P;
 
-## 2. Listar PCs (personagens jogáveis) com atributos e informações detalhadas
+-- 2. Listar PCs (personagens jogáveis) com atributos e informações detalhadas
 SELECT 
     PC.id_personagem, 
     PC.nome, 
@@ -26,7 +28,7 @@ SELECT
 FROM 
     PC;
 
-## 3. Listar NPCs associados a diálogos
+-- 3. Listar NPCs associados a diálogos
 SELECT 
     NPC.id_personagem AS id_npc, 
     NPC.tipo, 
@@ -39,7 +41,7 @@ JOIN
 JOIN 
     Dialogo AS D ON I.id_interacao = D.id_interacao;
 
-## 4. Obter comerciantes e suas localizações
+-- 4. Obter comerciantes e suas localizações
 SELECT 
     C.id_comerciante, 
     C.nome AS comerciante, 
@@ -50,7 +52,7 @@ FROM
 LEFT JOIN 
     CelulaMundo AS CM ON C.id_celula = CM.id_celula;
 
-## 5. Consultar inimigos em células específicas
+-- 5. Consultar inimigos em células específicas
 SELECT 
     I.id_inimigo, 
     I.nome, 
@@ -63,8 +65,7 @@ FROM
 LEFT JOIN 
     CelulaMundo AS CM ON I.id_celula = CM.id_celula;
 
-## 6. Listar missões atribuídas a personagens
-## (precisa criar uma tabela para suportar esse DQL)
+-- 6. Listar missões atribuídas a personagens
 SELECT 
     P.id_personagem, 
     P.tipo AS tipo_personagem, 
@@ -75,10 +76,9 @@ FROM
 JOIN 
     Interacao AS I ON I.personagem_destino = M.id_missao
 JOIN 
-    Personagem AS P ON I.personagem_origem= pf-Facção .
+    Personagem AS P ON I.personagem_origem = P.id_personagem;
 
-
-## 7. Consultar o inventário de um personagem específico
+-- 7. Consultar o inventário de um personagem específico
 SELECT 
     I.id_inventario, 
     II.id_instancia_item, 
@@ -93,7 +93,7 @@ JOIN
 LEFT JOIN 
     CelulaMundo AS CM ON II.id_celula = CM.id_celula;
 
-## 8. Listar personagens e suas facções
+-- 8. Listar personagens e suas facções
 SELECT 
     PC.nome AS personagem, 
     F.nome AS faccao, 
@@ -103,7 +103,7 @@ FROM
 JOIN 
     Faccao AS F ON PC.id_faccao = F.id_faccao;
 
-## 9. Exibir as lojas e itens disponíveis em cada loja
+-- 9. Exibir as lojas e itens disponíveis em cada loja
 SELECT 
     L.id_loja, 
     C.nome AS comerciante, 
@@ -118,9 +118,7 @@ JOIN
 JOIN 
     Item AS IT ON II.id_item = IT.id_item;
 
-
-
-## 10. Consultar relacionamentos entre PCs e instâncias de inimigos
+-- 10. Consultar relacionamentos entre PCs e instâncias de inimigos
 SELECT 
     PC.id_personagem AS id_pc, 
     PC.nome AS nome_pc, 
@@ -135,5 +133,3 @@ JOIN
     CelulaMundo AS CM ON II.id_celula = CM.id_celula
 JOIN 
     PC ON PC.id_celula = CM.id_celula;
-
-
