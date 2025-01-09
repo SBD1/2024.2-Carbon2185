@@ -31,7 +31,7 @@ CREATE TABLE PC (
 
 CREATE TABLE NPC (
     id_personagem INT PRIMARY KEY REFERENCES Personagem(id_personagem),
-    tipo VARCHAR(100) NOT NULL
+    tipo ENUM('comerciante', 'inimigo') NOT NULL
 );
 
 CREATE TABLE Comerciante (
@@ -75,12 +75,12 @@ CREATE TABLE Dialogo (
 
 CREATE TABLE Item (
     id_item INT PRIMARY KEY,
-    tipo VARCHAR(100) NOT NULL
+    tipo ENUM('equipamento', 'objeto_mapa') NOT NULL
 );
 
 CREATE TABLE Equipamento (
     id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    tipo ENUM('armadura', 'equipamento', 'arma', 'implante_cibernetico') NOT NULL
+    tipo ENUM('armadura', 'arma', 'implante_cibernetico') NOT NULL
 );
 
 CREATE TABLE Armadura (
@@ -189,5 +189,6 @@ COMMIT;
 | :-: | :-: | :-: | :-: | 
 | `1.0`  | 07/01/2025 | Primeira versão do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
 | `1.1`  | 08/01/2025 | Correção do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
+| `1.2`  | 09/01/2025 | Correção do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
 
 </center>
