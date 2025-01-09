@@ -11,6 +11,7 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - NPC
         - Comerciante
         - Inimigo
+- Iventário
 - Missão
 - Diálogo
 - Item
@@ -34,10 +35,11 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
 ## **Atributos**
 
 - Personagem: [<ins>_id_personagem</ins>,tipo_]
-    - PC: [<ins>_id_personagem</ins>,id_celula,id_faccao,id_classe,id_inventario,energia,dano,hp,hp_atual,nivel,xp,nome,descricao_]
+    - PC: [<ins>_id_personagem</ins>,id_celula,id_faccao,id_classe,energia,dano,hp,hp_atual,nivel,xp,nome,descricao_]
     - NPC: [_<ins>_id_personagem</ins>,tipo_]
         - Comerciante: [_<ins>id_comerciante</ins>,id_personagem,id_celula,nome,descricao_]
-        - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,id_celula,dano,xp,hp,hp_atual,nome,descricao_]  
+        - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,id_celula,dano,xp,hp,hp_atual,nome,descricao_] 
+- Inventário: [_<ins>id_inventario</ins>,id_istancia_item,quatidade_itens,capacidade_maxima_]
 - Missão: [_<ins>id_missao</ins>,nome,descrição,dificuldade,objetivo_]
 - Diálogo: [_<ins>id_interacao</ins>,mensagem_atual,responsavel_mensagem_]
 - Item: [_<ins>id_item</ins>,tipo_]
@@ -45,7 +47,7 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
         - Armadura: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,hp_bonus,raridade_]
         - Arma: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raridade,municao,dano_]
         - Implante cibernético: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,raridade,custo_energia,dano_]
-- Instância Item: [_<ins>id_instanciaitem</ins>,id_inventario,id_item]
+- Instância Item: [_<ins>id_instancia_item</ins>,id_inventario,id_item]
 - Facção: [_<ins>id_faccao</ins>,tipo_]
     - Yazuka: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
     - Triad: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
@@ -53,7 +55,7 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - Daimyo [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
     - Hacker [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
     - Scoundrel: [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
-- Distrito: [_<ins>id_distrito</ins>,nome,descricao,distritos,range_maximo,quantidade_personagens_]  
+- Distrito: [_<ins>id_distrito</ins>,nome,descricao,range_maximo,quantidade_personagens_]  
 - Célula do mundo: [_<ins>id_celula</ins>,id_disrito,nome,descricao,destino_]
 - Instância Inimigo: [_<ins>id_instancia_inimigo</ins>,id_inimigo,id_celula,hp,hp_atual_]
 - Loja: [_<ins>id_loja</ins>,id_comerciante,id_instancia_item_]
