@@ -11,7 +11,7 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - NPC
         - Comerciante
         - Inimigo
-- Iventário
+- Inventário
 - Missão
 - Diálogo
 - Item
@@ -41,7 +41,7 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
         - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,id_celula,dano,xp,hp,hp_atual,nome,descricao_] 
 - Inventário: [_<ins>id_inventario</ins>,id_istancia_item,quatidade_itens,capacidade_maxima_]
 - Missão: [_<ins>id_missao</ins>,nome,descrição,dificuldade,objetivo_]
-- Diálogo: [_<ins>id_interacao</ins>,mensagem_atual,responsavel_mensagem_]
+- Diálogo: [_<ins>id_interacao</ins>,mensagem_atual_]
 - Item: [_<ins>id_item</ins>,tipo_]
     - Equipamento: [_<ins>id_item</ins>,tipo_]
         - Armadura: [_<ins>id_item</ins>,id_celula,nome,descricao,valor,hp_bonus,raridade_]
