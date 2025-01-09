@@ -80,19 +80,15 @@ Resolver problemas em que várias relações independentes são representadas na
 
 #
 
-### Tabela PC:
-    
+### Tabela PC: 
+
 ### Tabela NPC:
 
 ### Tabela Personagem:
 
-### Tabela Background:
-
 ### Tabela Classes:
 
 ### Tabela Facção:
-
-### Tabela Habilidade:
 
 ### Tabela Inimigo:
 
@@ -105,8 +101,6 @@ Resolver problemas em que várias relações independentes são representadas na
 ### Tabela Item:
 
 ### Tabela Instância item:
-
-### Tabela Coletável:
 
 ### Tabela Equipamento:
 
