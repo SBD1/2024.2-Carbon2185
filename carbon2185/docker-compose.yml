@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:15
+    container_name: carbon2185_db
+    environment:
+      POSTGRES_USER: carbon_user
+      POSTGRES_PASSWORD: carbon_password
+      POSTGRES_DB: carbon2185
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
