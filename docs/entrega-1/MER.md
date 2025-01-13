@@ -38,7 +38,8 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - PC: [<ins>_id_personagem</ins>,id_celula,id_faccao,id_classe,energia,dano,hp,hp_atual,nivel,xp,nome,descricao_]
     - NPC: [_<ins>_id_personagem</ins>,tipo_]
         - Comerciante: [_<ins>id_comerciante</ins>,id_personagem,id_celula,nome,descricao_]
-        - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,id_celula,dano,xp,hp,hp_atual,nome,descricao_] 
+        - Inimigo: [_<ins>id_inimigo</ins>,id_personagem,dano,xp,hp_] 
+- Instância Inimigo: [_<ins>id_instancia_inimigo</ins>,id_inimigo,id_celula,hp_atual_]
 - Inventário: [_<ins>id_inventario</ins>,id_istancia_item,quatidade_itens,capacidade_maxima_]
 - Missão: [_<ins>id_missao</ins>,nome,descrição,dificuldade,objetivo_]
 - Diálogo: [_<ins>id_interacao</ins>,mensagem_atual_]
@@ -55,9 +56,9 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - Daimyo [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
     - Hacker [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
     - Scoundrel: [_<ins>id_classe</ins>,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
-- Distrito: [_<ins>id_distrito</ins>,nome,descricao,range_maximo,quantidade_personagens_]  
+- Distrito: [_<ins>id_distrito</ins>,nome,descricao,range_maximo,quantidade_personagens_] 
+- Célula: [_<ins>d_celula</ins>,nome,id_distrito,descricao,destino_] 
 - Célula do mundo: [_<ins>id_celula</ins>,id_disrito,nome,descricao,destino_]
-- Instância Inimigo: [_<ins>id_instancia_inimigo</ins>,id_inimigo,id_celula,hp,hp_atual_]
 - Loja: [_<ins>id_loja</ins>,id_comerciante,id_instancia_item_]
 
 
