@@ -7,6 +7,7 @@
 A DQL (Data Query Language) é a parte do SQL que se concentra na consulta e recuperação de dados. Ela permite que os usuários solicitem e visualizem dados de tabelas e outros objetos no banco de dados. A DQL é fundamental porque a maior parte da interação com bancos de dados envolve a leitura e extração de informações para relatórios, análises e outros fins. O principal comando da DQL é o SELECT, que pode ser usado de várias maneiras para filtrar, ordenar e agrupar os dados.
 
 ```sql
+
 -- 1. Consultar todos os personagens e seus tipos
 SELECT 
     P.id_personagem, 
@@ -133,3 +134,5 @@ JOIN
     CelulaMundo AS CM ON II.id_celula = CM.id_celula
 JOIN 
     PC ON PC.id_celula = CM.id_celula;
+
+```
