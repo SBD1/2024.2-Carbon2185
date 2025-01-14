@@ -6,19 +6,60 @@ A DDL (Data Definition Language) é um subconjunto do SQL que é usado para defi
 
 ```sql
 
-BEGIN TRANSACTION;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE Personagem (
-    id_personagem INT PRIMARY KEY,
-    tipo ENUM('pc', 'npc') NOT NULL
+CREATE TABLE IF NOT EXISTS Inventario (
+    id_inventario UUID DEFAULT uuid_generate_v4(),
+    quantidade_itens INT NOT NULL,
+    capacidade_maxima INT NOT NULL,
+    PRIMARY KEY (id_inventario)
 );
 
-CREATE TABLE PC (
-    id_personagem INT PRIMARY KEY REFERENCES Personagem(id_personagem),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
-    id_faccao INT REFERENCES Faccao(id_faccao),
-    id_classe INT REFERENCES Classe(id_classe),
-    id_inventario INT REFERENCES Inventario(id_inventario),
+CREATE TABLE IF NOT EXISTS Classe (
+    id_classe UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('daimyo', 'hacker', 'scoundrel')),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    hp_bonus INT NOT NULL,
+    dano_bonus INT NOT NULL,
+    energia_bonus INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Faccao (
+    id_faccao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('yakuza', 'triad')),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    ideologia VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Distrito (
+    id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    range_maximo INT NOT NULL,
+    quantidade_personagens INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS CelulaMundo (
+    id_celula UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_distrito UUID REFERENCES Distrito(id_distrito),
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL,
+    destino VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Personagem (
+    id_personagem UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('pc', 'npc'))
+);
+
+CREATE TABLE IF NOT EXISTS PC (
+    id_personagem UUID PRIMARY KEY REFERENCES Personagem(id_personagem),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
+    id_faccao UUID REFERENCES Faccao(id_faccao),
+    id_classe UUID REFERENCES Classe(id_classe),
+    id_inventario UUID REFERENCES Inventario(id_inventario),
     energia INT NOT NULL,
     dano INT NOT NULL,
     hp INT NOT NULL,
@@ -26,26 +67,26 @@ CREATE TABLE PC (
     nivel INT NOT NULL,
     xp INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
+    descricao VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE NPC (
-    id_personagem INT PRIMARY KEY REFERENCES Personagem(id_personagem),
-    tipo ENUM('comerciante', 'inimigo') NOT NULL
+CREATE TABLE IF NOT EXISTS NPC (
+    id_personagem UUID PRIMARY KEY REFERENCES Personagem(id_personagem),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('comerciante', 'inimigo'))
 );
 
-CREATE TABLE Comerciante (
-    id_comerciante INT PRIMARY KEY,
-    id_personagem INT REFERENCES Personagem(id_personagem),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
+CREATE TABLE IF NOT EXISTS Comerciante (
+    id_comerciante UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_personagem UUID REFERENCES NPC(id_personagem),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Inimigo (
-    id_inimigo INT PRIMARY KEY,
-    id_personagem INT REFERENCES Personagem(id_personagem),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
+CREATE TABLE IF NOT EXISTS Inimigo (
+    id_inimigo UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_personagem UUID REFERENCES NPC(id_personagem),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     dano INT NOT NULL,
     xp INT NOT NULL,
     hp INT NOT NULL,
@@ -54,38 +95,38 @@ CREATE TABLE Inimigo (
     descricao VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Missao (
-    id_missao INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Missao (
+    id_missao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL,
     dificuldade INT NOT NULL,
     objetivo VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Interacao (
-    id_interacao INT PRIMARY KEY,
-    personagem_origem INT REFERENCES Personagem(id_personagem),
-    personagem_destino INT REFERENCES Personagem(id_personagem)
+CREATE TABLE IF NOT EXISTS Interacao (
+    id_interacao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    personagem_origem UUID REFERENCES Personagem(id_personagem),
+    personagem_destino UUID REFERENCES Personagem(id_personagem)
 );
 
-CREATE TABLE Dialogo (
-    id_interacao INT PRIMARY KEY REFERENCES Interacao(id_interacao),
-    mensagem_atual VARCHAR(100) NOT NULL,
+CREATE TABLE IF NOT EXISTS Dialogo (
+    id_interacao UUID PRIMARY KEY REFERENCES Interacao(id_interacao),
+    mensagem_atual VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Item (
-    id_item INT PRIMARY KEY,
-    tipo ENUM('equipamento', 'objeto_mapa') NOT NULL
+CREATE TABLE IF NOT EXISTS Item (
+    id_item UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('equipamento', 'objeto_mapa'))
 );
 
-CREATE TABLE Equipamento (
-    id_item INT PRIMARY KEY REFERENCES Item(id_item),
-    tipo ENUM('armadura', 'arma', 'implante_cibernetico') NOT NULL
+CREATE TABLE IF NOT EXISTS Equipamento (
+    id_item UUID PRIMARY KEY REFERENCES Item(id_item),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('armadura', 'arma', 'implante_cibernetico'))
 );
 
-CREATE TABLE Armadura (
-    id_item INT PRIMARY KEY REFERENCES Equipamento(id_item),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
+CREATE TABLE IF NOT EXISTS Armadura (
+    id_item UUID PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL,
     valor INT NOT NULL,
@@ -93,9 +134,9 @@ CREATE TABLE Armadura (
     raridade VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Arma (
-    id_item INT PRIMARY KEY REFERENCES Equipamento(id_item),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
+CREATE TABLE IF NOT EXISTS Arma (
+    id_item UUID PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL,
     valor INT NOT NULL,
@@ -104,9 +145,9 @@ CREATE TABLE Arma (
     dano INT NOT NULL
 );
 
-CREATE TABLE ImplanteCibernetico (
-    id_item INT PRIMARY KEY REFERENCES Equipamento(id_item),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
+CREATE TABLE IF NOT EXISTS ImplanteCibernetico (
+    id_item UUID PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL,
     valor INT NOT NULL,
@@ -115,70 +156,31 @@ CREATE TABLE ImplanteCibernetico (
     dano INT NOT NULL
 );
 
-CREATE TABLE InstanciaItem (
-    id_instancia_item INT PRIMARY KEY,
-    id_inventario INT REFERENCES Inventario(id_inventario),
-    id_item INT REFERENCES Item(id_item)
+CREATE TABLE IF NOT EXISTS InstanciaItem (
+    id_instancia_item UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_inventario UUID REFERENCES Inventario(id_inventario),
+    id_item UUID REFERENCES Item(id_item)
 );
 
-CREATE TABLE Faccao (
-    id_faccao INT PRIMARY KEY,
-    tipo ENUM('yakuza', 'triad') NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    ideologia VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE Classe (
-    id_classe INT PRIMARY KEY,
-    tipo ENUM('daimyo', 'hacker', 'scoundrel') NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    hp_bonus INT NOT NULL,
-    dano_bonus INT NOT NULL,
-    energia_bonus INT NOT NULL
-);
-
-CREATE TABLE Inventario (
-    id_inventario INT,
-    id_instancia_item INT REFERENCES InstanciaItem(id_instancia_item),
+CREATE TABLE IF NOT EXISTS InventarioTemItem (
+    id_inventario UUID REFERENCES Inventario(id_inventario),
+    id_instancia_item UUID REFERENCES InstanciaItem(id_instancia_item)
     PRIMARY KEY (id_inventario, id_instancia_item)
-    quantidade_itens INT NOT NULL,
-    capacidade_maxima INT NOT NULL,
 );
 
-CREATE TABLE Distrito (
-    id_distrito INT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    range_maximo INT NOT NULL,
-    quantidade_personagens INT NOT NULL
-);
-
-CREATE TABLE CelulaMundo (
-    id_celula INT PRIMARY KEY,
-    id_distrito INT REFERENCES Distrito(id_distrito),
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    destino VARCHAR(100) NOT NULL,
-);
-
-CREATE TABLE InstanciaInimigo (
-    id_instancia_inimigo INT PRIMARY KEY,
-    id_inimigo INT REFERENCES Inimigo(id_inimigo),
-    id_celula INT REFERENCES CelulaMundo(id_celula),
+CREATE TABLE IF NOT EXISTS InstanciaInimigo (
+    id_instancia_inimigo UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id_inimigo UUID REFERENCES Inimigo(id_inimigo),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     hp INT NOT NULL,
     hp_atual INT NOT NULL
 );
 
-CREATE TABLE Loja (
-    id_loja INT PRIMARY KEY,
-    id_comerciante INT REFERENCES Comerciante(id_comerciante),
-    id_instancia_item INT REFERENCES InstanciaItem(id_instancia_item)
+CREATE TABLE IF NOT EXISTS Loja (
+    id_comerciante UUID REFERENCES Comerciante(id_comerciante),
+    id_instancia_item UUID REFERENCES InstanciaItem(id_instancia_item)
+    PRIMARY KEY (id_comerciante, id_instancia_item)
 );
-
-
-COMMIT;
 
 ```
 
@@ -190,5 +192,6 @@ COMMIT;
 | `1.0`  | 07/01/2025 | Primeira versão do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
 | `1.1`  | 08/01/2025 | Correção do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
 | `1.2`  | 09/01/2025 | Correção do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
+| `1.3`  | 14/01/2025 | Correção do DDL | [Lucas Caldas](https://github.com/lucascaldasb) |
 
 </center>
