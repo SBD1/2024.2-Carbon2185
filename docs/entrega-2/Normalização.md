@@ -293,3 +293,11 @@ Missão (id_Missão, nome, descricao, dificuldade, objetivo)
 
 A tabela Missão já estava na 4FN
 
+<center>
+
+## Histórico de Versão
+| Versão | Data | Descrição | Autor(es) |
+| :-: | :-: | :-: | :-: | 
+| `1.0`  | 13/01/2025 | Primeira normalização | [Arthur Fonseca](https://github.com/arthrfonsecaa), [Mateus Santos](https://github.com/14luke08)|
+
+</center>

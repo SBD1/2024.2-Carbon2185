@@ -154,3 +154,13 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - (1,1) Uma Facção domina um único Distrito
     - (1,1) Um único Distrito é dominado por uma única Facção
 
+
+<center>
+
+## Histórico de Versão
+| Versão | Data | Descrição | Autor(es) |
+| :-: | :-: | :-: | :-: | 
+| `1.0`  | 20/11/2024 | Adição MER | [Arthur Fonseca](https://github.com/arthrfonsecaa), [Daniel Nunes](https://github.com/DanNunes777), [Lucas Caldas](https://github.com/lucascaldasb), [Mateus Santos](https://github.com/14luke08), [Rudson Martins](https://github.com/RudsonMartin) |
+| `2.0`  | 08/01/2025 | Versão 2 MER | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
+
+</center>

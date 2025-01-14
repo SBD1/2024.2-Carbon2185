@@ -136,3 +136,11 @@ JOIN
     PC ON PC.id_celula = CM.id_celula;
 
 ```
+<center>
+
+## Histórico de Versão
+| Versão | Data | Descrição | Autor(es) |
+| :-: | :-: | :-: | :-: | 
+| `1.0`  | 07/01/2025 | Primeira versão do DQL | [Rudson Martins ](https://github.com/RudsonMartin) |
+
+</center>

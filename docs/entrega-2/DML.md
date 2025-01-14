@@ -13,7 +13,6 @@ BEGIN TRANSACTION;
 INSERT INTO Personagem (id_personagem, tipo) VALUES 
 (1, 'PC'),
 (2, 'NPC'),
-(3, 'NPC');
 
 INSERT INTO PC (id_personagem, id_celula, id_faccao, id_classe, id_inventario, descricao, dano, hp, hp_atual, nome, level, energia, xp) VALUES
 (1, 10, 20, 30, 40, 'Descrição 1', 50, 60, 0, 'Personagem 1', 80, 90, 100),
@@ -81,8 +80,8 @@ INSERT INTO Classes (id_classe, tipo, enegia_bonus, hp_bonus, descricao, dano_bo
 (1, 'Daimyo', 5, 5, 'Descrição da Classe Daimyo', 5),
 
 INSERT INTO Faccao (id_faccao, nome, descricao, ideologia) VALUES 
-(1, 'Yazuka', 'Descrição da Yazuka', 'Ideologia Yazuka'),
-(2, 'Triad', 'Descrição da Triad', 'Ideologia Triad');
+(1, 'Yazuka', 'A Yakuza é um dos pilares do submundo criminal de Carbon2185, misturando tradições ancestrais com a realidade distópica do cyberpunk', 'A Yazuka segue uma ideologia baseada em honra, lealdade e dever, mantendo códigos rígidos que governam suas operações, mesmo em um mundo caótico e decadente. Embora envolvida em atividades criminosas, como tráfico de dados, contrabando e segurança privada, a Yakuza frequentemente se apresenta como protetora de comunidades locais, oferecendo "justiça" e proteção onde governos e corporações falham. Seus membros valorizam a hierarquia e o respeito, e um juramento de vida é feito ao clã que servem. Para a Yakuza, a reputação é tudo, e qualquer traição é tratada com severidade mortal.'),
+(2, 'Triad', 'Com raízes em tradições chinesas e estrutura hierárquica rígida, a Triad equilibra cultura ancestral e tecnologia futurista, usando cyberware e IA para dominar territórios e mercados ilegais, como tráfico humano e comércio tecnológico.' 'Triad em Carbon2185 é uma organização criminosa poderosa e pragmática, movida por lealdade ao clã, expansão implacável e lucro acima de tudo.  Diferente de outras facções, a Triad vê o mundo como um jogo estratégico, punindo traições com brutalidade exemplar e consolidando poder tanto nas sombras quanto nos altos escalões da sociedade.');
 
 INSERT INTO Habilidade (id_habilidade, nome, tipo_habilidade, descricao, custo_de_uso, dano, velocidade_movimento) VALUES 
 (1, 'Ataque Rápido', 'Ofensiva', 'Ataque rápido e preciso', 5, 10, 2),
@@ -211,3 +210,12 @@ DELETE FROM Missao WHERE id_missao = 1;
 COMMIT;
 
 ```
+
+<center>
+
+## Histórico de Versão
+| Versão | Data | Descrição | Autor(es) |
+| :-: | :-: | :-: | :-: | 
+| `1.0`  | 13/01/2025 | Primeira versão do DML | [Arthur Fonseca](https://github.com/arthurfonsecaa), [Daniel Nunes](https://github.com/DanNunes777) |
+
+</center>
