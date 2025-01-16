@@ -17,7 +17,7 @@ FROM
 
 -- 2. Listar PCs (personagens jogáveis) com atributos e informações detalhadas
 SELECT 
-    PC.id_personagem, 
+    PC.id_personagem,
     PC.nome, 
     PC.descricao, 
     PC.energia, 
