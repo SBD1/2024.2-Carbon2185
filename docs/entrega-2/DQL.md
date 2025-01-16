@@ -75,9 +75,11 @@ SELECT
 FROM 
     Missao AS M
 JOIN 
-    Interacao AS I ON I.personagem_destino = M.id_missao
+    Interacao AS I ON M.id_missao = I.personagem_destino 
 JOIN 
-    Personagem AS P ON I.personagem_origem = P.id_personagem;
+    Personagem AS P ON I.personagem_origem = P.id_personagem 
+WHERE 
+    P.tipo = 'npc'; 
 
 -- 7. Consultar o inventário de um personagem específico
 SELECT 
