@@ -30,6 +30,15 @@
   - [Modelo Relacional](./docs/entrega-1/ModeloRelacional.md)
   - [Dicionário de Dados](./docs/entrega-1/DD.md)
 
+- Entrega do módulo 2
+
+  - [Apresentação](./docs/entrega-2/Apresentação.md)
+  - [Álgebra Relacional](./docs/entrega-2/AlgebraRelacional.md)
+  - [Normalização](./docs/entrega-2/Normalização.md)
+  - [DDL](./docs/entrega-2/DDL.md)
+  - [DML](./docs/entrega-2/DML.md)
+  - [DQL](./docs/entrega-2/DQL.md)
+
 <div align="left">
   <h2> Colaboradores </h2>
 </div> 
