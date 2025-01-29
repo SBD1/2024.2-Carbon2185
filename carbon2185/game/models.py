@@ -1,4 +1,5 @@
 import random
+from gameplay import loja  # Importando loja no topo para evitar problemas de importação.
 
 def create_pc(conn, name, description, energia, dano, hp):
     cursor = conn.cursor()
@@ -23,19 +24,30 @@ def create_pc(conn, name, description, energia, dano, hp):
     conn.commit()
     cursor.close()
 
-
-def interact_with_npc(conn, npc_id):
+def interact_with_npc(conn, npc_id, id_personagem):
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT tipo FROM NPC WHERE id_personagem = %s", (npc_id,)
+        "SELECT tipo, id_personagem FROM NPC WHERE id_personagem = %s", (npc_id,)
     )
-    npc_type = cursor.fetchone()
+    npc_info = cursor.fetchone()
 
-    if npc_type:
-        if npc_type[0] == 'comerciante':
-            print("Este NPC é um comerciante. Você pode comprar itens aqui.")
-        elif npc_type[0] == 'inimigo':
-            print("Este NPC é um inimigo! Prepare-se para lutar.")
+    if not npc_info:
+        print("NPC não encontrado.")
+        cursor.close()
+        return
+
+    npc_type, id_comerciante = npc_info
+    
+    if npc_type == 'comerciante':
+        print("Este NPC é um comerciante. Você pode comprar itens aqui.")
+        cursor.execute("SELECT id_celula FROM Comerciante WHERE id_personagem = %s", (npc_id,))
+        id_celula = cursor.fetchone()
+        if id_celula:
+            loja(conn, id_comerciante, id_personagem, id_celula[0])
+        else:
+            print("Erro ao localizar a célula do comerciante.")
+    elif npc_type == 'inimigo':
+        print("Este NPC é um inimigo! Prepare-se para lutar.")
     else:
         print("Nenhuma interação disponível com este NPC.")
 
