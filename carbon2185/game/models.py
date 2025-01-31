@@ -1,7 +1,7 @@
 import random
-from gameplay import loja  # Importando loja no topo para evitar problemas de importação.
+import psycopg2
 
-def create_pc(conn, name, description, energia, dano, hp):
+def create_pc(conn, name, description):
     cursor = conn.cursor()
     
     cursor.execute(
@@ -16,27 +16,31 @@ def create_pc(conn, name, description, energia, dano, hp):
 
     cursor.execute(
         """
-        INSERT INTO PC (id_personagem, energia, dano, hp, hp_atual, nivel, xp, nome, descricao)
-        VALUES (%s, %s, %s, %s, %s, 1, 0, %s, %s)
+        INSERT INTO PC (id_personagem, energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao)
+        VALUES (%s, 10, 100, 20, 100, 100, 1, 0, %s, %s)
         """,
-        (id_personagem, energia, dano, hp, hp, name, description)
+        (id_personagem, name, description)
     )
     conn.commit()
     cursor.close()
 
+
 def interact_with_npc(conn, npc_id, id_personagem):
+
+    from game.gameplay import loja 
+
     cursor = conn.cursor()
     cursor.execute(
         "SELECT tipo, id_personagem FROM NPC WHERE id_personagem = %s", (npc_id,)
     )
-    npc_info = cursor.fetchone()
 
+    npc_info = cursor.fetchone()
     if not npc_info:
         print("NPC não encontrado.")
         cursor.close()
         return
-
-    npc_type, id_comerciante = npc_info
+    
+        npc_type, id_comerciante = npc_info
     
     if npc_type == 'comerciante':
         print("Este NPC é um comerciante. Você pode comprar itens aqui.")
@@ -48,8 +52,6 @@ def interact_with_npc(conn, npc_id, id_personagem):
             print("Erro ao localizar a célula do comerciante.")
     elif npc_type == 'inimigo':
         print("Este NPC é um inimigo! Prepare-se para lutar.")
-    else:
-        print("Nenhuma interação disponível com este NPC.")
 
     cursor.close()
 
@@ -107,3 +109,15 @@ def create_npc(conn, npc_type, id_celula=None):
     except Exception as e:
         conn.rollback()
         print(f"Erro ao criar NPC: {e}")
+
+def get_all_pcs(conn):
+    """
+    Retorna uma lista de todos os personagens do banco de dados no PostgreSQL.
+    """
+    cursor = conn.cursor()
+    cursor.execute("SELECT id_personagem, nome, descricao FROM PC")  # Ajuste os campos conforme necessário
+    PC = cursor.fetchall()  # Obtém todos os personagens
+
+    # Convertendo a lista de tuplas para uma lista de dicionários
+    return [{"id": row[0], "nome": row[1]} for row in PC]
+ 

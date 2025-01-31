@@ -6,7 +6,7 @@ def create_connection():
         dbname="carbon2185",
         user="carbon_user",
         password="carbon_password",
-        host="0.0.0.0",
+        host="localhost",
         port="5432"
     )
     return conn

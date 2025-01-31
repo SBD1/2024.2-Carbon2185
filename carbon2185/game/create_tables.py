@@ -24,10 +24,18 @@ CREATE TABLE IF NOT EXISTS Classe (
 CREATE TABLE IF NOT EXISTS Faccao (
     id_faccao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('yakuza', 'triad')),
-    nome VARCHAR(100) NOT NULL,
+    nome VARCHAR(100) NOT NULL UNIQUE,
     descricao VARCHAR(100) NOT NULL,
     ideologia VARCHAR(100) NOT NULL
 );
+
+INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
+SELECT uuid_generate_v4(), 'yakuza', 'Yakuza', 'máfia japonesa, conhecida por sua honra e disciplina.', 'Lealdade acima de tudo.'
+WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'yakuza');
+
+INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
+SELECT uuid_generate_v4(), 'triad', 'Triad', 'organização secreta chinesa, mestre do submundo.', 'O poder nasce da sombra.'
+WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'triad');
 
 CREATE TABLE IF NOT EXISTS Distrito (
     id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -57,6 +65,7 @@ CREATE TABLE IF NOT EXISTS PC (
     id_classe UUID REFERENCES Classe(id_classe),
     id_inventario UUID REFERENCES Inventario(id_inventario),
     energia INT NOT NULL,
+    wonglongs INT NOT NULL, 
     dano INT NOT NULL,
     hp INT NOT NULL,
     hp_atual INT NOT NULL,
@@ -171,12 +180,13 @@ CREATE TABLE IF NOT EXISTS Loja (
     id_comerciante UUID REFERENCES Comerciante(id_comerciante),
     id_instancia_item UUID REFERENCES InstanciaItem(id_instancia_item)
 );
-"""
 
+"""
 
 def create_tables(conn):
     cursor = conn.cursor()
     cursor.execute(SCHEMA_SQL)
+
 
     conn.commit()
     cursor.close()
