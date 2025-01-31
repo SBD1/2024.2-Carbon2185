@@ -171,6 +171,12 @@ CREATE TABLE IF NOT EXISTS Loja (
     id_comerciante UUID REFERENCES Comerciante(id_comerciante),
     id_instancia_item UUID REFERENCES InstanciaItem(id_instancia_item)
 );
+
+CREATE TABLE IF NOT EXISTS ProgressoMissao (
+    id_missao UUID PRIMARY KEY REFERENCES Missao(id_missao),
+    id_personagem UUID PRIMARY KEY REFERENCES PC(id_personagem),
+    progresso INT NOT NULL
+);
 """
 
 

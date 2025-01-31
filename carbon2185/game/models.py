@@ -107,3 +107,27 @@ def create_npc(conn, npc_type, id_celula=None):
     except Exception as e:
         conn.rollback()
         print(f"Erro ao criar NPC: {e}")
+        
+def progredir_missao(conn, id_personagem, id_missao):
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        """
+        SELECT progresso 
+        FROM ProgressoMissao 
+        WHERE id_personagem = %s AND id_missao = %s;
+        """,
+        (id_personagem, id_missao)
+    )
+    progresso = cursor.fetchone()[0]
+
+    cursor.execute(
+        """
+        UPDATE ProgressoMissao 
+        SET progresso = %s 
+        WHERE id_personagem = %s AND id_missao = %s;
+        """,
+        (progresso+1, id_personagem, id_missao)
+    )
+    conn.commit()
+    cursor.close()
