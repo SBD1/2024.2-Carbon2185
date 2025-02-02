@@ -24,10 +24,18 @@ CREATE TABLE IF NOT EXISTS Classe (
 CREATE TABLE IF NOT EXISTS Faccao (
     id_faccao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('yakuza', 'triad')),
-    nome VARCHAR(100) NOT NULL,
+    nome VARCHAR(100) NOT NULL UNIQUE,
     descricao VARCHAR(100) NOT NULL,
     ideologia VARCHAR(100) NOT NULL
 );
+
+INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
+SELECT uuid_generate_v4(), 'yakuza', 'Yakuza', 'máfia japonesa, conhecida por sua honra e disciplina.', 'Lealdade acima de tudo.'
+WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'yakuza');
+
+INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
+SELECT uuid_generate_v4(), 'triad', 'Triad', 'organização secreta chinesa, mestre do submundo.', 'O poder nasce da sombra.'
+WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'triad');
 
 CREATE TABLE IF NOT EXISTS Distrito (
     id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -57,6 +65,7 @@ CREATE TABLE IF NOT EXISTS PC (
     id_classe UUID REFERENCES Classe(id_classe),
     id_inventario UUID REFERENCES Inventario(id_inventario),
     energia INT NOT NULL,
+    wonglongs INT NOT NULL, 
     dano INT NOT NULL,
     hp INT NOT NULL,
     hp_atual INT NOT NULL,
@@ -98,6 +107,18 @@ CREATE TABLE IF NOT EXISTS Missao (
     dificuldade INT NOT NULL,
     objetivo VARCHAR(100) NOT NULL
 );
+
+INSERT IGNORE INTO Missao (id_missao, nome, descricao, dificuldade, objetivo) VALUES
+    (uuid_generate_v4(), 'Faxina na Periferia', 'A gangue Steel Fangs está aterrorizando os becos do distrito industrial.', 2, 'Eliminar 5 Steel Fangs'),
+    (uuid_generate_v4(), 'Caçada aos Hackers', 'O grupo cyberterrorista Black Ice está hackeando servidores corporativos.', 3, 'Eliminar 5 Hackers Black Ice'),
+    (uuid_generate_v4(), 'Limpeza na Zona Vermelha', 'A milícia Red Claws impõe sua lei com brutalidade.', 2, 'Eliminar 5 Patrulheiros Red Claws'),
+    (uuid_generate_v4(), 'Roubo Mal-Sucedido', 'Um grupo de Neon Scavs assaltou um carregamento de implantes cibernéticos.', 3, 'Eliminar 5 Neon Scavs'),
+    (uuid_generate_v4(), 'Predadores Noturnos', 'Um culto de assassinos conhecidos como Children of the Void está atacando civis.', 4, 'Eliminar 5 Children of the Void'),
+    (uuid_generate_v4(), 'Os Oligarcas Não Perdoam', 'O sindicato de assassinos Ebony Hand falhou em um contrato e precisa ser eliminado.', 3, 'Eliminar 5 Assassinos Ebony Hand'),
+    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 5, 'Derrotar Zero.exe'),
+    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant'),
+    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion'),
+    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper');
 
 CREATE TABLE IF NOT EXISTS Interacao (
     id_interacao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -177,12 +198,27 @@ CREATE TABLE IF NOT EXISTS ProgressoMissao (
     id_personagem UUID PRIMARY KEY REFERENCES PC(id_personagem),
     progresso INT NOT NULL
 );
-"""
 
+CREATE OR REPLACE FUNCTION criar_progresso_missao()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO ProgressoMissao (id_missao, id_personagem, progresso)
+    SELECT m.id_missao, NEW.id_personagem, 0
+    FROM Missao m;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_criar_progresso_missao
+AFTER INSERT ON PC
+FOR EACH ROW
+EXECUTE FUNCTION criar_progresso_missao();
+"""
 
 def create_tables(conn):
     cursor = conn.cursor()
     cursor.execute(SCHEMA_SQL)
+
 
     conn.commit()
     cursor.close()
