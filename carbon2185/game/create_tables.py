@@ -29,14 +29,6 @@ CREATE TABLE IF NOT EXISTS Faccao (
     ideologia VARCHAR(100) NOT NULL
 );
 
-INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
-SELECT uuid_generate_v4(), 'yakuza', 'Yakuza', 'máfia japonesa, conhecida por sua honra e disciplina.', 'Lealdade acima de tudo.'
-WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'yakuza');
-
-INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
-SELECT uuid_generate_v4(), 'triad', 'Triad', 'organização secreta chinesa, mestre do submundo.', 'O poder nasce da sombra.'
-WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'triad');
-
 CREATE TABLE IF NOT EXISTS Distrito (
     id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR(100) NOT NULL,
@@ -186,7 +178,5 @@ CREATE TABLE IF NOT EXISTS Loja (
 def create_tables(conn):
     cursor = conn.cursor()
     cursor.execute(SCHEMA_SQL)
-
-
     conn.commit()
     cursor.close()

@@ -37,8 +37,14 @@ def start_game(conn):
             create_character(conn)
         elif choice == "3":
             print("\n")
-            display_message(f"{cores['magenta']}Sobre o Carbon2185{cores['reset']}")
+            print(f"{cores['magenta']}Sobre o Carbon2185{cores['reset']}")
+            print("\n")
             print(f"Carbon 2185 é um RPG cyberpunk focado em contar histórias em um futuro distópico sombrio.")
+            print("\n")
+            print(f"{cores['magenta']}Como jogar?{cores['reset']}")
+            print("\n")
+            print(f"A primeira coisa que você, jogador, deve fazer ao iniciar o Carbon 2185 é criar seu personagem, escolhendo um nome e dando uma breve descrição sobre ele. Em seguida, escolha a facção na qual deseja representar e por fim, decida-se sobre sua classe, a qual impactará diretamente a sua gameplay.")
+            print("\n")
         elif choice == "4":
             print("\n")
             display_message(f"{cores['magenta']}Saindo do jogo. Até a próxima!{cores['reset']}")
@@ -66,7 +72,6 @@ def select_character(conn):
             escolha = int(input("Escolha o número do personagem: ")) - 1
             if 0 <= escolha < len(personagens):
                 personagem_escolhido = personagens[escolha]
-                display_message(f"Você escolheu {cores['amarelo']}{personagem_escolhido['nome']}{cores['reset']}!")
                 playing_with_character(conn, personagem_escolhido)  # Chama o menu do jogo com o personagem escolhido
                 break
             else:
@@ -78,9 +83,10 @@ def select_character(conn):
 def create_character(conn):
     cursor = conn.cursor()
 
+    display_message(f"{cores['magenta']}\nCriação de personagem:{cores['reset']}\n")
     # Informações básicas do personagem
-    nome_personagem = input("\nDigite o nome do seu personagem: ")
-    descricao_personagem = input("Digite uma breve descrição do seu personagem: ")
+    nome_personagem = input("Digite o nome do seu personagem: ")
+    descricao_personagem = input("\nDigite uma breve descrição do seu personagem: ")
 
     # Escolha da facção
     print("\nEscolha sua facção:\n")
@@ -169,7 +175,7 @@ def playing_with_character(conn, pc):
     
     #Menu principal do jogo quando um personagem é escolhido.
 
-    display_message(f"Bem-vindo ao jogo, {cores['amarelo']}{pc['nome']}{cores['reset']}!")
+    display_message(f" {cores['magenta']}Bem-vindo ao jogo,{cores['reset']} {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['magenta']}!{cores['reset']}")
     while True:
         print("\nO que deseja fazer?\n")
         print(f"{cores['amarelo']}1.{cores['reset']} Informações do personagem")
@@ -350,4 +356,3 @@ def loja(conn, id_comerciante, id_personagem, id_celula):
                     display_message("Opção inválida. Tente novamente.")
     except Exception as e:
         display_message(f"Erro ao acessar a loja: {e}")
-
