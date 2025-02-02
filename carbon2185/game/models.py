@@ -145,3 +145,32 @@ def get_all_pcs(conn):
     # Convertendo a lista de tuplas para uma lista de dicionários
     return [{"id": row[0], "nome": row[1]} for row in PC]
  
+def listar_missoes_progresso(conn, id_personagem):
+    try:
+        cursor = conn.cursor()
+        cursor.callproc('listar_missoes_progresso', (id_personagem,))
+        resultados = cursor.fetchall()
+
+        if resultados:
+            for row in resultados:
+                nome, descricao, dificuldade, objetivo, progresso = row
+                print(f"Missão: {nome}")
+                print(f"Descrição: {descricao}")
+                print(f"Dificuldade: {dificuldade}")
+                print(f"Objetivo: {objetivo}")
+                print(f"Progresso: {progresso}")
+
+        cursor.close()
+
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
+
+def progride_missao(conn, id_personagem, id_missao):
+    try:
+        cursor = conn.cursor()
+        cursor.callproc('progredir_missao', (id_personagem, id_missao))
+        conn.commit()
+        cursor.close()
+
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")

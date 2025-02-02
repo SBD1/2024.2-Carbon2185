@@ -236,6 +236,23 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION listar_missoes_progresso(id_personagem UUID)
+RETURNS TABLE (
+    nome VARCHAR(100),
+    descricao VARCHAR(100),
+    dificuldade INT,
+    objetivo VARCHAR(100),
+    progresso INT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT m.nome, m.descricao, m.dificuldade, m.objetivo, p.progresso
+    FROM Missao m
+    JOIN ProgressoMissao p ON m.id_missao = p.id_missao
+    WHERE p.id_personagem = id_personagem;
+END;
+$$ LANGUAGE plpgsql;
+
 """
 
 def create_tables(conn):

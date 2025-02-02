@@ -188,6 +188,7 @@ def playing_with_character(conn, pc):
             display_message("Exploração deve partir daqui")
         elif escolha == "4":
             display_message("Menu das missões devem partir daqui")
+            # listar_missoes_progresso(conn, id_personagem)
         elif escolha == "5":  # Agora a opção correta para sair do menu
             display_message(f"Voltando ao menu principal...")
             break  # Agora sim, sair do menu do personagem
