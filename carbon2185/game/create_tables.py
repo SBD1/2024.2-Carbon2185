@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS Missao (
     objetivo VARCHAR(100) NOT NULL
 );
 
-INSERT IGNORE INTO Missao (id_missao, nome, descricao, dificuldade, objetivo) VALUES
+INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo) VALUES
     (uuid_generate_v4(), 'Faxina na Periferia', 'A gangue Steel Fangs está aterrorizando os becos do distrito industrial.', 2, 'Eliminar 5 Steel Fangs'),
     (uuid_generate_v4(), 'Caçada aos Hackers', 'O grupo cyberterrorista Black Ice está hackeando servidores corporativos.', 3, 'Eliminar 5 Hackers Black Ice'),
     (uuid_generate_v4(), 'Limpeza na Zona Vermelha', 'A milícia Red Claws impõe sua lei com brutalidade.', 2, 'Eliminar 5 Patrulheiros Red Claws'),
@@ -194,9 +194,10 @@ CREATE TABLE IF NOT EXISTS Loja (
 );
 
 CREATE TABLE IF NOT EXISTS ProgressoMissao (
-    id_missao UUID PRIMARY KEY REFERENCES Missao(id_missao),
-    id_personagem UUID PRIMARY KEY REFERENCES PC(id_personagem),
-    progresso INT NOT NULL
+    id_missao UUID REFERENCES Missao(id_missao),
+    id_personagem UUID REFERENCES PC(id_personagem),
+    progresso INT NOT NULL,
+    PRIMARY KEY (id_missao, id_personagem)
 );
 
 CREATE OR REPLACE FUNCTION criar_progresso_missao()
@@ -209,10 +210,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_criar_progresso_missao
-AFTER INSERT ON PC
-FOR EACH ROW
-EXECUTE FUNCTION criar_progresso_missao();
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_criar_progresso_missao') THEN
+        CREATE TRIGGER trigger_criar_progresso_missao
+        AFTER INSERT ON PC
+        FOR EACH ROW
+        EXECUTE FUNCTION criar_progresso_missao();
+    END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION progredir_missao(id_personagem UUID, id_missao UUID)
+RETURNS void AS $$
+DECLARE
+    progress INT;
+BEGIN
+    SELECT progresso 
+    INTO progress
+    FROM ProgressoMissao 
+    WHERE id_personagem = id_personagem AND id_missao = id_missao;
+
+    UPDATE ProgressoMissao 
+    SET progresso = progress + 1
+    WHERE id_personagem = id_personagem AND id_missao = id_missao;
+END;
+$$ LANGUAGE plpgsql;
 
 """
 
