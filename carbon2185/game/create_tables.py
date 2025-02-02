@@ -213,6 +213,7 @@ CREATE TRIGGER trigger_criar_progresso_missao
 AFTER INSERT ON PC
 FOR EACH ROW
 EXECUTE FUNCTION criar_progresso_missao();
+
 """
 
 def create_tables(conn):

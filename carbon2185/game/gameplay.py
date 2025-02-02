@@ -1,108 +1,199 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message
-from gameplay import inventario
+from game.models import get_all_pcs 
+from game.database import create_connection
 
-
+# Códigos de cores ANSI
+cores = {
+    'vermelho': '\033[31m',
+    'verde': '\033[32m',
+    'amarelo': '\033[33m',
+    'azul': '\033[34m',
+    'magenta': '\033[35m',
+    'ciano': '\033[36m',
+    'branco': '\033[37m',
+    'reset': '\033[0m'  # Reset para a cor padrão
+}
 
 def start_game(conn):
-    """
+    """ 
     Inicia o jogo, apresentando as opções e gerenciando o fluxo principal.
     """
-    display_message("Bem-vindo ao Carbon2185!")
+    display_message(f"{cores['magenta']}Bem-vindo ao Carbon2185!{cores['reset']}")
     while True:
-        print("\nEscolha uma opção:")
-        print("1. Criar Personagem")
-        print("2. Ver Missões")
-        print("3. Interagir com NPC")
-        print("4. Inventário")
-        print("5. Sair")
+        print("\nEscolha uma opção:\n")
+        print(f"{cores['amarelo']}1.{cores['reset']} Selecionar Personagem")
+        print(f"{cores['amarelo']}2.{cores['reset']} Criar Personagem")
+        print(f"{cores['amarelo']}3.{cores['reset']} Sobre o jogo")
+        print(f"{cores['amarelo']}4.{cores['reset']} Sair\n")
 
-        choice = input("Escolha: ")
+        choice = input("Digite o número da sua escolha: ")
         if choice == "1":
-            create_character(conn)
+            personagem = select_character(conn)
+            if personagem:  # Se um personagem for escolhido, inicia o jogo e sai do menu principal
+                playing_with_character(conn, personagem)
+                break  # Sai do loop principal
         elif choice == "2":
-            view_missions(conn)
+            create_character(conn)
         elif choice == "3":
-            interact_with_npc(conn)
+            print("\n")
+            display_message(f"{cores['magenta']}Sobre o Carbon2185{cores['reset']}")
+            print(f"Carbon 2185 é um RPG cyberpunk focado em contar histórias em um futuro distópico sombrio.")
         elif choice == "4":
-            id_personagem = input("Digite o ID do seu personagem: ")
-            inventario(conn, id_personagem)
-        elif choice == "5":
-            display_message("Saindo do jogo. Até a próxima!")
+            print("\n")
+            display_message(f"{cores['magenta']}Saindo do jogo. Até a próxima!{cores['reset']}")
             break
         else:
-            display_message("Opção inválida. Tente novamente.")
+            display_message(f"{cores['vermelho']}Opção inválida. Tente novamente.{cores['reset']}")
+
+
+def select_character(conn):
+    """
+    Lista os personagens existentes no banco de dados e permite ao jogador selecionar um.
+    """
+    personagens = get_all_pcs(conn)  # Obtém todos os personagens do banco de dados
+
+    if not personagens:
+       print(f"{cores['vermelho']}Nenhum personagem encontrado. Crie um primeiro!{cores['reset']}")
+       return
+
+    print("\nSelecione um personagem para jogar:\n")
+    for i, personagem in enumerate(personagens, start=1):
+        print(f"{cores['amarelo']}{i}.{cores['reset']} {personagem['nome']}\n")
+
+    while True:
+        try:
+            escolha = int(input("Escolha o número do personagem: ")) - 1
+            if 0 <= escolha < len(personagens):
+                personagem_escolhido = personagens[escolha]
+                display_message(f"Você escolheu {cores['amarelo']}{personagem_escolhido['nome']}{cores['reset']}!")
+                playing_with_character(conn, personagem_escolhido)  # Chama o menu do jogo com o personagem escolhido
+                break
+            else:
+                print(f"{cores['vermelho']}\nEscolha inválida.\n{cores['reset']}")
+        except ValueError:
+            print(f"{cores['vermelho']}\nDigite um número válido.\n{cores['reset']}")
+
 
 def create_character(conn):
-    """
-    Gerencia a criação de um personagem.
-    """
-    print("\nCriação de Personagem:")
-    nome = input("Digite o nome do personagem: ")
-    descricao = input("Descreva seu personagem: ")
-    energia = get_valid_input("Energia inicial: ", int)
-    dano = get_valid_input("Dano inicial: ", int)
-    hp = get_valid_input("HP inicial: ", int)
+    cursor = conn.cursor()
 
-    # Criação do personagem no banco de dados
-    create_pc(conn, nome, descricao, energia, dano, hp)
-    display_message(f"Personagem {nome} criado com sucesso!")
+    # Informações básicas do personagem
+    nome_personagem = input("\nDigite o nome do seu personagem: ")
+    descricao_personagem = input("Digite uma breve descrição do seu personagem: ")
 
-def view_missions(conn):
-    """
-    Exibe as missões disponíveis no jogo.
-    """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT id_missao, nome, descricao FROM Missao")
-            missions = cursor.fetchall()
+    # Escolha da facção
+    print("\nEscolha sua facção:\n")
+    cursor.execute("SELECT id_faccao, nome, descricao, ideologia FROM Faccao")
+    faccoes = cursor.fetchall()
 
-            print("\nMissões Disponíveis:")
-            for mission in missions:
-                print(f"- {mission[1]}: {mission[2]} (ID: {mission[0]})")
-    except Exception as e:
-        display_message(f"Erro ao exibir missões: {e}")
-
-def interact_with_npc(conn):
-    """
-    Gerencia a interação com um NPC.
-    """
-    print("\nInteração com NPC:")
-    npc_id = get_valid_input("Digite o ID do NPC: ", int)
-
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT nome, descricao FROM NPC WHERE id_personagem = %s", (npc_id,))
-            npc = cursor.fetchone()
-
-            if npc:
-                display_message(f"Você encontrou {npc[0]}: {npc[1]}")
-                npc_interaction(conn, npc_id)
-            else:
-                display_message("NPC não encontrado.")
-    except Exception as e:
-        display_message(f"Erro ao interagir com o NPC: {e}")
-
-def npc_interaction(conn, npc_id):
-    """
-    Lida com a interação real com o NPC.
-    """
-    print("\nEscolha uma opção:")
-    print("1. Falar com o NPC")
-    print("2. Comprar itens")
-    print("3. Voltar")
-    
-    escolha = input("Escolha: ")
-    if escolha == "1":
-        # Implementar a lógica de conversa com o NPC
-        display_message("Você conversou com o NPC.")
-    elif escolha == "2":
-        # Lógica de compra de itens
-        pass
-    elif escolha == "3":
+    if not faccoes:
+        print(f"{cores['vermelho']}Nenhuma facção disponível no banco de dados!{cores['reset']}")
         return
-    else:
-        display_message("Opção inválida.")
+
+    for idx, faccao in enumerate(faccoes, start=1):
+        id_faccao, nome, descricao, ideologia = faccao
+        print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['vermelho']}[{nome}]{cores['reset']} É a {descricao} Ideologia: {cores['magenta']}{ideologia}{cores['reset']}\n")
+
+    while True:
+        try:
+            escolha_faccao = int(input("Digite o número da facção escolhida: "))
+            if 1 <= escolha_faccao <= len(faccoes):
+                id_faccao_escolhida = faccoes[escolha_faccao - 1][0]
+                break
+            else:
+                print(f"{cores['vermelho']}Opção inválida! Escolha um número dentro da lista.{cores['reset']}")
+        except ValueError:
+            print(f"{cores['vermelho']}Entrada inválida! Digite um número válido.{cores['reset']}")
+
+    # Escolha da classe
+    print("\nEscolha sua classe:\n")
+    cursor.execute("SELECT id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus FROM Classe")
+    classes = cursor.fetchall()
+
+    if not classes:
+        print(f"{cores['vermelho']}Nenhuma classe encontrada no banco de dados!{cores['reset']}")
+        return
+
+    for idx, (id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus) in enumerate(classes, start=1):
+        print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['magenta']}[{nome}]{cores['reset']} - {descricao}")
+        print(f"     (HP: {cores['verde']}+{hp_bonus:<1}{cores['reset']}, "f"Dano: {cores['vermelho']}+{dano_bonus:<1}{cores['reset']}, "f"Energia: {cores['amarelo']}+{energia_bonus:<1}{cores['reset']})\n")
+
+
+    while True:
+        try:
+            escolha_classe = int(input("Digite o número da classe escolhida: "))
+            if 1 <= escolha_classe <= len(classes):
+                id_classe_escolhida, _, _, hp_bonus, dano_bonus, energia_bonus = classes[escolha_classe - 1]
+                break
+            else:
+                print(f"{cores['vermelho']}Opção inválida! Escolha um número dentro da lista.{cores['reset']}")
+        except ValueError:
+            print(f"{cores['vermelho']}Entrada inválida! Digite um número válido.{cores['reset']}")
+
+    # Definição dos atributos básicos
+    hp_base = 100
+    dano_base = 20
+    energia_base = 20
+    nivel = 1
+    xp = 0
+    wonglongs = 100
+
+    # Aplicação dos bônus da classe escolhida
+    hp_final = hp_base + hp_bonus
+    dano_final = dano_base + dano_bonus
+    energia_final = energia_base + energia_bonus
+
+    # Criar entrada na tabela Personagem
+    cursor.execute(""" 
+        INSERT INTO Personagem (id_personagem, tipo)
+        VALUES (uuid_generate_v4(), 'pc') RETURNING id_personagem;
+    """)
+    id_personagem = cursor.fetchone()[0]
+
+    # Criar entrada na tabela PC com os atributos já somados
+    cursor.execute("""
+        INSERT INTO PC ( id_personagem, id_celula, id_faccao, id_classe, id_inventario, energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao) 
+        VALUES (%s, NULL, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+    """, (
+        id_personagem, id_faccao_escolhida, id_classe_escolhida, energia_final, wonglongs, dano_final, hp_final, hp_final, nivel, xp, nome_personagem, descricao_personagem
+    ))
+
+    conn.commit()
+    cursor.close()
+
+    print(f"\nPersonagem {cores['amarelo']}'{nome_personagem}'{cores['reset']} criado com sucesso!")
+
+
+def playing_with_character(conn, pc):
+    
+    #Menu principal do jogo quando um personagem é escolhido.
+
+    display_message(f"Bem-vindo ao jogo, {cores['amarelo']}{pc['nome']}{cores['reset']}!")
+    while True:
+        print("\nO que deseja fazer?\n")
+        print(f"{cores['amarelo']}1.{cores['reset']} Informações do personagem")
+        print(f"{cores['amarelo']}2.{cores['reset']} Inventário")
+        print(f"{cores['amarelo']}3.{cores['reset']} Explorar")
+        print(f"{cores['amarelo']}4.{cores['reset']} Missões disponíveis")
+        print(f"{cores['amarelo']}5.{cores['reset']} Voltar\n")
+        
+        escolha = input("Escolha uma opção: ")
+
+        if escolha == "1":
+            display_message(f"Aqui deve se listar as informações gerais do personagem como nome, descrição, classe, facção, wonglongs, dano, energia, hp total, nivel, xp ")
+        elif escolha == "2":
+            display_message("Mecânica do inventário precisar se implentada aqui")
+        elif escolha == "3":
+            display_message("Exploração deve partir daqui")
+        elif escolha == "4":
+            display_message("Menu das missões devem partir daqui")
+        elif escolha == "5":  # Agora a opção correta para sair do menu
+            display_message(f"Voltando ao menu principal...")
+            break  # Agora sim, sair do menu do personagem
+        else:
+            display_message("Opção inválida. Tente novamente.") 
+
 
 def inventario(conn, id_personagem):
     """
