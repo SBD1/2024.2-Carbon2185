@@ -19,7 +19,7 @@ def start_game(conn):
     """ 
     Inicia o jogo, apresentando as opções e gerenciando o fluxo principal.
     """
-    display_message(f"\n{cores['magenta']}Bem-vindo ao Carbon2185!{cores['reset']}")
+    display_message(f"{cores['magenta']}Bem-vindo ao Carbon2185!{cores['reset']}")
     while True:
         print(f"\n{cores['magenta']}Escolha uma opção:{cores['reset']}\n")
         print(f"{cores['amarelo']}1.{cores['reset']} Selecionar Personagem")
@@ -76,6 +76,8 @@ def start_game(conn):
             print("\n")
             print(f"{cores['magenta']}Os Distritos{cores['reset']}")
             print("\n")
+            print("Todos os distritos possuem nove regiões e cada uma conta uma história diferente. Descubra por si mesmo ao explorar o mundo de Carbon2185")
+            print("\n")
             display_message(f"{cores['magenta']}Distrito A - Ruínas do Noroeste{cores['reset']}")
             print("\n")
             print("Outrora um centro industrial próspero, o Distrito A agora é um cemitério de fábricas abandonadas e arranha-céus em colapso. A poluição tóxica impregna o ar, e os poucos sobreviventes vivem nas sombras, evitando os drones patrulheiros do governo. A resistência subterrânea usa os túneis antigos como esconderijo.")
@@ -92,7 +94,6 @@ def start_game(conn):
             print("\n")
             print("Um experimento fracassado de terraformação deixou o solo do Distrito C envenenado. Seus habitantes, chamados de “Os Condenados”, são forçados a trabalhar nas minas subterrâneas em troca de doses de antídoto para a contaminação. O céu sobre o distrito brilha com uma aurora artificial, enquanto os gritos ecoam nos becos da cidade morta.")
             print("\n")
-            
         elif choice == "4":
             print("\n")
             display_message(f"{cores['magenta']}Saindo do jogo. Até a próxima!{cores['reset']}")
@@ -340,13 +341,10 @@ def inventario(conn, id_personagem):
     cursor.execute("""
         SELECT 
             ii.id_instancia_item,
-            COALESCE(a.nome, ar.nome, ic.nome) AS nome,
-            COALESCE(a.descricao, ar.descricao, ic.descricao) AS descricao
+            i.nome,  -- Busca o nome diretamente da tabela Item
+            i.descricao  -- Busca a descrição diretamente da tabela Item
         FROM InstanciaItem ii
         JOIN Item i ON ii.id_item = i.id_item
-        LEFT JOIN Armadura a ON i.id_item = a.id_item
-        LEFT JOIN Arma ar ON i.id_item = ar.id_item
-        LEFT JOIN ImplanteCibernetico ic ON i.id_item = ic.id_item
         WHERE ii.id_inventario = (
             SELECT id_inventario FROM PC WHERE id_personagem = %s
         )
