@@ -21,7 +21,15 @@ def main():
 
     while True:
         print("\n")
-        display_message(f"{cores['magenta']}Carbon2185{cores['reset']}\n")
+        from colorama import Fore, Style
+
+        with open("banner.txt", "r", encoding="utf-8") as file:
+            banner = file.read()
+
+        print(Fore.MAGENTA + banner + Style.RESET_ALL)  # Exibe em ciano
+
+        print("\n")
+        
         print(f"{cores['amarelo']} 1. {cores['reset']}Iniciar Jogo")
         print(f"{cores['amarelo']} 2. {cores['reset']}Sair\n")
 

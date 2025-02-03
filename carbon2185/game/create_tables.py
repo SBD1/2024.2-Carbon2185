@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Faccao (
 
 CREATE TABLE IF NOT EXISTS Distrito (
     id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(100) NOT NULL UNIQUE,
+    nome VARCHAR(1000) NOT NULL UNIQUE,
     descricao TEXT NOT NULL
 );
 

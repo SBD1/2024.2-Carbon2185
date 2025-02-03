@@ -6,11 +6,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
 INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
-SELECT uuid_generate_v4(), 'daimyo', 'Daimyo', 'Um guerreiro forte e resistente, especializado em táticas de combate.', 10, 5, 5
+SELECT uuid_generate_v4(), 'daimyo', 'Daimyo', 'Um soldado forte e resistente, especializado em táticas de combate.', 10, 5, 5
 WHERE NOT EXISTS (SELECT 1 FROM Classe WHERE tipo = 'daimyo');
 
 INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
-SELECT uuid_generate_v4(), 'hacker', 'Hacker', 'Especialista em tecnologia e ataques estratégicos, possui muita energia.', 5, 5, 10
+SELECT uuid_generate_v4(), 'hacker', 'Hacker', 'Especialista em tecnologia e ataques estratégicos, possui muita energia', 5, 5, 10
 WHERE NOT EXISTS (SELECT 1 FROM Classe WHERE tipo = 'hacker');
 
 INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
