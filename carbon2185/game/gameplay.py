@@ -137,125 +137,96 @@ def select_character(conn):
 def create_character(conn):
     cursor = conn.cursor()
 
-     # Pegar a célula inicial (0,0)
-    cursor.execute("SELECT id_celula FROM CelulaMundo WHERE eixoX = 0 AND eixoY = 0;")
-    celula_inicial = cursor.fetchone()[0]
-
-    # Modificar a inserção do PC para incluir a célula inicial
-    cursor.execute("""
-        INSERT INTO PC (id_personagem, id_celula, id_faccao, id_classe, id_inventario, 
-                        energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-    """, (
-        id_personagem, celula_inicial, id_faccao_escolhida, id_classe_escolhida, id_inventario, 
-        energia_final, wonglongs, dano_final, hp_final, hp_final, nivel, xp, 
-        nome_personagem, descricao_personagem
-    ))
-
     display_message(f"{cores['magenta']}\nCriação de personagem:{cores['reset']}\n")
 
-    # Informações básicas do personagem
+    # 1. Coletar informações básicas primeiro
     nome_personagem = input("Digite o nome do seu personagem: ")
     descricao_personagem = input("\nDigite uma breve descrição do seu personagem: ")
 
-    # Escolha da facção
-    print("\nEscolha sua facção:\n")
-    cursor.execute("SELECT id_faccao, nome, descricao, ideologia FROM Faccao")
-    faccoes = cursor.fetchall()
-
-    if not faccoes:
-        print(f"{cores['vermelho']}Nenhuma facção disponível no banco de dados!{cores['reset']}")
-        return
-
-    for idx, faccao in enumerate(faccoes, start=1):
-        id_faccao, nome, descricao, ideologia = faccao
-        print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['vermelho']}[{nome}]{cores['reset']} É a {descricao} Ideologia: {cores['magenta']}{ideologia}{cores['reset']}\n")
-
-    while True:
-        try:
-            escolha_faccao = int(input("Digite o número da facção escolhida: "))
-            if 1 <= escolha_faccao <= len(faccoes):
-                id_faccao_escolhida = faccoes[escolha_faccao - 1][0]
-                break
-            else:
-                print(f"{cores['vermelho']}Opção inválida! Escolha um número dentro da lista.{cores['reset']}")
-        except ValueError:
-            print(f"{cores['vermelho']}Entrada inválida! Digite um número válido.{cores['reset']}")
-
-    # Escolha da classe
-    print("\nEscolha sua classe:\n")
-    cursor.execute("SELECT id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus FROM Classe")
-    classes = cursor.fetchall()
-
-    if not classes:
-        print(f"{cores['vermelho']}Nenhuma classe encontrada no banco de dados!{cores['reset']}")
-        return
-
-    for idx, (id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus) in enumerate(classes, start=1):
-        print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['magenta']}[{nome}]{cores['reset']} - {descricao}")
-        print(f"     (HP: {cores['verde']}+{hp_bonus:<1}{cores['reset']}, "f"Dano: {cores['vermelho']}+{dano_bonus:<1}{cores['reset']}, "f"Energia: {cores['amarelo']}+{energia_bonus:<1}{cores['reset']})\n")
-
-    while True:
-        try:
-            escolha_classe = int(input("Digite o número da classe escolhida: "))
-            if 1 <= escolha_classe <= len(classes):
-                id_classe_escolhida, _, _, hp_bonus, dano_bonus, energia_bonus = classes[escolha_classe - 1]
-                break
-            else:
-                print(f"{cores['vermelho']}Opção inválida! Escolha um número dentro da lista.{cores['reset']}")
-        except ValueError:
-            print(f"{cores['vermelho']}Entrada inválida! Digite um número válido.{cores['reset']}")
-
-    # Definição dos atributos básicos
-    hp_base = 100
-    dano_base = 20
-    energia_base = 20
-    nivel = 1
-    xp = 0
-    wonglongs = 100
-
-    # Aplicação dos bônus da classe escolhida
-    hp_final = hp_base + hp_bonus
-    dano_final = dano_base + dano_bonus
-    energia_final = energia_base + energia_bonus
-
-    # Criar entrada na tabela Personagem
+    # 2. Criar Personagem e Inventário ANTES de outras operações
     cursor.execute(""" 
         INSERT INTO Personagem (id_personagem, tipo)
         VALUES (uuid_generate_v4(), 'pc') RETURNING id_personagem;
     """)
     id_personagem = cursor.fetchone()[0]
 
-    # Criar um inventário para o personagem
     cursor.execute(""" 
         INSERT INTO Inventario (id_inventario, quantidade_itens, capacidade_maxima)
         VALUES (uuid_generate_v4(), 0, 10) RETURNING id_inventario;
     """)
     id_inventario = cursor.fetchone()[0]
 
-    # Criar entrada na tabela PC com o inventário vinculado
+    # 3. Escolha da facção
+    print("\nEscolha sua facção:\n")
+    cursor.execute("SELECT id_faccao, nome, descricao, ideologia FROM Faccao")
+    faccoes = cursor.fetchall()
+
+    if not faccoes:
+        print(f"{cores['vermelho']}Nenhuma facção disponível!{cores['reset']}")
+        return
+
+    for idx, faccao in enumerate(faccoes, start=1):
+        id_faccao, nome, descricao, ideologia = faccao
+        print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['vermelho']}[{nome}]{cores['reset']} É uma {descricao} Ideologia: {cores['magenta']}{ideologia}{cores['reset']}")
+
+    while True:
+        try:
+            escolha = int(input("\nEscolha: ")) - 1
+            id_faccao_escolhida = faccoes[escolha][0]
+            break
+        except (IndexError, ValueError):
+            print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
+
+    # 4. Escolha da classe
+    print("\nEscolha sua classe:\n")
+    cursor.execute("SELECT id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus FROM Classe")
+    classes = cursor.fetchall()
+
+    for idx, classe in enumerate(classes, start=1):
+        id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus = classe
+        print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['magenta']}[{nome}]{cores['reset']} {descricao} (HP: {cores['verde']}+{hp_bonus}{cores['reset']}, Dano: {cores['vermelho']}+{dano_bonus}{cores['reset']}, Energia: {cores['amarelo']}+{energia_bonus}{cores['reset']})")
+
+
+    while True:
+        try:
+            escolha = int(input("\nEscolha: ")) - 1
+            id_classe_escolhida, _, hp_bonus, dano_bonus, energia_bonus = classes[escolha]
+            break
+        except (IndexError, ValueError):
+            print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
+
+    # 5. Calcular atributos
+    hp_final = 100 + hp_bonus
+    dano_final = 20 + dano_bonus
+    energia_final = 20 + energia_bonus
+
+    # 6. Pegar célula inicial
+    cursor.execute("SELECT id_celula FROM CelulaMundo WHERE eixoX = 0 AND eixoY = 0;")
+    celula_inicial = cursor.fetchone()[0]
+
+    # 7. Inserir PC
     cursor.execute("""
-        INSERT INTO PC (id_personagem, id_celula, id_faccao, id_classe, id_inventario, energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao) 
-        VALUES (%s, NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        INSERT INTO PC (
+            id_personagem, id_celula, id_faccao, id_classe, id_inventario,
+            energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (
-        id_personagem, id_faccao_escolhida, id_classe_escolhida, id_inventario, 
-        energia_final, wonglongs, dano_final, hp_final, hp_final, nivel, xp, 
-        nome_personagem, descricao_personagem
+        id_personagem, celula_inicial, id_faccao_escolhida, id_classe_escolhida, id_inventario,
+        energia_final, 100, dano_final, hp_final, hp_final, 1, 0, nome_personagem, descricao_personagem
     ))
 
+    # 8. Adicionar arma inicial
     cursor.execute("SELECT id_item FROM Arma ORDER BY id_item LIMIT 1;")
-    id_arma = cursor.fetchone()[0]
-
-    # Criar uma instância dessa arma e vinculá-la ao inventário do novo personagem
-    cursor.execute("""
-        INSERT INTO InstanciaItem (id_instancia_item, id_inventario, id_item)
-        VALUES (uuid_generate_v4(), %s, %s);
-    """, (id_inventario, id_arma))
+    if cursor.rowcount > 0:
+        id_arma = cursor.fetchone()[0]
+        cursor.execute("""
+            INSERT INTO InstanciaItem (id_instancia_item, id_inventario, id_item)
+            VALUES (uuid_generate_v4(), %s, %s)
+        """, (id_inventario, id_arma))
 
     conn.commit()
     cursor.close()
-
-    print(f"\nPersonagem {cores['amarelo']}'{nome_personagem}'{cores['reset']} criado com sucesso, com um inventário associado!")
+    print(f"\nPersonagem {cores['amarelo']}{nome_personagem}{cores['reset']} criado com sucesso!")
 
 # gameplay.py
 import time
