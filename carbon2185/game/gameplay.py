@@ -21,7 +21,7 @@ def start_game(conn):
     """
     display_message(f"{cores['magenta']}Bem-vindo ao Carbon2185!{cores['reset']}")
     while True:
-        print("\nEscolha uma opção:\n")
+        print(f"\n{cores['magenta']}Escolha uma opção:{cores['reset']}\n")
         print(f"{cores['amarelo']}1.{cores['reset']} Selecionar Personagem")
         print(f"{cores['amarelo']}2.{cores['reset']} Criar Personagem")
         print(f"{cores['amarelo']}3.{cores['reset']} Sobre o jogo")
@@ -63,7 +63,7 @@ def select_character(conn):
        print(f"{cores['vermelho']}Nenhum personagem encontrado. Crie um primeiro!{cores['reset']}")
        return
 
-    print("\nSelecione um personagem para jogar:\n")
+    print(f"\n{cores['magenta']}Selecione um personagem para jogar:{cores['reset']}\n")
     for i, personagem in enumerate(personagens, start=1):
         print(f"{cores['amarelo']}{i}.{cores['reset']} {personagem['nome']}\n")
 
@@ -214,9 +214,9 @@ def playing_with_character(conn, pc):
     
     #Menu principal do jogo quando um personagem é escolhido.
 
-    display_message(f" {cores['magenta']}Bem-vindo ao jogo,{cores['reset']} {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['magenta']}!{cores['reset']}")
+    display_message(f"\n{cores['magenta']}Bem-vindo ao jogo,{cores['reset']} {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['magenta']}!{cores['reset']}")
     while True:
-        print("\nO que deseja fazer?\n")
+        print(f"\n{cores['magenta']}O que deseja fazer?{cores['reset']}\n")
         print(f"{cores['amarelo']}1.{cores['reset']} Informações do personagem")
         print(f"{cores['amarelo']}2.{cores['reset']} Inventário")
         print(f"{cores['amarelo']}3.{cores['reset']} Explorar")
@@ -232,14 +232,14 @@ def playing_with_character(conn, pc):
             mostrar_informacoes_personagem(conn, pc['id'])
         elif escolha == "2":
             print("\n")
-            display_message(f"{cores['magenta']}Inventário do {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['reset']}")
+            display_message(f"{cores['magenta']}Inventário de {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['reset']}")
             inventario(conn, pc['id'])
         elif escolha == "3":
             navigate_in_the_map(conn, pc)
         elif escolha == "4":
             display_message("Menu das missões devem partir daqui")
         elif escolha == "5":  # Agora a opção correta para sair do menu
-            display_message(f"Voltando ao menu principal...")
+            display_message(f"\n{cores['magenta']}Voltando ao menu principal...{cores['reset']}")
             break  # Agora sim, sair do menu do personagem
         else:
             display_message("Opção inválida. Tente novamente.") 

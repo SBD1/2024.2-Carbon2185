@@ -34,14 +34,10 @@ SELECT id_item, 'arma' FROM Item WHERE tipo = 'equipamento'
 AND NOT EXISTS (SELECT 1 FROM Equipamento WHERE tipo = 'arma');
 
 INSERT INTO Arma (id_item, id_celula, nome, descricao, valor, raridade, municao, dano)
-SELECT id_item, NULL, 'Pistola', 'Uma arma básica', 100, 'comum', 10, 5 
+SELECT id_item, NULL, 'Glock', 'Uma pistola básica', 100, 'comum', 10, 5 
 FROM Equipamento WHERE tipo = 'arma'
 AND NOT EXISTS (SELECT 1 FROM Arma);
 
-INSERT INTO InstanciaItem (id_instancia_item, id_inventario, id_item)
-SELECT uuid_generate_v4(), (SELECT id_inventario FROM Inventario LIMIT 1), 
-       (SELECT id_item FROM Arma LIMIT 1)
-WHERE NOT EXISTS (SELECT 1 FROM InstanciaItem);
 
 """
 def dml(conn):
