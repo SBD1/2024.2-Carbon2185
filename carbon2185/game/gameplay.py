@@ -187,7 +187,10 @@ def playing_with_character(conn, pc):
         escolha = input("Escolha uma opção: ")
 
         if escolha == "1":
-            display_message(f"Aqui deve se listar as informações gerais do personagem como nome, descrição, classe, facção, wonglongs, dano, energia, hp total, nivel, xp ")
+            print("\n")
+            display_message(f"{cores['magenta']}Informações sobre {pc['nome']}:{cores['reset']}")
+            print("\n")
+            mostrar_informacoes_personagem(conn, pc['id'])
         elif escolha == "2":
             display_message("Mecânica do inventário precisar se implentada aqui")
         elif escolha == "3":
@@ -201,158 +204,74 @@ def playing_with_character(conn, pc):
             display_message("Opção inválida. Tente novamente.") 
 
 
+def mostrar_informacoes_personagem(conn, id_personagem):
+    """Exibe detalhes do personagem."""
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT nome, descricao, nivel, xp, energia, dano, hp, wonglongs 
+        FROM PC WHERE id_personagem = %s
+    """, (id_personagem,))
+    info = cursor.fetchone()
+    print(f"{cores['amarelo']}Nome:{cores['reset']} {info[0]}")
+    print(f"{cores['amarelo']}Descrição:{cores['reset']} {info[1]}")
+    print(f"{cores['amarelo']}Nível:{cores['reset']} {info[2]}")
+    print(f"{cores['amarelo']}XP:{cores['reset']} {info[3]}")
+    print(f"{cores['amarelo']}Energia:{cores['reset']} {info[4]}")
+    print(f"{cores['amarelo']}Dano:{cores['reset']} {info[5]}")
+    print(f"{cores['amarelo']}HP:{cores['reset']} {info[6]}")
+    print(f"{cores['amarelo']}Wonglongs:{cores['reset']} {info[7]}")
+    cursor.close()
+
 def inventario(conn, id_personagem):
-    """
-    Exibe o inventário do personagem e permite usar ou descartar itens.
-    """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                SELECT i.id_item, a.nome, a.descricao, a.valor, a.raridade 
-                FROM InstanciaItem ii
-                JOIN Item i ON ii.id_item = i.id_item
-                LEFT JOIN Armadura a ON i.id_item = a.id_item
-                WHERE ii.id_inventario = (
-                    SELECT id_inventario FROM PC WHERE id_personagem = %s
-                )
-            """, (id_personagem,))
-            items = cursor.fetchall()
+    """Gerencia o inventário."""
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT i.id_item, a.nome, a.descricao 
+        FROM InstanciaItem ii
+        JOIN Item i ON ii.id_item = i.id_item
+        LEFT JOIN Armadura a ON i.id_item = a.id_item
+        WHERE ii.id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+    """, (id_personagem,))
+    itens = cursor.fetchall()
+    
+    if not itens:
+        print(f"{cores['amarelo']}Seu inventário está vazio.{cores['reset']}")
+        return
 
-            if not items:
-                display_message("Seu inventário está vazio.")
-                return
+    print(f"\n{cores['verde']}Itens no Inventário:{cores['reset']}")
+    for idx, (id_item, nome, desc) in enumerate(itens, 1):
+        print(f"{idx}. {nome} - {desc}")
 
-            while True:
-                print("\nItens no Inventário:")
-                for idx, item in enumerate(items, 1):
-                    print(f"{idx}. {item[1]} - {item[2]} (Valor: {item[3]}, Raridade: {item[4]})")
+    escolha = input("\n1. Usar item\n2. Descartar\n3. Voltar\nEscolha: ")
+    if escolha == "1":
+        item_idx = int(input("Escolha o item: ")) - 1
+        usar_item(conn, itens[item_idx][0], id_personagem)
+    elif escolha == "2":
+        item_idx = int(input("Escolha o item: ")) - 1
+        descartar_item(conn, itens[item_idx][0], id_personagem)
+    cursor.close()
 
-                print("\nEscolha uma opção:")
-                print("1. Usar item")
-                print("2. Descartar item")
-                print("3. Voltar")
-
-                escolha = input("Escolha: ")
-
-                if escolha == "1":
-                    item_idx = get_valid_input("Escolha o número do item para usar: ", int) - 1
-                    if 0 <= item_idx < len(items):
-                        usar_item(conn, items[item_idx][0], id_personagem)
-                        reduzir_item_inventario(conn, items[item_idx][0], id_personagem)
-                        break
-                    else:
-                        display_message("Escolha inválida. Tente novamente.")
-                elif escolha == "2":
-                    item_idx = get_valid_input("Escolha o número do item para descartar: ", int) - 1
-                    if 0 <= item_idx < len(items):
-                        descartar_item(conn, items[item_idx][0], id_personagem)
-                        break
-                    else:
-                        display_message("Escolha inválida. Tente novamente.")
-                elif escolha == "3":
-                    break
-                else:
-                    display_message("Opção inválida. Tente novamente.")
-    except Exception as e:
-        display_message(f"Erro ao exibir inventário: {e}")
-
-def get_valid_input(prompt, input_type):
-    """
-    Valida as entradas do usuário, garantindo que a entrada seja do tipo esperado.
-    """
-    while True:
-        try:
-            return input_type(input(prompt))
-        except ValueError:
-            print(f"Entrada inválida. Por favor, insira um valor válido do tipo {input_type.__name__}.")
-
-def reduzir_item_inventario(conn, id_item, id_personagem):
-    """ Reduz a quantidade do item no inventário em uma unidade ou remove se chegar a zero. """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                DELETE FROM InstanciaItem 
-                WHERE id_item = %s AND id_inventario = (
-                    SELECT id_inventario FROM PC WHERE id_personagem = %s
-                )
-                LIMIT 1
-            """, (id_item, id_personagem))
-            conn.commit()
-    except Exception as e:
-        display_message(f"Erro ao reduzir item no inventário: {e}")
+def usar_item(conn, id_item, id_personagem):
+    """Usa um item consumível."""
+    cursor = conn.cursor()
+    cursor.execute("""
+        DELETE FROM InstanciaItem 
+        WHERE id_item = %s 
+        AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+        LIMIT 1
+    """, (id_item, id_personagem))
+    conn.commit()
+    print(f"{cores['verde']}Item usado!{cores['reset']}")
+    cursor.close()
 
 def descartar_item(conn, id_item, id_personagem):
-    """ Remove o item do inventário. """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM InstanciaItem WHERE id_item = %s AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)", (id_item, id_personagem))
-            conn.commit()
-            display_message("Item descartado com sucesso.")
-    except Exception as e:
-        display_message(f"Erro ao descartar item: {e}")
-
-def comprar_item(conn, id_item, id_personagem):
-    """ Adiciona um item comprado ao inventário do personagem. """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT id_inventario FROM PC WHERE id_personagem = %s", (id_personagem,))
-            id_inventario = cursor.fetchone()
-
-            if id_inventario:
-                cursor.execute("INSERT INTO InstanciaItem (id_inventario, id_item) VALUES (%s, %s)", (id_inventario[0], id_item))
-                conn.commit()
-                display_message("Item comprado e adicionado ao inventário!")
-            else:
-                display_message("Erro ao encontrar o inventário do personagem.")
-    except Exception as e:
-        display_message(f"Erro ao comprar item: {e}")
-
-def loja(conn, id_comerciante, id_personagem, id_celula):
-    """ Exibe a loja do comerciante e permite comprar itens apenas nas células 4 dos distritos. """
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT id_celula FROM PC WHERE id_personagem = %s", (id_personagem,))
-            celula_personagem = cursor.fetchone()
-
-            if not celula_personagem or celula_personagem[0] != id_celula:
-                display_message("Você só pode acessar a loja na célula 4 de um distrito.")
-                return
-
-            cursor.execute("""
-                SELECT i.id_item, a.nome, a.descricao, a.valor, a.raridade 
-                FROM Loja l
-                JOIN InstanciaItem ii ON l.id_instancia_item = ii.id_instancia_item
-                JOIN Item i ON ii.id_item = i.id_item
-                LEFT JOIN Armadura a ON i.id_item = a.id_item
-                WHERE l.id_comerciante = %s
-            """, (id_comerciante,))
-            itens_loja = cursor.fetchall()
-
-            if not itens_loja:
-                display_message("A loja está vazia no momento.")
-                return
-
-            while True:
-                print("\nItens disponíveis na loja:")
-                for idx, item in enumerate(itens_loja, 1):
-                    print(f"{idx}. {item[1]} - {item[2]} (Valor: {item[3]}, Raridade: {item[4]})")
-
-                print("\nEscolha uma opção:")
-                print("1. Comprar item")
-                print("2. Voltar")
-
-                escolha = input("Escolha: ")
-
-                if escolha == "1":
-                    item_idx = get_valid_input("Escolha o número do item para comprar: ", int) - 1
-                    if 0 <= item_idx < len(itens_loja):
-                        comprar_item(conn, itens_loja[item_idx][0], id_personagem)
-                        break
-                    else:
-                        display_message("Escolha inválida. Tente novamente.")
-                elif escolha == "2":
-                    break
-                else:
-                    display_message("Opção inválida. Tente novamente.")
-    except Exception as e:
-        display_message(f"Erro ao acessar a loja: {e}")
+    """Descarta um item."""
+    cursor = conn.cursor()
+    cursor.execute("""
+        DELETE FROM InstanciaItem 
+        WHERE id_item = %s 
+        AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+    """, (id_item, id_personagem))
+    conn.commit()
+    print(f"{cores['verde']}Item descartado!{cores['reset']}")
+    cursor.close()
