@@ -5,23 +5,21 @@ def insert_initial_data(conn):
     
     # Lista de distritos a serem criados
     distritos = [
-        {"nome": "Distrito A", "descricao": "Distrito ao noroeste da cidade"},
-        {"nome": "Distrito B", "descricao": "Distrito ao nordeste da cidade"},
-        {"nome": "Distrito C", "descricao": "Distrito ao sudoeste da cidade"},
-        {"nome": "Distrito D", "descricao": "Distrito ao sudeste da cidade"}
+        {"nome": "Distrito A", "descricao": "Distrito ao noroeste da cidade", "eixoXInicial": 0, "eixoYInicial": 0},
+        {"nome": "Distrito B", "descricao": "Distrito ao nordeste da cidade", "eixoXInicial": 0, "eixoYInicial": 3},
+        {"nome": "Distrito C", "descricao": "Distrito ao sudoeste da cidade", "eixoXInicial": 3, "eixoYInicial": 0},
+        {"nome": "Distrito D", "descricao": "Distrito ao sudeste da cidade", "eixoXInicial": 3, "eixoYInicial": 3}
     ]
     
     # Definição da grade de cada distrito
     largura_distrito = 3  # Células por linha
     altura_distrito = 3   # Células por coluna
     
-    # Coordenadas iniciais
-    eixoX_inicial = 0
-    eixoY_inicial = 0
-    
     for distrito in distritos:
         nome_distrito = distrito["nome"]
         descricao_distrito = distrito["descricao"]
+        eixoX_inicial = distrito["eixoXInicial"]
+        eixoY_inicial = distrito["eixoYInicial"]
 
         # Insere o distrito, se não existir
         cur.execute("""
