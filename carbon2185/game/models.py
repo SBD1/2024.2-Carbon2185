@@ -189,6 +189,6 @@ def get_cell_id_by_position(conn, x, y):
 def update_player_cell(conn, pc_id, new_cell_id):
     with conn.cursor() as cur:
         cur.execute("""
-            UPDATE Personagem SET id_celula = %s WHERE id_personagem = %s;
+            UPDATE PC SET id_celula = %s WHERE id_personagem = %s;
         """, (new_cell_id, pc_id))
         conn.commit()
