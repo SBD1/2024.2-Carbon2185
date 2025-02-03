@@ -192,3 +192,32 @@ def update_player_cell(conn, pc_id, new_cell_id):
             UPDATE PC SET id_celula = %s WHERE id_personagem = %s;
         """, (new_cell_id, pc_id))
         conn.commit()
+
+# models.py
+
+# models.py
+def get_cell_info(conn, cell_id):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT 
+                cm.nome AS cell_name,
+                cm.descricao AS cell_desc,
+                d.nome AS district_name,
+                d.descricao AS district_desc,
+                cm.eixoX,
+                cm.eixoY
+            FROM CelulaMundo cm
+            JOIN Distrito d ON cm.id_distrito = d.id_distrito
+            WHERE cm.id_celula = %s;
+        """, (cell_id,))
+        result = cur.fetchone()
+        if result:
+            return {
+                'cell_name': result[0],
+                'cell_desc': result[1],
+                'district_name': result[2],
+                'district_desc': result[3],
+                'eixoX': result[4],
+                'eixoY': result[5]
+            }
+        return None

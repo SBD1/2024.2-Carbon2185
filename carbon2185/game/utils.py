@@ -61,18 +61,21 @@ def define_district(x, y):
         return "D"
 
 # Exibe o mapa com a posição do jogador
+# utils.py
+
 def display_map(mapa, player_pos):
-    os.system("cls" if os.name == "nt" else "clear")  # Limpa o terminal
+    os.system("cls" if os.name == "nt" else "clear")
     for i in range(MAP_SIZE):
         row = ""
         for j in range(MAP_SIZE):
+            cell = mapa[i][j]
             if [i, j] == player_pos:
-                row += f"{districtColor['X']}[X] "
+                row += f"{districtColor['X']}[X]{cores['reset']} "
             else:
-                row += f"[{mapa[i][j]}] "
+                row += f"[{cell}] "
         print(row)
-    print(f"\nUse {cores['amarelo']}W{cores['reset']} (cima), {cores['amarelo']}S{cores['reset']} (baixo), {cores['amarelo']}A{cores['reset']} (esquerda), {cores['amarelo']}D{cores['reset']} (direita) para mover. {cores['vermelho']}Voltar{cores['reset']} para sair.")
- 
+    print(f"\nInsira {cores['amarelo']}W, A, S ou D{cores['reset']} para se mover. {cores['vermelho']}Voltar{cores['reset']} para sair.")
+
 # Movimenta o personagem dentro do limite do mapa
 def move_player(move, position):
     x, y = position
@@ -86,4 +89,30 @@ def move_player(move, position):
         y += 1
     return [x, y]
 
+def get_cell_label(x, y):
+    district = define_district(x, y)
+    if district == 'A':
+        initial_x, initial_y = 0, 0
+    elif district == 'B':
+        initial_x, initial_y = 0, 3
+    elif district == 'C':
+        initial_x, initial_y = 3, 0
+    else:  # D
+        initial_x, initial_y = 3, 3
+    
+    local_x = x - initial_x
+    local_y = y - initial_y
+    cell_number = (local_x * 3) + local_y + 1
+    return f"{district}{cell_number}"
+
+def generate_map():
+    mapa = []
+    for i in range(MAP_SIZE):
+        row = []
+        for j in range(MAP_SIZE):
+            cell_label = get_cell_label(i, j)
+            district = define_district(i, j)
+            row.append(f"{districtColor[district]}{cell_label}{cores['reset']}")
+        mapa.append(row)
+    return mapa
 

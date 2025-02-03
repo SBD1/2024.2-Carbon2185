@@ -3,7 +3,7 @@ from game.create_tables import create_tables
 from game.gameplay import start_game
 from game.dml import dml
 from game.utils import display_message
-from game.insert_data import insert_initial_data
+from game.navegation import insert_initial_data
 
 cores = {
     'vermelho': '\033[31m',

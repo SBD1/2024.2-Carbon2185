@@ -2,6 +2,10 @@ from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
 from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell
 from game.database import create_connection
+from game.models import get_cell_info  # Adicione esta linha
+from game.utils import get_cell_label  # E esta também
+import os 
+import time
 
 # Códigos de cores ANSI
 cores = {
@@ -238,28 +242,59 @@ def create_character(conn):
 
     print(f"\nPersonagem {cores['amarelo']}'{nome_personagem}'{cores['reset']} criado com sucesso, com um inventário associado!")
 
+# gameplay.py
+import time
+
+# gameplay.py (versão corrigida)
 def navigate_in_the_map(conn, pc):
     print(pc)
-    player_position = get_player_position(conn, pc['id'])  # Obtém posição do banco
+    player_position = get_player_position(conn, pc['id'])
     game_map = generate_map()
+    
+    # Informações iniciais
+    initial_cell_id = get_cell_id_by_position(conn, *player_position)
+    if initial_cell_id:
+        cell_info = get_cell_info(conn, initial_cell_id)
+        display_cell_info(cell_info)  # Função nova para exibir informações
 
     while True:
         display_map(game_map, player_position)
         print("\n")
         command = input(f"{cores['amarelo']}Movimento:{cores['reset']} ").lower()
-        
+
         if command == "voltar":
             break
+            
         elif command in ["w", "a", "s", "d"]:
             new_position = move_player(command, player_position)
-            new_cell_id = get_cell_id_by_position(conn, new_position[0], new_position[1])
-
+            new_cell_id = get_cell_id_by_position(conn, *new_position)
+            
             if new_cell_id:
-                player_position = new_position  # Atualiza posição localmente
-                update_player_cell(conn, pc['id'], new_cell_id)  # Atualiza no banco
+                print("\n")
+                print("Navegando...")
+                time.sleep(3)
+                player_position = new_position
+                update_player_cell(conn, pc['id'], new_cell_id)
+                
+                # Exibir informações ANTES do próximo display_map()
+                cell_info = get_cell_info(conn, new_cell_id)
+                display_cell_info(cell_info)
+                
             else:
-                print(f"{cores['vermelho']}Movimento inválido! Não há célula nessa posição.{cores['reset']}")
+                print(f"{cores['vermelho']}Movimento inválido!{cores['reset']}")
+                time.sleep(1)  # Pequena pausa para ver a mensagem
 
+# Adicione esta nova função
+def display_cell_info(cell_info):
+    os.system("cls" if os.name == "nt" else "clear")  # Limpa antes de mostrar info
+    if cell_info:
+        cell_label = get_cell_label(cell_info['eixoX'], cell_info['eixoY'])
+        print(f"\n{cores['magenta']}{cell_info['district_name']} - {cell_info['district_desc']}{cores['reset']}")
+        print("\n")
+        display_message(f"{cores['verde']}Região {cell_label} - {cell_info['cell_name']}:{cores['reset']}")
+        print(f"{cores['branco']}{cell_info['cell_desc']}{cores['reset']}\n")
+        print("\n")
+        input(f"{cores['amarelo']}Pressione Enter para navegar novamente...{cores['reset']}")  # Pausa até confirmação
 
 def playing_with_character(conn, pc):
     
