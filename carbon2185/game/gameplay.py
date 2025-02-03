@@ -189,7 +189,8 @@ def create_character(conn):
     print(f"\nPersonagem {cores['amarelo']}'{nome_personagem}'{cores['reset']} criado com sucesso, com um inventário associado!")
 
 def navigate_in_the_map(conn, pc):
-    player_position = get_player_position(conn, pc['id_personagem'])  # Obtém posição do banco
+    print(pc)
+    player_position = get_player_position(conn, pc['id'])  # Obtém posição do banco
     game_map = generate_map()
 
     while True:
@@ -204,7 +205,7 @@ def navigate_in_the_map(conn, pc):
 
             if new_cell_id:
                 player_position = new_position  # Atualiza posição localmente
-                update_player_cell(conn, pc['id_personagem'], new_cell_id)  # Atualiza no banco
+                update_player_cell(conn, pc['id'], new_cell_id)  # Atualiza no banco
             else:
                 print("Movimento inválido! Não há célula nessa posição.")
 
