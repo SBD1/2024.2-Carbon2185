@@ -1,10 +1,9 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
-from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info
 from game.models import listar_missoes_progresso
 from game.database import create_connection
-from game.models import get_cell_info  # Adicione esta linha
-from game.utils import get_cell_label  # E esta também
+from game.utils import get_cell_label, display_map, generate_map, move_player
 import os 
 import time
 
@@ -138,6 +137,21 @@ def select_character(conn):
 def create_character(conn):
     cursor = conn.cursor()
 
+     # Pegar a célula inicial (0,0)
+    cursor.execute("SELECT id_celula FROM CelulaMundo WHERE eixoX = 0 AND eixoY = 0;")
+    celula_inicial = cursor.fetchone()[0]
+
+    # Modificar a inserção do PC para incluir a célula inicial
+    cursor.execute("""
+        INSERT INTO PC (id_personagem, id_celula, id_faccao, id_classe, id_inventario, 
+                        energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+    """, (
+        id_personagem, celula_inicial, id_faccao_escolhida, id_classe_escolhida, id_inventario, 
+        energia_final, wonglongs, dano_final, hp_final, hp_final, nivel, xp, 
+        nome_personagem, descricao_personagem
+    ))
+
     display_message(f"{cores['magenta']}\nCriação de personagem:{cores['reset']}\n")
 
     # Informações básicas do personagem
@@ -246,17 +260,18 @@ def create_character(conn):
 # gameplay.py
 import time
 
-# gameplay.py (versão corrigida)
 def navigate_in_the_map(conn, pc):
     print(pc)
-    player_position = get_player_position(conn, pc['id'])
     game_map = generate_map()
+    
+    # Sempre carrega a posição ATUAL do banco
+    player_position = get_player_position(conn, pc['id'])
     
     # Informações iniciais
     initial_cell_id = get_cell_id_by_position(conn, *player_position)
     if initial_cell_id:
         cell_info = get_cell_info(conn, initial_cell_id)
-        display_cell_info(cell_info)  # Função nova para exibir informações
+        display_cell_info(cell_info)
 
     while True:
         display_map(game_map, player_position)
@@ -264,6 +279,9 @@ def navigate_in_the_map(conn, pc):
         command = input(f"{cores['amarelo']}Movimento:{cores['reset']} ").lower()
 
         if command == "voltar":
+            # Atualiza a posição FINAL antes de sair
+            final_cell_id = get_cell_id_by_position(conn, *player_position)
+            update_player_cell(conn, pc['id'], final_cell_id)
             break
             
         elif command in ["w", "a", "s", "d"]:
@@ -271,19 +289,18 @@ def navigate_in_the_map(conn, pc):
             new_cell_id = get_cell_id_by_position(conn, *new_position)
             
             if new_cell_id:
-                print("\n")
-                print("Navegando...")
+                print("\nNavegando...")
                 time.sleep(3)
+                # Atualiza tanto a posição local quanto no banco
                 player_position = new_position
                 update_player_cell(conn, pc['id'], new_cell_id)
                 
-                # Exibir informações ANTES do próximo display_map()
                 cell_info = get_cell_info(conn, new_cell_id)
                 display_cell_info(cell_info)
                 
             else:
                 print(f"{cores['vermelho']}Movimento inválido!{cores['reset']}")
-                time.sleep(1)  # Pequena pausa para ver a mensagem
+                time.sleep(1)
 
 # Adicione esta nova função
 def display_cell_info(cell_info):
@@ -324,7 +341,8 @@ def playing_with_character(conn, pc):
         elif escolha == "3":
             navigate_in_the_map(conn, pc)
         elif escolha == "4":
-            display_message("Menu das missões devem partir daqui")
+            print("\n")
+            display_message(f"Missões disponíveis para {pc['nome']}")
             listar_missoes_progresso(conn, pc['id'])
         elif escolha == "5":  # Agora a opção correta para sair do menu
             display_message(f"\n{cores['magenta']}Voltando ao menu principal...{cores['reset']}")
