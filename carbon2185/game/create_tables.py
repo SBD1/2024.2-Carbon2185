@@ -100,7 +100,8 @@ CREATE TABLE IF NOT EXISTS Missao (
     descricao VARCHAR(100) NOT NULL,
     dificuldade INT NOT NULL,
     objetivo VARCHAR(100) NOT NULL,
-    goal INT NOT NULL
+    goal INT NOT NULL,
+    recompensa INT NOT NULL
 );
     
 CREATE TABLE IF NOT EXISTS Interacao (

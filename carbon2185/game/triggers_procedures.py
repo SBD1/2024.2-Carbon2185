@@ -253,6 +253,29 @@ FOR EACH ROW
 EXECUTE FUNCTION Diminuir_hp_por_armadura();
 
 
+-- trigger concluir missao e recompensar player
+CREATE OR REPLACE FUNCTION concluir_missao()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.progresso >= (SELECT goal FROM Missao WHERE id_missao = NEW.id_missao) THEN
+        UPDATE ProgressoMissao
+        SET progresso = 0
+        WHERE id_missao = NEW.id_missao AND id_personagem = NEW.id_personagem;
+
+        UPDATE PC
+        SET wonglongs = wonglongs + (SELECT recompensa FROM Missao WHERE id_missao = NEW.id_missao)
+        WHERE id_personagem = NEW.id_personagem;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_concluir_missao
+AFTER UPDATE ON ProgressoMissao
+FOR EACH ROW
+EXECUTE FUNCTION concluir_missao();
+
 """
 def trigger_procedure(conn):
     cursor = conn.cursor()

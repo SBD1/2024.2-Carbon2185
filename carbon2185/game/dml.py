@@ -55,17 +55,18 @@ VALUES
     'Equipado com sensores térmicos e um arsenal de armas customizadas, o Caçador de Recompensas rastreia alvos para o regime e para os criminosos ricos. Ele não tem lealdade, apenas um preço. Se seu nome estiver em sua lista, prepare-se para fugir... ou lutar pela vida.')
 ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal) VALUES
-    (uuid_generate_v4(), 'Silenciando as Máquinas', 'Desative os Drones de Supressão antes que alertem as autoridades.', 2, 'Destruir 40 Drones de Supressão', 40),
-    (uuid_generate_v4(), 'Revolta nas Favelas', 'Derrote os Carrascos das Favelas que aterrorizam os moradores.', 2, 'Eliminar 40 Carrascos das Favelas', 40),
-    (uuid_generate_v4(), 'Expurgo Urbano', 'Elimine os Andarilhos Corrompidos que espreitam nos becos abandonados.', 3, 'Derrotar 30 Andarilhos Corrompidos', 30),
-    (uuid_generate_v4(), 'Caçada Radioativa', 'Neutralize os Mutantes das Minas antes que se espalhem pela cidade.', 4, 'Eliminar 30 Mutantes das Minas', 30),
-    (uuid_generate_v4(), 'O Regime não Dorme', 'Enfrente os Drones de Supressão e impeça a vigilância implacável.', 5, 'Destruir 30 Drones de Supressão', 30),
-    (uuid_generate_v4(), 'Justiça nas Sombras', 'Acabe com a rede de violência imposta pelos Carrascos das Favelas.', 5, 'Eliminar 30 Carrascos das Favelas', 30),
-    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 6, 'Derrotar Zero.exe', 1),
-    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant', 1),
-    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion', 1),
-    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1)
+-- Missoes
+INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal, recompensa) VALUES
+    (uuid_generate_v4(), 'Saque diário', 'Derrote alguns Saqueadores Nômade.', 1, 'Destruir 5 Saqueador Nômade', 5, 50),
+    (uuid_generate_v4(), 'O Caçador se Torna a Presa', 'Derrote alguns Caçadores de Recompensas.', 1, 'Eliminar 5 Caçador de Recompensas', 5, 50),
+    (uuid_generate_v4(), 'Expurgo Urbano', 'Elimine os Andarilhos Corrompidos que espreitam nos becos abandonados.', 3, 'Derrotar 30 Andarilhos Corrompidos', 30, 1000),
+    (uuid_generate_v4(), 'Caçada Radioativa', 'Neutralize os Mutantes das Minas antes que se espalhem pela cidade.', 4, 'Eliminar 30 Mutantes das Minas', 30, 1200),
+    (uuid_generate_v4(), 'O Regime não Dorme', 'Enfrente os Drones de Supressão e impeça a vigilância implacável.', 5, 'Destruir 30 Drones de Supressão', 30, 1100),
+    (uuid_generate_v4(), 'Justiça nas Sombras', 'Acabe com a rede de violência imposta pelos Carrascos das Favelas.', 5, 'Eliminar 30 Carrascos das Favelas', 30, 1500),
+    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 6, 'Derrotar Zero.exe', 1, 5000),
+    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant', 1, 5200),
+    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion', 1, 7000),
+    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1, 100000)
 ON CONFLICT (nome) DO NOTHING;
 
 -- Itens Comuns (5)
