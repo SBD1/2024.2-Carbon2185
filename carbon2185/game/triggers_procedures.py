@@ -55,6 +55,71 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE Equipar_armadura(
+    p_id_personagem UUID,
+    p_id_armadura UUID
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO ArmaduraEquipada(id_personagem, id_armadura)
+    VALUES (p_id_personagem, p_id_armadura)
+    ON CONFLICT (id_personagem) DO NOTHING;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION Remover_Armadura(p_id_personagem UUID)
+RETURNS VOID
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM ArmaduraEquipada
+    WHERE id_personagem = p_id_personagem;
+END;
+$$;
+
+
+
+CREATE OR REPLACE FUNCTION Aumentar_hp_por_armadura()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE PC
+    SET hp = PC.hp + (SELECT hp_bonus FROM Armadura WHERE id_item = NEW.id_armadura)
+    WHERE id_personagem = NEW.id_personagem;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS Trigger_hp_Aumentar_por_armadura ON ArmaduraEquipada;
+
+CREATE TRIGGER Trigger_hp_Aumentar_por_armadura
+AFTER INSERT ON ArmaduraEquipada
+FOR EACH ROW
+EXECUTE FUNCTION Aumentar_hp_por_armadura();
+
+
+
+CREATE OR REPLACE FUNCTION Diminuir_hp_por_armadura()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE PC
+    SET hp = PC.hp - (SELECT hp_bonus FROM Armadura WHERE id_item = OLD.id_armadura)
+    WHERE id_personagem = OLD.id_personagem;
+    
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS Trigger_Diminuir_hp_por_armadura ON ArmaduraEquipada;
+
+CREATE TRIGGER Trigger_Diminuir_hp_por_armadura
+BEFORE DELETE ON ArmaduraEquipada
+FOR EACH ROW
+EXECUTE FUNCTION Diminuir_hp_por_armadura();
+
+
 """
 def trigger_procedure(conn):
     cursor = conn.cursor()

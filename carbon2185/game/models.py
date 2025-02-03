@@ -275,3 +275,13 @@ def progride_missao(conn, id_personagem, id_missao):
 
     except Exception as e:
         print(f"Ocorreu um erro: {e}")
+
+def deletar_personagem(conn, id_personagem):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM PC WHERE id_personagem = %s", (id_personagem,))
+            conn.commit()
+            print("Personagem deletado com sucesso.")
+    except Exception as e:
+        conn.rollback()
+        print("Erro ao deletar personagem:", e)

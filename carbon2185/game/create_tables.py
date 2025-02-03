@@ -160,10 +160,15 @@ CREATE TABLE IF NOT EXISTS Loja (
 
 
 CREATE TABLE IF NOT EXISTS ProgressoMissao (
-    id_missao UUID REFERENCES Missao(id_missao),
-    id_personagem UUID REFERENCES PC(id_personagem),
+    id_missao UUID REFERENCES Missao(id_missao) ON DELETE CASCADE,
+    id_personagem UUID REFERENCES PC(id_personagem) ON DELETE CASCADE,
     progresso INT NOT NULL,
     PRIMARY KEY (id_missao, id_personagem)
+);
+
+CREATE TABLE IF NOT EXISTS ArmaduraEquipada (
+    id_personagem UUID PRIMARY KEY REFERENCES PC(id_personagem) ON DELETE CASCADE,
+    id_armadura UUID REFERENCES Armadura(id_item) ON DELETE CASCADE
 );
 
 """
