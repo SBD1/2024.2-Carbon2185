@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS Inventario (
     id_inventario UUID DEFAULT uuid_generate_v4(),
     quantidade_itens INT NOT NULL,
     capacidade_maxima INT NOT NULL,
-    dinheiro DECIMAL(10,2) NOT NULL DEFAULT 0,
     PRIMARY KEY (id_inventario)
 );
 
@@ -31,18 +30,19 @@ CREATE TABLE IF NOT EXISTS Faccao (
 
 CREATE TABLE IF NOT EXISTS Distrito (
     id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    range_maximo INT NOT NULL,
-    quantidade_personagens INT NOT NULL
+    nome VARCHAR(1000) NOT NULL UNIQUE,
+    descricao TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CelulaMundo (
     id_celula UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    id_distrito UUID REFERENCES Distrito(id_distrito),
+    id_distrito UUID NOT NULL REFERENCES Distrito(id_distrito) ON DELETE CASCADE,
     nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    destino VARCHAR(100) NOT NULL
+    descricao TEXT NOT NULL,
+    eixoX INT NOT NULL,
+    eixoY INT NOT NULL,
+    
+    CONSTRAINT unique_position UNIQUE (id_distrito, eixoX, eixoY)
 );
 
 CREATE TABLE IF NOT EXISTS Personagem (
@@ -83,13 +83,11 @@ CREATE TABLE IF NOT EXISTS Comerciante (
 CREATE TABLE IF NOT EXISTS Inimigo (
     id_inimigo UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     id_personagem UUID REFERENCES NPC(id_personagem),
-    id_celula UUID REFERENCES CelulaMundo(id_celula),
     dano INT NOT NULL,
     xp INT NOT NULL,
     hp INT NOT NULL,
-    hp_atual INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL
+    descricao VARCHAR(1000) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Missao (
@@ -100,19 +98,6 @@ CREATE TABLE IF NOT EXISTS Missao (
     objetivo VARCHAR(100) NOT NULL,
     goal INT NOT NULL
 );
-
-INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal) VALUES
-    (uuid_generate_v4(), 'Faxina na Periferia', 'A gangue Steel Fangs está aterrorizando os becos do distrito industrial.', 2, 'Eliminar 40 Steel Fangs', 40),
-    (uuid_generate_v4(), 'Caçada aos Hackers', 'O grupo cyberterrorista Black Ice está hackeando servidores corporativos.', 3, 'Eliminar 35 Hackers Black Ice', 35),
-    (uuid_generate_v4(), 'Limpeza na Zona Vermelha', 'A milícia Red Claws impõe sua lei com brutalidade.', 2, 'Eliminar 30 Patrulheiros Red Claws', 30),
-    (uuid_generate_v4(), 'Roubo Mal-Sucedido', 'Um grupo de Neon Scavs assaltou um carregamento de implantes cibernéticos.', 3, 'Eliminar 20 Neon Scavs', 20),
-    (uuid_generate_v4(), 'Predadores Noturnos', 'Um culto de assassinos conhecidos como Children of the Void está atacando civis.', 4, 'Eliminar 10 Children of the Void', 10),
-    (uuid_generate_v4(), 'Os Oligarcas Não Perdoam', 'O sindicato de assassinos Ebony Hand falhou em um contrato e precisa ser eliminado.', 3, 'Eliminar 10 Assassinos Ebony Hand', 10),
-    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 5, 'Derrotar Zero.exe', 1),
-    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant', 1),
-    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion', 1),
-    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1)
-ON CONFLICT (nome) DO NOTHING;
     
 CREATE TABLE IF NOT EXISTS Interacao (
     id_interacao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -127,42 +112,29 @@ CREATE TABLE IF NOT EXISTS Dialogo (
 
 CREATE TABLE IF NOT EXISTS Item (
     id_item UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('equipamento', 'objeto_mapa'))
-);
-
-CREATE TABLE IF NOT EXISTS Equipamento (
-    id_item UUID PRIMARY KEY REFERENCES Item(id_item),
-    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('armadura', 'arma', 'implante_cibernetico'))
-);
-
-CREATE TABLE IF NOT EXISTS Armadura (
-    id_item UUID PRIMARY KEY REFERENCES Equipamento(id_item),
-    id_celula UUID REFERENCES CelulaMundo(id_celula),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('arma', 'armadura', 'implantecibernetico', 'objeto_mapa')),
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL,
     valor INT NOT NULL,
-    hp_bonus INT NOT NULL,
     raridade VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Arma (
-    id_item UUID PRIMARY KEY REFERENCES Equipamento(id_item),
+CREATE TABLE IF NOT EXISTS Armadura (
+    id_item UUID PRIMARY KEY REFERENCES Item(id_item),
     id_celula UUID REFERENCES CelulaMundo(id_celula),
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    valor INT NOT NULL,
-    raridade VARCHAR(100) NOT NULL,
+    hp_bonus INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Arma (
+    id_item UUID PRIMARY KEY REFERENCES Item(id_item),
+    id_celula UUID REFERENCES CelulaMundo(id_celula),
     municao INT NOT NULL,
     dano INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ImplanteCibernetico (
-    id_item UUID PRIMARY KEY REFERENCES Equipamento(id_item),
+    id_item UUID PRIMARY KEY REFERENCES Item(id_item),
     id_celula UUID REFERENCES CelulaMundo(id_celula),
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    valor INT NOT NULL,
-    raridade VARCHAR(100) NOT NULL,
     custo_energia INT NOT NULL,
     dano INT NOT NULL
 );
@@ -177,7 +149,6 @@ CREATE TABLE IF NOT EXISTS InstanciaInimigo (
     id_instancia_inimigo UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     id_inimigo UUID REFERENCES Inimigo(id_inimigo),
     id_celula UUID REFERENCES CelulaMundo(id_celula),
-    hp INT NOT NULL,
     hp_atual INT NOT NULL
 );
 
@@ -187,65 +158,13 @@ CREATE TABLE IF NOT EXISTS Loja (
     id_instancia_item UUID REFERENCES InstanciaItem(id_instancia_item)
 );
 
+
 CREATE TABLE IF NOT EXISTS ProgressoMissao (
     id_missao UUID REFERENCES Missao(id_missao),
     id_personagem UUID REFERENCES PC(id_personagem),
     progresso INT NOT NULL,
     PRIMARY KEY (id_missao, id_personagem)
 );
-
-CREATE OR REPLACE FUNCTION criar_progresso_missao()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO ProgressoMissao (id_missao, id_personagem, progresso)
-    SELECT m.id_missao, NEW.id_personagem, 0
-    FROM Missao m;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_criar_progresso_missao') THEN
-        CREATE TRIGGER trigger_criar_progresso_missao
-        AFTER INSERT ON PC
-        FOR EACH ROW
-        EXECUTE FUNCTION criar_progresso_missao();
-    END IF;
-END $$;
-
-CREATE OR REPLACE FUNCTION progredir_missao(id_personagem UUID, id_missao UUID)
-RETURNS void AS $$
-DECLARE
-    progress INT;
-BEGIN
-    SELECT progresso 
-    INTO progress
-    FROM ProgressoMissao 
-    WHERE id_personagem = id_personagem AND id_missao = id_missao;
-
-    UPDATE ProgressoMissao 
-    SET progresso = progress + 1
-    WHERE id_personagem = id_personagem AND id_missao = id_missao;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION listar_missoes_progresso(id_personagem UUID)
-RETURNS TABLE (
-    nome VARCHAR(100),
-    descricao VARCHAR(100),
-    dificuldade INT,
-    objetivo VARCHAR(100),
-    progresso INT
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT m.nome, m.descricao, m.dificuldade, m.objetivo, p.progresso
-    FROM Missao m
-    JOIN ProgressoMissao p ON m.id_missao = p.id_missao
-    WHERE p.id_personagem = $1;
-END;
-$$ LANGUAGE plpgsql;
 
 """
 

@@ -3,6 +3,8 @@ from game.create_tables import create_tables
 from game.gameplay import start_game
 from game.dml import dml
 from game.utils import display_message
+from game.insert_data import insert_initial_data
+from game.triggers_procedures import trigger_procedure
 
 cores = {
     'vermelho': '\033[31m',
@@ -20,7 +22,15 @@ def main():
 
     while True:
         print("\n")
-        display_message(f"{cores['magenta']}Carbon2185{cores['reset']}\n")
+        from colorama import Fore, Style
+
+        with open("banner.txt", "r", encoding="utf-8") as file:
+            banner = file.read()
+
+        print(Fore.MAGENTA + banner + Style.RESET_ALL)  # Exibe em ciano
+
+        print("\n")
+        
         print(f"{cores['amarelo']} 1. {cores['reset']}Iniciar Jogo")
         print(f"{cores['amarelo']} 2. {cores['reset']}Sair\n")
 
@@ -28,6 +38,9 @@ def main():
         try:
             create_tables(conn)
             dml(conn)
+            insert_initial_data(conn)
+            trigger_procedure(conn)
+
             choice = input("Escolha uma opção: ") 
             print("\n")
             if choice == "1":
