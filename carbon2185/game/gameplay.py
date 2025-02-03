@@ -213,15 +213,31 @@ def create_character(conn):
         energia_final, 100, dano_final, hp_final, hp_final, 1, 0, nome_personagem, descricao_personagem
     ))
 
-    # 8. Adicionar arma inicial
-    cursor.execute("SELECT id_item FROM Arma ORDER BY id_item LIMIT 1;")
-    if cursor.rowcount > 0:
-        id_arma = cursor.fetchone()[0]
+    # 8. Adicionar arma inicial (Glock)
+    cursor.execute("""
+        SELECT i.id_item 
+        FROM Item i 
+        JOIN Arma a ON i.id_item = a.id_item 
+        WHERE i.nome = 'Glock'
+    """)
+    arma_glock = cursor.fetchone()
+
+    if arma_glock:
+        id_arma = arma_glock[0]
+        # Adicionar instância da arma no inventário
         cursor.execute("""
             INSERT INTO InstanciaItem (id_instancia_item, id_inventario, id_item)
             VALUES (uuid_generate_v4(), %s, %s)
         """, (id_inventario, id_arma))
-
+        
+        # Atualizar quantidade de itens no inventário
+        cursor.execute("""
+            UPDATE Inventario 
+            SET quantidade_itens = quantidade_itens + 1 
+            WHERE id_inventario = %s
+        """, (id_inventario,))
+    else:
+        print(f"{cores['vermelho']}Erro: Arma inicial não encontrada!{cores['reset']}")
     conn.commit()
     cursor.close()
     print(f"\nPersonagem {cores['amarelo']}{nome_personagem}{cores['reset']} criado com sucesso!")
@@ -362,13 +378,23 @@ def mostrar_informacoes_personagem(conn, id_personagem):
 
     
 def inventario(conn, id_personagem):
-    """Gerencia o inventário do personagem informado, listando as instâncias de item associadas."""
     cursor = conn.cursor()
+    
+    # Primeiro pegar a capacidade do inventário
+    cursor.execute("""
+        SELECT inv.quantidade_itens, inv.capacidade_maxima 
+        FROM Inventario inv
+        JOIN PC ON PC.id_inventario = inv.id_inventario
+        WHERE PC.id_personagem = %s
+    """, (id_personagem,))
+    quantidade, capacidade = cursor.fetchone()
+    
+    # Consulta dos itens
     cursor.execute("""
         SELECT 
             ii.id_instancia_item,
-            i.nome,  -- Busca o nome diretamente da tabela Item
-            i.descricao  -- Busca a descrição diretamente da tabela Item
+            i.nome,
+            i.descricao
         FROM InstanciaItem ii
         JOIN Item i ON ii.id_item = i.id_item
         WHERE ii.id_inventario = (
@@ -377,16 +403,20 @@ def inventario(conn, id_personagem):
     """, (id_personagem,))
     itens = cursor.fetchall()
     
+    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")
+    
+    # Verificação REAL se há itens
     if not itens:
         print(f"{cores['vermelho']}Seu inventário está vazio.{cores['reset']}")
         cursor.close()
         return
-
-    print(f"\n{cores['verde']}Itens no Inventário:{cores['reset']}\n")
+    
+    # Listagem de itens
     for idx, (id_instancia, nome, desc) in enumerate(itens, start=1):
         print(f"{cores['verde']}{idx}.{cores['reset']} {nome} - {desc}")
 
     escolha = input(f"\n\n{cores['amarelo']}1.{cores['reset']} Descartar item\n\n{cores['amarelo']}2.{cores['reset']} Voltar\n\nEscolha: ")
+    
     if escolha == "1":
         try:
             entrada = input(f"\nEscolha o número do item para descartar ou digite 'voltar' para sair: ").strip().lower()
@@ -399,42 +429,39 @@ def inventario(conn, id_personagem):
                     confirm = input(f"Tem certeza que deseja descartar o item? ({cores['verde']}s{cores['reset']}/{cores['vermelho']}n{cores['reset']}): ").strip().lower()
                     if confirm == 's':
                         descartar_item(conn, itens[item_idx][0], id_personagem)
+                        inventario(conn, id_personagem)  # Atualiza a lista após descarte
                     else:
                         print(f"{cores['amarelo']}\nDescartar item cancelado. Voltando à listagem de itens...{cores['reset']}")
-                        inventario(conn, id_personagem)  # Retorna à listagem
+                        inventario(conn, id_personagem)
                 else:
                     print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
         except ValueError:
             print(f"{cores['vermelho']}Entrada inválida!{cores['reset']}")
-    # Se a escolha for "2" ou qualquer outra opção, apenas retorna ao menu
     cursor.close()
-
-
-# def usar_item(conn, id_instancia_item, id_personagem):
-#    """Usa um item consumível, removendo a instância do inventário do personagem."""
-#    cursor = conn.cursor()
-#    cursor.execute
-#    
-#    ("""
-#        DELETE FROM InstanciaItem 
-#        WHERE id_instancia_item = %s 
-#          AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
-#    """, (id_instancia_item, id_personagem))
-#    conn.commit()
-#    print(f"{cores['verde']}Item usado!{cores['reset']}")
-#    cursor.close()
-
-
 
 def descartar_item(conn, id_instancia_item, id_personagem):
     """Descarta um item, removendo a instância do inventário do personagem."""
     cursor = conn.cursor()
-    cursor.execute("""
-        DELETE FROM InstanciaItem 
-        WHERE id_instancia_item = %s 
-          AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
-    """, (id_instancia_item, id_personagem))
-    conn.commit()
-    print(f"\n{cores['verde']}Item descartado!{cores['reset']}")
-    cursor.close()
-
+    try:
+        # Deletar o item diretamente (já validamos a existência anteriormente)
+        cursor.execute("""
+            DELETE FROM InstanciaItem 
+            WHERE id_instancia_item = %s 
+              AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+        """, (id_instancia_item, id_personagem))
+        
+        # Atualizar quantidade no inventário
+        cursor.execute("""
+            UPDATE Inventario
+            SET quantidade_itens = GREATEST(quantidade_itens - 1, 0)
+            WHERE id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+        """, (id_personagem,))
+        
+        conn.commit()
+        print(f"\n{cores['verde']}Item descartado! Atualizando inventário...{cores['reset']}")
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"{cores['vermelho']}Erro ao descartar item: {str(e)}{cores['reset']}")
+    finally:
+        cursor.close()
