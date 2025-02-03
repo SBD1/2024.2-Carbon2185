@@ -185,11 +185,10 @@ def create_character(conn):
         id_classe, nome, descricao, hp_bonus, dano_bonus, energia_bonus = classe
         print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['magenta']}[{nome}]{cores['reset']} {descricao} (HP: {cores['verde']}+{hp_bonus}{cores['reset']}, Dano: {cores['vermelho']}+{dano_bonus}{cores['reset']}, Energia: {cores['amarelo']}+{energia_bonus}{cores['reset']})")
 
-
     while True:
         try:
             escolha = int(input("\nEscolha: ")) - 1
-            id_classe_escolhida, _, hp_bonus, dano_bonus, energia_bonus = classes[escolha]
+            id_classe_escolhida, _, _, hp_bonus, dano_bonus, energia_bonus = classes[escolha]
             break
         except (IndexError, ValueError):
             print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
