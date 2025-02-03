@@ -71,8 +71,8 @@ def display_map(mapa, player_pos):
             else:
                 row += f"[{mapa[i][j]}] "
         print(row)
-    print("\nUse W (cima), S (baixo), A (esquerda), D (direita) para mover. Q para sair.")
-
+    print(f"\nUse {cores['amarelo']}W{cores['reset']} (cima), {cores['amarelo']}S{cores['reset']} (baixo), {cores['amarelo']}A{cores['reset']} (esquerda), {cores['amarelo']}D{cores['reset']} (direita) para mover. {cores['vermelho']}Voltar{cores['reset']} para sair.")
+ 
 # Movimenta o personagem dentro do limite do mapa
 def move_player(move, position):
     x, y = position

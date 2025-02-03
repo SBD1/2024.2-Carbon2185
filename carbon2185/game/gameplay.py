@@ -109,6 +109,7 @@ def select_character(conn):
     personagens = get_all_pcs(conn)  # Obtém todos os personagens do banco de dados
 
     if not personagens:
+       print("\n")
        print(f"{cores['vermelho']}Nenhum personagem encontrado. Crie um primeiro!{cores['reset']}")
        return
 
@@ -244,9 +245,10 @@ def navigate_in_the_map(conn, pc):
 
     while True:
         display_map(game_map, player_position)
-        command = input("Movimento: ").lower()
+        print("\n")
+        command = input(f"{cores['amarelo']}Movimento:{cores['reset']} ").lower()
         
-        if command == "q":
+        if command == "voltar":
             break
         elif command in ["w", "a", "s", "d"]:
             new_position = move_player(command, player_position)
@@ -256,7 +258,7 @@ def navigate_in_the_map(conn, pc):
                 player_position = new_position  # Atualiza posição localmente
                 update_player_cell(conn, pc['id'], new_cell_id)  # Atualiza no banco
             else:
-                print("Movimento inválido! Não há célula nessa posição.")
+                print(f"{cores['vermelho']}Movimento inválido! Não há célula nessa posição.{cores['reset']}")
 
 
 def playing_with_character(conn, pc):
