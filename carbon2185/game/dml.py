@@ -46,7 +46,14 @@ VALUES
     'Um brutamontes contratado por gangues locais para impor o terror entre os desesperados. Vestindo pedaços de armadura improvisada, ele empunha um enorme martelo hidráulico capaz de esmagar concreto e ossos com facilidade.'),
 
     (uuid_generate_v4(), NULL, 15, 10, 120, 'Mutante das Minas', 
-    'Um mineiro que passou tempo demais exposto à radiação e aos gases tóxicos. Sua pele esverdeada e olhos sem pupilas denunciam a mutação avançada. Ele ataca com unhas endurecidas como lâminas, tentando arrancar o antídoto de qualquer intruso.');
+    'Um mineiro que passou tempo demais exposto à radiação e aos gases tóxicos. Sua pele esverdeada e olhos sem pupilas denunciam a mutação avançada. Ele ataca com unhas endurecidas como lâminas, tentando arrancar o antídoto de qualquer intruso.'),
+
+    (uuid_generate_v4(), NULL, 10, 5, 100, 'Saqueador Nômade', 
+    'Vagando entre os distritos, o Saqueador Nômade sobrevive pilhando suprimentos e eliminando qualquer um que represente uma ameaça. Sua máscara remendada esconde um rosto cheio de cicatrizes, e suas lâminas afiadas refletem a luz neon dos becos escuros.'),
+
+    (uuid_generate_v4(), NULL, 10, 5, 100, 'Caçador de Recompensas', 
+    'Equipado com sensores térmicos e um arsenal de armas customizadas, o Caçador de Recompensas rastreia alvos para o regime e para os criminosos ricos. Ele não tem lealdade, apenas um preço. Se seu nome estiver em sua lista, prepare-se para fugir... ou lutar pela vida.')
+ON CONFLICT (nome) DO NOTHING;
 
 INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal) VALUES
     (uuid_generate_v4(), 'Silenciando as Máquinas', 'Desative os Drones de Supressão antes que alertem as autoridades.', 2, 'Destruir 40 Drones de Supressão', 40),
@@ -60,6 +67,7 @@ INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal) VAL
     (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion', 1),
     (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1)
 ON CONFLICT (nome) DO NOTHING;
+
 
 """
 def dml(conn):

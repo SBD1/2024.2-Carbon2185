@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS PC (
     nivel INT NOT NULL,
     xp INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL
+    descricao VARCHAR(1000) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS NPC (
@@ -76,8 +76,10 @@ CREATE TABLE IF NOT EXISTS Comerciante (
     id_comerciante UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     id_personagem UUID REFERENCES NPC(id_personagem),
     id_celula UUID REFERENCES CelulaMundo(id_celula),
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL
+    nome VARCHAR(1000) NOT NULL,
+    descricao VARCHAR(1000) NOT NULL,
+
+    CONSTRAINT unique_comerciante_nome UNIQUE (nome)
 );
 
 CREATE TABLE IF NOT EXISTS Inimigo (
@@ -87,7 +89,9 @@ CREATE TABLE IF NOT EXISTS Inimigo (
     xp INT NOT NULL,
     hp INT NOT NULL,
     nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(1000) NOT NULL
+    descricao VARCHAR(1000) NOT NULL,
+
+    CONSTRAINT unique_inimigo_nome UNIQUE (nome)
 );
 
 CREATE TABLE IF NOT EXISTS Missao (

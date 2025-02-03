@@ -1,6 +1,17 @@
 import random
 import psycopg2
 
+cores = {
+    'vermelho': '\033[31m',
+    'verde': '\033[32m',
+    'amarelo': '\033[33m',
+    'azul': '\033[34m',
+    'magenta': '\033[35m',
+    'ciano': '\033[36m',
+    'branco': '\033[37m',
+    'reset': '\033[0m'  # Reset para a cor padrão
+}
+
 def create_pc(conn, name, description):
     cursor = conn.cursor()
 
@@ -193,12 +204,15 @@ def get_all_pcs(conn):
 # Função para buscar a posição inicial do personagem no banco
 def get_player_position(conn, pc_id):
     with conn.cursor() as cur:
+        # Consulta corrigida para pegar a posição através da tabela PC
         cur.execute("""
-            SELECT eixoX, eixoY FROM CelulaMundo 
-            WHERE id_celula = (SELECT id_celula FROM Personagem WHERE id_personagem = %s);
+            SELECT cm.eixoX, cm.eixoY 
+            FROM CelulaMundo cm
+            JOIN PC pc ON cm.id_celula = pc.id_celula
+            WHERE pc.id_personagem = %s;
         """, (pc_id,))
         pos = cur.fetchone()
-        return list(pos) if pos else [0, 0]  # Se não encontrar, assume (0,0)
+        return list(pos) if pos else [0, 0]  # Fallback seguro
 
 # Função para buscar a célula correspondente no banco
 def get_cell_id_by_position(conn, x, y):
@@ -216,8 +230,6 @@ def update_player_cell(conn, pc_id, new_cell_id):
             UPDATE PC SET id_celula = %s WHERE id_personagem = %s;
         """, (new_cell_id, pc_id))
         conn.commit()
-
-# models.py
 
 # models.py
 def get_cell_info(conn, cell_id):
@@ -255,16 +267,17 @@ def listar_missoes_progresso(conn, id_personagem):
         if resultados:
             for row in resultados:
                 nome, descricao, dificuldade, objetivo, progresso = row
-                print(f"Missão: {nome}")
-                print(f"Descrição: {descricao}")
-                print(f"Dificuldade: {dificuldade}")
-                print(f"Objetivo: {objetivo}")
-                print(f"Progresso: {progresso}")
+                print(f"{cores['magenta']}Missão:{cores['reset']} {nome}")
+                print(f"{cores['amarelo']}Descrição:{cores['reset']} {descricao}")
+                print(f"{cores['amarelo']}Dificuldade:{cores['reset']} {dificuldade}")
+                print(f"{cores['amarelo']}Objetivo:{cores['reset']} {objetivo}")
+                print(f"{cores['amarelo']}Progresso:{cores['reset']} {progresso}")
+                print("\n")
 
         cursor.close()
 
     except Exception as e:
-        print(f"Ocorreu um erro: {e}")
+        print(f"{cores['vermelho']}Ocorreu um erro:{cores['reset']} {e}")
 
 def progride_missao(conn, id_personagem, id_missao):
     try:
@@ -274,7 +287,7 @@ def progride_missao(conn, id_personagem, id_missao):
         cursor.close()
 
     except Exception as e:
-        print(f"Ocorreu um erro: {e}")
+        print(f"{cores['vermelho']}Ocorreu um erro:{cores['reset']} {e}")
 
 def deletar_personagem(conn, id_personagem):
     try:
