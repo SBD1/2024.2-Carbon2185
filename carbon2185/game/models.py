@@ -266,12 +266,13 @@ def listar_missoes_progresso(conn, id_personagem):
 
         if resultados:
             for row in resultados:
-                nome, descricao, dificuldade, objetivo, progresso = row
+                nome, descricao, dificuldade, objetivo, progresso, recompensa = row
                 print(f"{cores['magenta']}Missão:{cores['reset']} {nome}")
                 print(f"{cores['amarelo']}Descrição:{cores['reset']} {descricao}")
                 print(f"{cores['amarelo']}Dificuldade:{cores['reset']} {dificuldade}")
                 print(f"{cores['amarelo']}Objetivo:{cores['reset']} {objetivo}")
                 print(f"{cores['amarelo']}Progresso:{cores['reset']} {progresso}")
+                print(f"{cores['amarelo']}Recompensa:{cores['reset']} {recompensa} ₩")
                 print("\n")
 
         cursor.close()

@@ -44,11 +44,12 @@ RETURNS TABLE (
     descricao VARCHAR(100),
     dificuldade INT,
     objetivo VARCHAR(100),
-    progresso INT
+    progresso INT,
+    recompensa INT
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT m.nome, m.descricao, m.dificuldade, m.objetivo, p.progresso
+    SELECT m.nome, m.descricao, m.dificuldade, m.objetivo, p.progresso, m.recompensa
     FROM Missao m
     JOIN ProgressoMissao p ON m.id_missao = p.id_missao
     WHERE p.id_personagem = $1;
