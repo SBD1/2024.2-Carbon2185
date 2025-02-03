@@ -120,7 +120,9 @@ CREATE TABLE IF NOT EXISTS Item (
     nome VARCHAR(100) NOT NULL,
     descricao VARCHAR(100) NOT NULL,
     valor INT NOT NULL,
-    raridade VARCHAR(100) NOT NULL
+    raridade VARCHAR(100) NOT NULL,
+
+     CONSTRAINT unique_item_nome UNIQUE (nome)
 );
 
 CREATE TABLE IF NOT EXISTS Armadura (

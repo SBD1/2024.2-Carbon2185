@@ -68,6 +68,111 @@ INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal) VAL
     (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1)
 ON CONFLICT (nome) DO NOTHING;
 
+-- Itens Comuns (5)
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'arma', 'Pistola de Choque', 'Pistola que dispara pulsos elétricos', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Faca Serrilhada', 'Lâmina com fio molecular para cortes precisos', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Revólver Magnético', 'Arma que dispara projéteis ferromagnéticos', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Espingarda Térmica', 'Dispara cartuchos de calor concentrado', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Submetralhadora de Plasma', 'Versão básica para combate urbano', 100, 'Comum')
+ON CONFLICT (nome) DO NOTHING;
+
+-- Itens Raros (3)
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'arma', 'Lança-Chamas Criogênico', 'Congela alvos com jatos de -200°C', 200, 'Raro'),
+(uuid_generate_v4(), 'arma', 'Fuzil de Precisão Quântica', 'Mira através de paredes usando partículas entrelaçadas', 200, 'Raro'),
+(uuid_generate_v4(), 'arma', 'Espada de Fótons', 'Lâmina de energia corta ligas metálicas', 200, 'Raro')
+ON CONFLICT (nome) DO NOTHING;
+
+-- Itens Lendários (1)
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'arma', 'Canhão de Singularidade', 'Cria micro buracos negros que distorcem a realidade', 300, 'Lendário'),
+(uuid_generate_v4(), 'arma', 'Raio Desintegrador', 'Aniquila matéria a nível molecular', 300, 'Lendário')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Arma (id_item, id_celula, municao, dano)
+SELECT id_item, NULL, 
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END,
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+FROM Item 
+WHERE tipo = 'arma'
+AND NOT EXISTS (SELECT 1 FROM Arma WHERE Arma.id_item = Item.id_item);
+
+
+-- Armaduras Corrigidas
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'armadura', 'Colete Nanotecnológico', 'Fibras autoregenerativas', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Capacete de Sensor Térmico', 'Detecta assinaturas de calor', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Grevas de Carbono', 'Proteção leve para pernas', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Manto de Camuflagem', 'Distorção visual básica', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Placas de Cerâmica', 'Blindagem anti-projéteis', 100, 'Comum')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'armadura', 'Exoesqueleto Hidráulico', 'Amplifica força em 300%', 200, 'Raro'),
+(uuid_generate_v4(), 'armadura', 'Escudo de Energia', 'Campo de força portátil', 200, 'Raro'),
+(uuid_generate_v4(), 'armadura', 'Traje de Absorção', 'Converte dano em energia', 200, 'Raro')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'armadura', 'Armadura de Nanobots', 'Líquido metálico adaptativo', 300, 'Lendário'),
+(uuid_generate_v4(), 'armadura', 'Manto de Invisibilidade', 'Dobra a luz ao redor do usuário', 300, 'Lendário')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Armadura (id_item, id_celula, hp_bonus)
+SELECT id_item, NULL, 
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+FROM Item 
+WHERE tipo = 'armadura'
+AND NOT EXISTS (SELECT 1 FROM Armadura WHERE Armadura.id_item = Item.id_item);
+
+-- Implantes Corrigidos
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'implantecibernetico', 'Olos Biônicos', 'Visão noturna e zoom 5x', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Pulmões de Filtro', 'Filtra toxinas do ar', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Membros de Titânio', 'Próteses básicas para força aumentada', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Interface Neural', 'Controle dispositivos com a mente', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Dermaplacas', 'Pele reforçada com ligas metálicas', 100, 'Comum')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'implantecibernetico', 'Garras Retráteis', 'Lâminas de adamantium embutidas', 200, 'Raro'),
+(uuid_generate_v4(), 'implantecibernetico', 'Sistema de Adrenalina', 'Extrai o melhor do soldado', 200, 'Raro'),
+(uuid_generate_v4(), 'implantecibernetico', 'Glândula de Toxinas', 'Produz venenos orgânicos letais', 200, 'Raro')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'implantecibernetico', 'Chip de IA', 'Consciência artificial auxiliar', 300, 'Lendário'),
+(uuid_generate_v4(), 'implantecibernetico', 'Núcleo de Antimatéria', 'Capacidade de utilizar energia para atacar os inimigos', 300, 'Lendário')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO ImplanteCibernetico (id_item, id_celula, custo_energia, dano)
+SELECT id_item, NULL, 
+    CASE raridade
+        WHEN 'Lendário' THEN 10
+        WHEN 'Raro' THEN 5
+        ELSE 2
+    END,
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+FROM Item 
+WHERE tipo = 'implantecibernetico'
+AND NOT EXISTS (SELECT 1 FROM ImplanteCibernetico WHERE ImplanteCibernetico.id_item = Item.id_item);
 
 """
 def dml(conn):
