@@ -30,18 +30,19 @@ CREATE TABLE IF NOT EXISTS Faccao (
 
 CREATE TABLE IF NOT EXISTS Distrito (
     id_distrito UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    range_maximo INT NOT NULL,
-    quantidade_personagens INT NOT NULL
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    descricao TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CelulaMundo (
     id_celula UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    id_distrito UUID REFERENCES Distrito(id_distrito),
+    id_distrito UUID NOT NULL REFERENCES Distrito(id_distrito) ON DELETE CASCADE,
     nome VARCHAR(100) NOT NULL,
-    descricao VARCHAR(100) NOT NULL,
-    destino VARCHAR(100) NOT NULL
+    descricao TEXT NOT NULL,
+    eixoX INT NOT NULL,
+    eixoY INT NOT NULL,
+    
+    CONSTRAINT unique_position UNIQUE (id_distrito, eixoX, eixoY)
 );
 
 CREATE TABLE IF NOT EXISTS Personagem (

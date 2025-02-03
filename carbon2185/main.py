@@ -3,6 +3,7 @@ from game.create_tables import create_tables
 from game.gameplay import start_game
 from game.dml import dml
 from game.utils import display_message
+from game.insert_data import insert_initial_data
 
 cores = {
     'vermelho': '\033[31m',
@@ -28,6 +29,8 @@ def main():
         try:
             create_tables(conn)
             dml(conn)
+            insert_initial_data(conn)
+
             choice = input("Escolha uma opção: ") 
             print("\n")
             if choice == "1":

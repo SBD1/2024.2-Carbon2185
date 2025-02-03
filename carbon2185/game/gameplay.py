@@ -1,6 +1,6 @@
 from game.models import create_pc, create_npc, interact_with_npc
-from game.utils import display_message
-from game.models import get_all_pcs 
+from game.utils import display_message, generate_map, display_map, move_player
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell
 from game.database import create_connection
 
 # Códigos de cores ANSI
@@ -188,6 +188,26 @@ def create_character(conn):
 
     print(f"\nPersonagem {cores['amarelo']}'{nome_personagem}'{cores['reset']} criado com sucesso, com um inventário associado!")
 
+def navigate_in_the_map(conn, pc):
+    player_position = get_player_position(conn, pc['id_personagem'])  # Obtém posição do banco
+    game_map = generate_map()
+
+    while True:
+        display_map(game_map, player_position)
+        command = input("Movimento: ").lower()
+        
+        if command == "q":
+            break
+        elif command in ["w", "a", "s", "d"]:
+            new_position = move_player(command, player_position)
+            new_cell_id = get_cell_id_by_position(conn, new_position[0], new_position[1])
+
+            if new_cell_id:
+                player_position = new_position  # Atualiza posição localmente
+                update_player_cell(conn, pc['id_personagem'], new_cell_id)  # Atualiza no banco
+            else:
+                print("Movimento inválido! Não há célula nessa posição.")
+
 
 def playing_with_character(conn, pc):
     
@@ -214,7 +234,7 @@ def playing_with_character(conn, pc):
             display_message(f"{cores['magenta']}Inventário do {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['reset']}")
             inventario(conn, pc['id'])
         elif escolha == "3":
-            display_message("Exploração deve partir daqui")
+            navigate_in_the_map(conn, pc)
         elif escolha == "4":
             display_message("Menu das missões devem partir daqui")
         elif escolha == "5":  # Agora a opção correta para sair do menu

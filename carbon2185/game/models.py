@@ -164,4 +164,31 @@ def get_all_pcs(conn):
 
     # Convertendo a lista de tuplas para uma lista de dicionários
     return [{"id": row[0], "nome": row[1]} for row in PC]
- 
+
+
+# Função para buscar a posição inicial do personagem no banco
+def get_player_position(conn, pc_id):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT eixoX, eixoY FROM CelulaMundo 
+            WHERE id_celula = (SELECT id_celula FROM Personagem WHERE id_personagem = %s);
+        """, (pc_id,))
+        pos = cur.fetchone()
+        return list(pos) if pos else [0, 0]  # Se não encontrar, assume (0,0)
+
+# Função para buscar a célula correspondente no banco
+def get_cell_id_by_position(conn, x, y):
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT id_celula FROM CelulaMundo WHERE eixoX = %s AND eixoY = %s;
+        """, (x, y))
+        result = cur.fetchone()
+        return result[0] if result else None
+
+# Função para atualizar a célula do personagem no banco
+def update_player_cell(conn, pc_id, new_cell_id):
+    with conn.cursor() as cur:
+        cur.execute("""
+            UPDATE Personagem SET id_celula = %s WHERE id_personagem = %s;
+        """, (new_cell_id, pc_id))
+        conn.commit()
