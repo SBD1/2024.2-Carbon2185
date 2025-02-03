@@ -271,7 +271,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_concluir_missao ON ArmaduraEquipada;
+DROP TRIGGER IF EXISTS trigger_concluir_missao ON ProgressoMissao;
 
 CREATE TRIGGER trigger_concluir_missao
 AFTER UPDATE ON ProgressoMissao
