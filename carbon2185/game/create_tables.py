@@ -92,12 +92,13 @@ CREATE TABLE IF NOT EXISTS Inimigo (
 
 CREATE TABLE IF NOT EXISTS Missao (
     id_missao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(100) NOT NULL,
+    nome VARCHAR(100) NOT NULL UNIQUE,
     descricao VARCHAR(100) NOT NULL,
     dificuldade INT NOT NULL,
-    objetivo VARCHAR(100) NOT NULL
+    objetivo VARCHAR(100) NOT NULL,
+    goal INT NOT NULL
 );
-
+    
 CREATE TABLE IF NOT EXISTS Interacao (
     id_interacao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     personagem_origem UUID REFERENCES Personagem(id_personagem),
@@ -157,6 +158,13 @@ CREATE TABLE IF NOT EXISTS Loja (
     id_instancia_item UUID REFERENCES InstanciaItem(id_instancia_item)
 );
 
+
+CREATE TABLE IF NOT EXISTS ProgressoMissao (
+    id_missao UUID REFERENCES Missao(id_missao),
+    id_personagem UUID REFERENCES PC(id_personagem),
+    progresso INT NOT NULL,
+    PRIMARY KEY (id_missao, id_personagem)
+);
 
 """
 

@@ -116,6 +116,30 @@ def create_npc(conn, npc_type, id_celula=None):
     except Exception as e:
         conn.rollback()
         print(f"Erro ao criar NPC: {e}")
+        
+def progredir_missao(conn, id_personagem, id_missao):
+    cursor = conn.cursor()
+    
+    cursor.execute(
+        """
+        SELECT progresso 
+        FROM ProgressoMissao 
+        WHERE id_personagem = %s AND id_missao = %s;
+        """,
+        (id_personagem, id_missao)
+    )
+    progresso = cursor.fetchone()[0]
+
+    cursor.execute(
+        """
+        UPDATE ProgressoMissao 
+        SET progresso = %s 
+        WHERE id_personagem = %s AND id_missao = %s;
+        """,
+        (progresso+1, id_personagem, id_missao)
+    )
+    conn.commit()
+    cursor.close()
 
 def loja(conn, id_comerciante, id_personagem, id_celula):
     """Lógica da loja."""
@@ -192,3 +216,33 @@ def update_player_cell(conn, pc_id, new_cell_id):
             UPDATE PC SET id_celula = %s WHERE id_personagem = %s;
         """, (new_cell_id, pc_id))
         conn.commit()
+
+def listar_missoes_progresso(conn, id_personagem):
+    try:
+        cursor = conn.cursor()
+        cursor.callproc('listar_missoes_progresso', (id_personagem,))
+        resultados = cursor.fetchall()
+
+        if resultados:
+            for row in resultados:
+                nome, descricao, dificuldade, objetivo, progresso = row
+                print(f"Missão: {nome}")
+                print(f"Descrição: {descricao}")
+                print(f"Dificuldade: {dificuldade}")
+                print(f"Objetivo: {objetivo}")
+                print(f"Progresso: {progresso}")
+
+        cursor.close()
+
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
+
+def progride_missao(conn, id_personagem, id_missao):
+    try:
+        cursor = conn.cursor()
+        cursor.callproc('progredir_missao', (id_personagem, id_missao))
+        conn.commit()
+        cursor.close()
+
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")

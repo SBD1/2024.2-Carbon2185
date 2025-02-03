@@ -48,6 +48,19 @@ VALUES
     (uuid_generate_v4(), NULL, 15, 10, 120, 'Mutante das Minas', 
     'Um mineiro que passou tempo demais exposto à radiação e aos gases tóxicos. Sua pele esverdeada e olhos sem pupilas denunciam a mutação avançada. Ele ataca com unhas endurecidas como lâminas, tentando arrancar o antídoto de qualquer intruso.');
 
+INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal) VALUES
+    (uuid_generate_v4(), 'Faxina na Periferia', 'A gangue Steel Fangs está aterrorizando os becos do distrito industrial.', 2, 'Eliminar 40 Steel Fangs', 40),
+    (uuid_generate_v4(), 'Caçada aos Hackers', 'O grupo cyberterrorista Black Ice está hackeando servidores corporativos.', 3, 'Eliminar 35 Hackers Black Ice', 35),
+    (uuid_generate_v4(), 'Limpeza na Zona Vermelha', 'A milícia Red Claws impõe sua lei com brutalidade.', 2, 'Eliminar 30 Patrulheiros Red Claws', 30),
+    (uuid_generate_v4(), 'Roubo Mal-Sucedido', 'Um grupo de Neon Scavs assaltou um carregamento de implantes cibernéticos.', 3, 'Eliminar 20 Neon Scavs', 20),
+    (uuid_generate_v4(), 'Predadores Noturnos', 'Um culto de assassinos conhecidos como Children of the Void está atacando civis.', 4, 'Eliminar 10 Children of the Void', 10),
+    (uuid_generate_v4(), 'Os Oligarcas Não Perdoam', 'O sindicato de assassinos Ebony Hand falhou em um contrato e precisa ser eliminado.', 3, 'Eliminar 10 Assassinos Ebony Hand', 10),
+    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 5, 'Derrotar Zero.exe', 1),
+    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant', 1),
+    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion', 1),
+    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1)
+ON CONFLICT (nome) DO NOTHING;
+
 """
 def dml(conn):
     cursor = conn.cursor()

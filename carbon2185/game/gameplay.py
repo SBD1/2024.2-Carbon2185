@@ -1,6 +1,7 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
 from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell
+from game.models import listar_missoes_progresso
 from game.database import create_connection
 
 # Códigos de cores ANSI
@@ -289,6 +290,7 @@ def playing_with_character(conn, pc):
             navigate_in_the_map(conn, pc)
         elif escolha == "4":
             display_message("Menu das missões devem partir daqui")
+            listar_missoes_progresso(conn, pc['id'])
         elif escolha == "5":  # Agora a opção correta para sair do menu
             display_message(f"\n{cores['magenta']}Voltando ao menu principal...{cores['reset']}")
             break  # Agora sim, sair do menu do personagem
