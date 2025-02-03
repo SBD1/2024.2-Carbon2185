@@ -1,6 +1,7 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message
 from game.models import get_all_pcs 
+from game.models import listar_missoes_progresso
 from game.database import create_connection
 
 # Códigos de cores ANSI
@@ -174,7 +175,7 @@ def create_character(conn):
 def playing_with_character(conn, pc):
     
     #Menu principal do jogo quando um personagem é escolhido.
-
+    global id_player
     display_message(f" {cores['magenta']}Bem-vindo ao jogo,{cores['reset']} {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['magenta']}!{cores['reset']}")
     while True:
         print("\nO que deseja fazer?\n")
@@ -197,7 +198,7 @@ def playing_with_character(conn, pc):
             display_message("Exploração deve partir daqui")
         elif escolha == "4":
             display_message("Menu das missões devem partir daqui")
-            # listar_missoes_progresso(conn, id_personagem)
+            listar_missoes_progresso(conn, pc['id'])
         elif escolha == "5":  # Agora a opção correta para sair do menu
             display_message(f"Voltando ao menu principal...")
             break  # Agora sim, sair do menu do personagem
