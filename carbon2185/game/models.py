@@ -134,6 +134,43 @@ def progredir_missao(conn, id_personagem, id_missao):
     conn.commit()
     cursor.close()
 
+def loja(conn, id_comerciante, id_personagem, id_celula):
+    """Lógica da loja."""
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT i.id_item, a.nome, a.valor 
+        FROM Loja l
+        JOIN InstanciaItem ii ON l.id_instancia_item = ii.id_instancia_item
+        JOIN Item i ON ii.id_item = i.id_item
+        LEFT JOIN Armadura a ON i.id_item = a.id_item
+        WHERE l.id_comerciante = %s
+    """, (id_comerciante,))
+    itens = cursor.fetchall()
+    
+    print(f"\n{'🏪'*5} LOJA {'🏪'*5}")
+    for idx, (id_item, nome, valor) in enumerate(itens, 1):
+        print(f"{idx}. {nome} - {valor} wonglongs")
+    
+    escolha = input("\n1. Comprar\n2. Sair\nEscolha: ")
+    if escolha == "1":
+        item_idx = int(input("Escolha o item: ")) - 1
+        id_item = itens[item_idx][0]
+        cursor.execute("SELECT wonglongs FROM PC WHERE id_personagem = %s", (id_personagem,))
+        wonglongs = cursor.fetchone()[0]
+        
+        if wonglongs >= itens[item_idx][2]:
+            cursor.execute("UPDATE PC SET wonglongs = wonglongs - %s WHERE id_personagem = %s", 
+                          (itens[item_idx][2], id_personagem))
+            cursor.execute("""
+                INSERT INTO InstanciaItem (id_inventario, id_item)
+                VALUES ((SELECT id_inventario FROM PC WHERE id_personagem = %s), %s)
+            """, (id_personagem, id_item))
+            conn.commit()
+            print(f"{'✅'*3} Compra realizada! {'✅'*3}")
+        else:
+            print(f"{cores['vermelho']}Saldo insuficiente!{cores['reset']}")
+    cursor.close()
+
 def get_all_pcs(conn):
     """
     Retorna uma lista de todos os personagens do banco de dados no PostgreSQL.

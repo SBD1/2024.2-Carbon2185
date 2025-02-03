@@ -1,6 +1,8 @@
 from game.database import create_connection
 from game.create_tables import create_tables
 from game.gameplay import start_game
+from game.dml import dml
+from game.utils import display_message
 
 cores = {
     'vermelho': '\033[31m',
@@ -17,21 +19,23 @@ cores = {
 def main():
 
     while True:
-        print(f"Bem-vindo ao Carbon2185!\n")
+        print("\n")
+        display_message(f"{cores['magenta']}Carbon2185{cores['reset']}\n")
         print(f"{cores['amarelo']} 1. {cores['reset']}Iniciar Jogo")
         print(f"{cores['amarelo']} 2. {cores['reset']}Sair\n")
 
         conn = create_connection()
         try:
             create_tables(conn)
-
+            dml(conn)
             choice = input("Escolha uma opção: ") 
             print("\n")
             if choice == "1":
                 start_game(conn)
                 break
             elif choice == "2":
-                print("Saindo...")
+                print(f"{cores['magenta']}Saindo...{cores['reset']}\n")
+                break
             else:
                 print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
         

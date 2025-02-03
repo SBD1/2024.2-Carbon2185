@@ -1,5 +1,4 @@
 import psycopg2
-from psycopg2 import sql
 
 def create_connection():
     conn = psycopg2.connect(
