@@ -4,6 +4,7 @@ from game.gameplay import start_game
 from game.dml import dml
 from game.utils import display_message
 from game.navegation import insert_initial_data
+from game.triggers_procedures import trigger_procedure
 
 cores = {
     'vermelho': '\033[31m',
@@ -38,6 +39,7 @@ def main():
             create_tables(conn)
             dml(conn)
             insert_initial_data(conn)
+            trigger_procedure(conn)
 
             choice = input("Escolha uma opção: ") 
             print("\n")
