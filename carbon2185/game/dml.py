@@ -4,6 +4,7 @@ INSERT_DATA_SQL = """
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+
 INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
 SELECT uuid_generate_v4(), 'daimyo', 'Daimyo', 'Um guerreiro forte e resistente, especializado em táticas de combate.', 10, 5, 5
 WHERE NOT EXISTS (SELECT 1 FROM Classe WHERE tipo = 'daimyo');
@@ -23,6 +24,24 @@ WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'yakuza');
 INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
 SELECT uuid_generate_v4(), 'triad', 'Triad', 'organização secreta chinesa, mestre do submundo.', 'O poder nasce da sombra.'
 WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'triad');
+
+INSERT INTO Item (id_item, tipo)
+SELECT uuid_generate_v4(), 'equipamento'
+WHERE NOT EXISTS (SELECT 1 FROM Item WHERE tipo = 'equipamento');
+
+INSERT INTO Equipamento (id_item, tipo)
+SELECT id_item, 'arma' FROM Item WHERE tipo = 'equipamento' 
+AND NOT EXISTS (SELECT 1 FROM Equipamento WHERE tipo = 'arma');
+
+INSERT INTO Arma (id_item, id_celula, nome, descricao, valor, raridade, municao, dano)
+SELECT id_item, NULL, 'Pistola', 'Uma arma básica', 100, 'comum', 10, 5 
+FROM Equipamento WHERE tipo = 'arma'
+AND NOT EXISTS (SELECT 1 FROM Arma);
+
+INSERT INTO InstanciaItem (id_instancia_item, id_inventario, id_item)
+SELECT uuid_generate_v4(), (SELECT id_inventario FROM Inventario LIMIT 1), 
+       (SELECT id_item FROM Arma LIMIT 1)
+WHERE NOT EXISTS (SELECT 1 FROM InstanciaItem);
 
 """
 def dml(conn):

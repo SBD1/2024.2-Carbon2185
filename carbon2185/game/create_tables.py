@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS Inventario (
     id_inventario UUID DEFAULT uuid_generate_v4(),
     quantidade_itens INT NOT NULL,
     capacidade_maxima INT NOT NULL,
-    dinheiro DECIMAL(10,2) NOT NULL DEFAULT 0,
     PRIMARY KEY (id_inventario)
 );
 

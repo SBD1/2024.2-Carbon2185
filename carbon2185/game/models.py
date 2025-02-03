@@ -3,6 +3,13 @@ import psycopg2
 
 def create_pc(conn, name, description):
     cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO Inventario (quantidade_itens, capacidade_maxima) 
+        VALUES (0, 20) 
+        RETURNING id_inventario
+    """)
+    id_inventario = cursor.fetchone()[0]
     
     cursor.execute(
         """
