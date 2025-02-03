@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS Inimigo (
 
 CREATE TABLE IF NOT EXISTS Missao (
     id_missao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(100) NOT NULL,
+    nome VARCHAR(100) NOT NULL UNIQUE,
     descricao VARCHAR(100) NOT NULL,
     dificuldade INT NOT NULL,
     objetivo VARCHAR(100) NOT NULL
@@ -118,8 +118,9 @@ INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo) VALUES
     (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 5, 'Derrotar Zero.exe'),
     (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant'),
     (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion'),
-    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper');
-
+    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper')
+ON CONFLICT (nome) DO NOTHING;
+    
 CREATE TABLE IF NOT EXISTS Interacao (
     id_interacao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     personagem_origem UUID REFERENCES Personagem(id_personagem),
