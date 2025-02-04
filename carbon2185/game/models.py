@@ -282,3 +282,57 @@ def deletar_personagem(conn, id_personagem):
     except Exception as e:
         conn.rollback()
         print("Erro ao deletar personagem:", e)
+
+# chance de pc acertar inimigo
+def calcular_chance_ataque(xp, nivel):
+    diff = nivel - xp
+    chance = max(0, 70 + diff)
+    return chance
+
+#chande de inimigo acertar pc
+def calcular_chance_defesa(xp, nivel):
+    diff = xp - nivel
+    chance = max(0, 25 + diff)
+    return chance
+
+def tentar_fugir(nome, nivel):
+    chance_fuga = max(0, 50 + nivel*1.5)
+    if random.randint(0, 100) < chance_fuga:
+        print(f"{nome} conseguiu fugir com sucesso!")
+        return True
+    else:
+        print(f"{nome} falhou na fuga.")
+        return False
+    
+def atualizar_hp_inimigo(conn, id_inimigo, hp_atual):
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE Inimigo
+        SET hp_atual = %s
+        WHERE id_inimigo = %s;
+    """, (hp_atual, id_inimigo))
+    conn.commit()
+    cursor.close()
+
+def atualizar_hp_pc(conn, id_personagem, hp_atual):
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE PC
+        SET hp_atual = %s
+        WHERE id_personagem = %s;
+    """, (hp_atual, id_personagem))
+    conn.commit()
+    cursor.close()
+
+def atacar(agressor, defensor, conn):
+    chance_acerto = calcular_chance_ataque(agressor[3], defensor[2])
+    if random.randint(0, 100) < chance_acerto:
+        novo_hp = defensor[5] - agressor[4]
+        atualizar_hp_pc(conn, defensor[0], novo_hp)
+        print(f"{agressor[1]} atacou {defensor[1]} e causou {agressor[4]} de dano.")
+        if novo_hp <= 0:
+            print(f"{defensor[1]} foi morto!")
+            return True
+    else:
+        print(f"{agressor[1]} tentou atacar {defensor[1]}, mas errou.")
+    return False
