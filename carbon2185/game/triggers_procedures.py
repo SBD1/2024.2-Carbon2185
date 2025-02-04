@@ -56,139 +56,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DO $$
-DECLARE 
-    personagem_id UUID;
-    comerciante_id UUID;
-    celula_id UUID;
-BEGIN
-    -- Verificar se o comerciante já existe pelo nome
-    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Doc Carnificina') THEN
-        SELECT id_celula INTO celula_id FROM CelulaMundo WHERE nome = 'O Abatedouro' LIMIT 1;
-        
-        -- Gerar novos UUIDs
-        personagem_id := uuid_generate_v4();
-        comerciante_id := uuid_generate_v4();
-        
-        INSERT INTO Personagem (id_personagem, tipo) 
-        VALUES (personagem_id, 'npc')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO NPC (id_personagem, tipo)
-        VALUES (personagem_id, 'comerciante')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO Comerciante (id_comerciante, id_personagem, id_celula, nome, descricao)
-        VALUES (
-            comerciante_id,
-            personagem_id,
-            celula_id,
-            'Doc Carnificina',
-            'Cirurgião especializado em implantes cibernéticos de procedência duvidosa'
-        )
-        ON CONFLICT (nome) DO NOTHING;
-    END IF;
-END $$;
-
--- Comerciante para Bastião Sintético (Distrito B)
-DO $$
-DECLARE 
-    personagem_id UUID;
-    comerciante_id UUID;
-    celula_id UUID;
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Dr. Vex - "O Escultor de Aço"') THEN
-        SELECT id_celula INTO celula_id FROM CelulaMundo WHERE nome = 'Bastião Sintético' LIMIT 1;
-        
-        personagem_id := uuid_generate_v4();
-        comerciante_id := uuid_generate_v4();
-        
-        INSERT INTO Personagem (id_personagem, tipo) 
-        VALUES (personagem_id, 'npc')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO NPC (id_personagem, tipo)
-        VALUES (personagem_id, 'comerciante')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO Comerciante (id_comerciante, id_personagem, id_celula, nome, descricao)
-        VALUES (
-            comerciante_id,
-            personagem_id,
-            celula_id,
-            'Dr. Vex - "O Escultor de Aço"',
-            'Ex-cientista do regime que oferece armas e aprimoramentos cibernéticos experimentais'
-        )
-        ON CONFLICT (nome) DO NOTHING;
-    END IF;
-END $$;
-
--- Comerciante para Trilhos Mortos (Distrito C)
-DO $$
-DECLARE 
-    personagem_id UUID;
-    comerciante_id UUID;
-    celula_id UUID;
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Relíquia') THEN
-        SELECT id_celula INTO celula_id FROM CelulaMundo WHERE nome = 'Trilhos Mortos' LIMIT 1;
-        
-        personagem_id := uuid_generate_v4();
-        comerciante_id := uuid_generate_v4();
-        
-        INSERT INTO Personagem (id_personagem, tipo) 
-        VALUES (personagem_id, 'npc')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO NPC (id_personagem, tipo)
-        VALUES (personagem_id, 'comerciante')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO Comerciante (id_comerciante, id_personagem, id_celula, nome, descricao)
-        VALUES (
-            comerciante_id,
-            personagem_id,
-            celula_id,
-            'Relíquia',
-            'Mercador de tecnologia obsoleta e protótipos roubados de corporações'
-        )
-        ON CONFLICT (nome) DO NOTHING;
-    END IF;
-END $$;
-
--- Comerciante para Os Suspiros (Distrito D)
-DO $$
-DECLARE 
-    personagem_id UUID;
-    comerciante_id UUID;
-    celula_id UUID;
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Lídia "Mãos Leves"') THEN
-        SELECT id_celula INTO celula_id FROM CelulaMundo WHERE nome = 'Os Suspiros' LIMIT 1;
-        
-        personagem_id := uuid_generate_v4();
-        comerciante_id := uuid_generate_v4();
-        
-        INSERT INTO Personagem (id_personagem, tipo) 
-        VALUES (personagem_id, 'npc')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO NPC (id_personagem, tipo)
-        VALUES (personagem_id, 'comerciante')
-        ON CONFLICT (id_personagem) DO NOTHING;
-        
-        INSERT INTO Comerciante (id_comerciante, id_personagem, id_celula, nome, descricao)
-        VALUES (
-            comerciante_id,
-            personagem_id,
-            celula_id,
-            'Lídia "Mãos Leves"',
-            'Cirurgiã renegada especialista em próteses biotecnológicas ilegais e armas tecnológicas'
-        )
-        ON CONFLICT (nome) DO NOTHING;
-    END IF;
-END $$;
-
 CREATE OR REPLACE PROCEDURE Equipar_armadura(
     p_id_personagem UUID,
     p_id_armadura UUID
@@ -253,6 +120,214 @@ BEFORE DELETE ON ArmaduraEquipada
 FOR EACH ROW
 EXECUTE FUNCTION Diminuir_hp_por_armadura();
 
+-- COMERCIANTES CORRIGIDOS (SEM REPETIÇÃO DE ITENS)
+-- Doc Carnificina (Distrito A)
+DO $$
+DECLARE 
+    personagem_id UUID;
+    comerciante_id UUID;
+    celula_id UUID;
+    item_record RECORD;
+    instancia_id UUID;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Doc Carnificina') THEN
+        -- Cria NPC
+        INSERT INTO Personagem (id_personagem, tipo) 
+        VALUES (uuid_generate_v4(), 'npc') 
+        RETURNING id_personagem INTO personagem_id;
+
+        INSERT INTO NPC (id_personagem, tipo) 
+        VALUES (personagem_id, 'comerciante');
+
+        -- Localiza célula
+        SELECT id_celula INTO celula_id 
+        FROM CelulaMundo 
+        WHERE nome = 'O Abatedouro';
+
+        -- Cria Comerciante
+        INSERT INTO Comerciante (
+            id_comerciante, 
+            id_personagem, 
+            id_celula, 
+            nome, 
+            descricao
+        ) VALUES (
+            uuid_generate_v4(),
+            personagem_id,
+            celula_id,
+            'Doc Carnificina',
+            'Cirurgião especializado em armas e implantes cibernéticos de procedência duvidosa'
+        )
+        RETURNING id_comerciante INTO comerciante_id;
+
+        -- Cria instâncias únicas para cada item
+        FOR item_record IN 
+            SELECT id_item 
+            FROM Item 
+            WHERE tipo != 'objeto_mapa'
+        LOOP
+            INSERT INTO InstanciaItem (id_instancia_item, id_item)
+            VALUES (uuid_generate_v4(), item_record.id_item)
+            RETURNING id_instancia_item INTO instancia_id;
+
+            INSERT INTO Loja (id_comerciante, id_instancia_item)
+            VALUES (comerciante_id, instancia_id);
+        END LOOP;
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+-- Dr. Vex (Distrito B)
+DO $$
+DECLARE 
+    personagem_id UUID;
+    comerciante_id UUID;
+    celula_id UUID;
+    item_record RECORD;
+    instancia_id UUID;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Dr. Vex - "O Escultor de Aço"') THEN
+        INSERT INTO Personagem (id_personagem, tipo) 
+        VALUES (uuid_generate_v4(), 'npc') 
+        RETURNING id_personagem INTO personagem_id;
+
+        INSERT INTO NPC (id_personagem, tipo) 
+        VALUES (personagem_id, 'comerciante');
+
+        SELECT id_celula INTO celula_id 
+        FROM CelulaMundo 
+        WHERE nome = 'Bastião Sintético';
+
+        INSERT INTO Comerciante (
+            id_comerciante, 
+            id_personagem, 
+            id_celula, 
+            nome, 
+            descricao
+        ) VALUES (
+            uuid_generate_v4(),
+            personagem_id,
+            celula_id,
+            'Dr. Vex - "O Escultor de Aço"',
+            'Ex-cientista do regime que oferece armas e aprimoramentos cibernéticos experimentais'
+        )
+        RETURNING id_comerciante INTO comerciante_id;
+
+        FOR item_record IN 
+            SELECT id_item 
+            FROM Item 
+            WHERE tipo != 'objeto_mapa'
+        LOOP
+            INSERT INTO InstanciaItem (id_instancia_item, id_item)
+            VALUES (uuid_generate_v4(), item_record.id_item)
+            RETURNING id_instancia_item INTO instancia_id;
+
+            INSERT INTO Loja (id_comerciante, id_instancia_item)
+            VALUES (comerciante_id, instancia_id);
+        END LOOP;
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+-- Relíquia (Distrito C)
+DO $$
+DECLARE 
+    personagem_id UUID;
+    comerciante_id UUID;
+    celula_id UUID;
+    item_record RECORD;
+    instancia_id UUID;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Relíquia') THEN
+        INSERT INTO Personagem (id_personagem, tipo) 
+        VALUES (uuid_generate_v4(), 'npc') 
+        RETURNING id_personagem INTO personagem_id;
+
+        INSERT INTO NPC (id_personagem, tipo) 
+        VALUES (personagem_id, 'comerciante');
+
+        SELECT id_celula INTO celula_id 
+        FROM CelulaMundo 
+        WHERE nome = 'Trilhos Mortos';
+
+        INSERT INTO Comerciante (
+            id_comerciante, 
+            id_personagem, 
+            id_celula, 
+            nome, 
+            descricao
+        ) VALUES (
+            uuid_generate_v4(),
+            personagem_id,
+            celula_id,
+            'Relíquia',
+            'Mercador de tecnologia obsoleta e protótipos roubados de corporações'
+        )
+        RETURNING id_comerciante INTO comerciante_id;
+
+        FOR item_record IN 
+            SELECT id_item 
+            FROM Item 
+            WHERE tipo != 'objeto_mapa'
+        LOOP
+            INSERT INTO InstanciaItem (id_instancia_item, id_item)
+            VALUES (uuid_generate_v4(), item_record.id_item)
+            RETURNING id_instancia_item INTO instancia_id;
+
+            INSERT INTO Loja (id_comerciante, id_instancia_item)
+            VALUES (comerciante_id, instancia_id);
+        END LOOP;
+    END IF;
+END $$ LANGUAGE plpgsql;
+
+-- Lídia (Distrito D)
+DO $$
+DECLARE 
+    personagem_id UUID;
+    comerciante_id UUID;
+    celula_id UUID;
+    item_record RECORD;
+    instancia_id UUID;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Comerciante WHERE nome = 'Lídia "Mãos Leves"') THEN
+        INSERT INTO Personagem (id_personagem, tipo) 
+        VALUES (uuid_generate_v4(), 'npc') 
+        RETURNING id_personagem INTO personagem_id;
+
+        INSERT INTO NPC (id_personagem, tipo) 
+        VALUES (personagem_id, 'comerciante');
+
+        SELECT id_celula INTO celula_id 
+        FROM CelulaMundo 
+        WHERE nome = 'Os Suspiros';
+
+        INSERT INTO Comerciante (
+            id_comerciante, 
+            id_personagem, 
+            id_celula, 
+            nome, 
+            descricao
+        ) VALUES (
+            uuid_generate_v4(),
+            personagem_id,
+            celula_id,
+            'Lídia "Mãos Leves"',
+            'Cirurgiã renegada especialista em próteses biotecnológicas ilegais e armas tecnológicas'
+        )
+        RETURNING id_comerciante INTO comerciante_id;
+
+        FOR item_record IN 
+            SELECT id_item 
+            FROM Item 
+            WHERE tipo != 'objeto_mapa'
+        LOOP
+            INSERT INTO InstanciaItem (id_instancia_item, id_item)
+            VALUES (uuid_generate_v4(), item_record.id_item)
+            RETURNING id_instancia_item INTO instancia_id;
+
+            INSERT INTO Loja (id_comerciante, id_instancia_item)
+            VALUES (comerciante_id, instancia_id);
+        END LOOP;
+    END IF;
+END $$ LANGUAGE plpgsql;
 
 -- trigger concluir missao e recompensar player
 CREATE OR REPLACE FUNCTION concluir_missao()
