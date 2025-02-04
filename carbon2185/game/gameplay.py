@@ -542,11 +542,13 @@ def interact_with_merchant(conn, merchant_id, pc_id):
                             WHERE id_personagem = %s
                         """, (item_escolhido[2], pc_id))
                         
-                        # Remove da loja
                         cursor.execute("""
-                            DELETE FROM Loja
-                            WHERE id_instancia_item = %s
-                        """, (item_escolhido[3],))
+                            UPDATE Inventario
+                            SET quantidade_itens = quantidade_itens + 1
+                            WHERE id_inventario = (
+                                SELECT id_inventario FROM PC WHERE id_personagem = %s
+                            )
+                        """, (pc_id,))
                         
                         conn.commit()
                         print(f"\n{cores['verde']}Compra realizada! {item_escolhido[0]} adicionado ao inventário.{cores['reset']}")
