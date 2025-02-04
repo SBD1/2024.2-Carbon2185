@@ -44,11 +44,12 @@ RETURNS TABLE (
     descricao VARCHAR(100),
     dificuldade INT,
     objetivo VARCHAR(100),
-    progresso INT
+    progresso INT,
+    recompensa INT
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT m.nome, m.descricao, m.dificuldade, m.objetivo, p.progresso
+    SELECT m.nome, m.descricao, m.dificuldade, m.objetivo, p.progresso, m.recompensa
     FROM Missao m
     JOIN ProgressoMissao p ON m.id_missao = p.id_missao
     WHERE p.id_personagem = $1;
@@ -327,6 +328,31 @@ BEGIN
         END LOOP;
     END IF;
 END $$ LANGUAGE plpgsql;
+
+-- trigger concluir missao e recompensar player
+CREATE OR REPLACE FUNCTION concluir_missao()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.progresso >= (SELECT goal FROM Missao WHERE id_missao = NEW.id_missao) THEN
+        UPDATE ProgressoMissao
+        SET progresso = 0
+        WHERE id_missao = NEW.id_missao AND id_personagem = NEW.id_personagem;
+
+        UPDATE PC
+        SET wonglongs = wonglongs + (SELECT recompensa FROM Missao WHERE id_missao = NEW.id_missao)
+        WHERE id_personagem = NEW.id_personagem;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_concluir_missao ON ProgressoMissao;
+
+CREATE TRIGGER trigger_concluir_missao
+AFTER UPDATE ON ProgressoMissao
+FOR EACH ROW
+EXECUTE FUNCTION concluir_missao();
 
 """
 def trigger_procedure(conn):
