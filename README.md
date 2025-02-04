@@ -39,6 +39,43 @@
   - [DML](./docs/entrega-2/DML.md)
   - [DQL](./docs/entrega-2/DQL.md)
 
+## 🎮 Intruções para executar o jogo
+
+### Tecnologias necessárias
+
+- **Docker**.
+- **Docker Compose**.
+
+### Comandos para rodar
+
+1. **Clone o Repositório** 
+
+```bash
+git clone git@github.com:SBD1/2024.2-Carbon2185.git
+```
+
+1. **Acesse o diretório do jogo**
+
+```bash
+cd carbon2185
+```
+
+3. **Contruir as imagens Docker**
+
+```bash
+docker-compose build
+```
+
+4. **Rodar o App**
+
+```bash
+docker-compose run app
+```
+
+### Acessando o Banco de Dados
+
+Para visualizar o banco de dados, você pode usar um cliente como o DBeaver. Utilize as credenciais do banco local, que podem ser encontradas no arquivo `game/database.py`. Certifique-se de usar o host localhost para a conexão com o banco.
+
 <div align="left">
   <h2> Colaboradores </h2>
 </div> 
@@ -87,8 +124,3 @@
       </a>
     </td>
 </div>
-
-
-
-
-
