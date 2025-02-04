@@ -1,4 +1,17 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: carbon2185_app
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    command: python3 main.py
+    stdin_open: true
+    tty: true 
+
   postgres:
     image: postgres:15
     container_name: carbon2185_db
