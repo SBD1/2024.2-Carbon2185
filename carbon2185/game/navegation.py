@@ -110,3 +110,4 @@ def insert_initial_data(conn):
 
     conn.commit()
     cur.close()
+

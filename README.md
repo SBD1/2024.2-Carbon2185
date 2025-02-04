@@ -39,6 +39,10 @@
   - [DML](./docs/entrega-2/DML.md)
   - [DQL](./docs/entrega-2/DQL.md)
 
+- Entrega do módulo 2
+
+  - [Apresentação](./docs/entrega-3/Apresentação.md)
+
 ## 🎮 Intruções para executar o jogo
 
 ### Tecnologias necessárias

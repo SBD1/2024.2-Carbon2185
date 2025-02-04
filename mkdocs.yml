@@ -44,6 +44,8 @@ nav:
     - DDL: entrega-2/DDL.md
     - DML: entrega-2/DML.md
     - DQL: entrega-2/DQL.md
+  - Entrega 03:
+    - Apresentação: entrega-3/Apresentação.md
 
 extra_css:
   - css/extra.css
