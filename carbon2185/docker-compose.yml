@@ -1,22 +1,4 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: carbon2185_app
-    depends_on:
-      - postgres
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql://carbon_user:carbon_password@postgres:5432/carbon2185
-    command: python main.py
-    stdin_open: true
-    tty: true 
-
   postgres:
     image: postgres:15
     container_name: carbon2185_db
