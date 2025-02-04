@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12.3
 
 ENV POSTGRES_USER=carbon_user
 ENV POSTGRES_PASSWORD=carbon_password
@@ -8,14 +8,15 @@ ENV POSTGRES_PORT=5432
 
 WORKDIR /app
 
-COPY . /app
+COPY requirements.txt /app/
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "carbon2185/main.py"]
+COPY . /app
+
+CMD ["python", "main.py"]
