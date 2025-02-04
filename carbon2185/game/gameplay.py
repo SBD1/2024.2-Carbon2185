@@ -1,6 +1,6 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
-from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo    
 from game.database import create_connection
 from game.utils import get_cell_label, display_map, generate_map, move_player
 import os 
@@ -106,31 +106,14 @@ def start_game(conn):
 
 
 def select_character(conn):
-    """
-    Lista os personagens existentes no banco de dados e permite ao jogador selecionar um.
-    """
-    personagens = get_all_pcs(conn)  # Obtém todos os personagens do banco de dados
-
-    if not personagens:
-       print("\n")
-       print(f"{cores['vermelho']}Nenhum personagem encontrado. Crie um primeiro!{cores['reset']}")
-       return
-
-    print(f"\n{cores['magenta']}Selecione um personagem para jogar:{cores['reset']}\n")
-    for i, personagem in enumerate(personagens, start=1):
-        print(f"{cores['amarelo']}{i}.{cores['reset']} {personagem['nome']}\n")
-
-    while True:
-        try:
-            escolha = int(input("Escolha o número do personagem: ")) - 1
-            if 0 <= escolha < len(personagens):
-                personagem_escolhido = personagens[escolha]
-                playing_with_character(conn, personagem_escolhido)  # Chama o menu do jogo com o personagem escolhido
-                break
-            else:
-                print(f"{cores['vermelho']}\nEscolha inválida.\n{cores['reset']}")
-        except ValueError:
-            print(f"{cores['vermelho']}\nDigite um número válido.\n{cores['reset']}")
+    personagens = get_all_pcs(conn)
+    
+    print(f"\n{cores['magenta']}Selecione um personagem:{cores['reset']}")
+    for idx, pc in enumerate(personagens, 1):
+        print(f"{cores['amarelo']}{idx}.{cores['reset']} {pc['nome']} (HP: {pc['hp_atual']}/{pc['hp']})")
+    
+    escolha = int(input("\nEscolha: ")) - 1
+    return personagens[escolha]
 
 
 def create_character(conn):
@@ -204,15 +187,14 @@ def create_character(conn):
 
     # 7. Inserir PC
     cursor.execute("""
-        INSERT INTO PC (
-            id_personagem, id_celula, id_faccao, id_classe, id_inventario,
-            energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, (
-        id_personagem, celula_inicial, id_faccao_escolhida, id_classe_escolhida, id_inventario,
-        energia_final, 100, dano_final, hp_final, hp_final, 1, 0, nome_personagem, descricao_personagem
-    ))
-
+    INSERT INTO PC (
+        id_personagem, id_celula, id_faccao, id_classe, id_inventario,
+        energia, wonglongs, dano, hp, hp_atual, nivel, xp, nome, descricao
+    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+""", (
+    id_personagem, celula_inicial, id_faccao_escolhida, id_classe_escolhida, id_inventario,
+    energia_final, 100, dano_final, hp_final, hp_final, 1, 0, nome_personagem, descricao_personagem
+))
     # 8. Adicionar arma inicial (Glock)
     cursor.execute("""
         SELECT i.id_item 
@@ -263,11 +245,21 @@ def navigate_in_the_map(conn, pc):
             new_cell_id = get_cell_id_by_position(conn, *new_position)
             
             if new_cell_id:
-                # Atualiza posição
                 player_position = new_position
                 update_player_cell(conn, pc['id'], new_cell_id)
                 
-                # Verifica comerciante
+                # Verifica combate
+                inimigos = get_inimigos_na_celula(conn, new_cell_id)
+                if inimigos:
+                    # Limpa a tela antes do combate
+                    os.system("cls" if os.name == "nt" else "clear")
+                    resultado = handle_combat(conn, pc, inimigos)
+                    if not resultado:  # Se jogador morreu
+                        deletar_personagem(conn, pc['id'])
+                        print(f"{cores['vermelho']}Game Over!{cores['reset']}")
+                        return
+
+                # Verifica comerciante (mantido do código anterior)
                 merchant = check_merchant(conn, new_cell_id)
                 if merchant:
                     # Limpa a tela antes da interação
@@ -589,3 +581,71 @@ def check_merchant(conn, cell_id):
         return None
     finally:
         cursor.close()
+
+def handle_combat(conn, pc, inimigos):
+    while inimigos:
+        current_enemy = inimigos[0]
+        
+        print(f"\n{cores['vermelho']}=== COMBATE ==={cores['reset']}")
+        print(f"Inimigo: {current_enemy['nome']}")
+        print(f"HP: {current_enemy['hp_atual']}/{current_enemy['hp_max']}")
+        print(f"{cores['amarelo']}Seu HP: {pc['hp_atual']}{cores['reset']}\n")
+
+        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar\n{cores['amarelo']}2.{cores['reset']} Fugir\nEscolha: ")
+
+        if escolha == "1":
+            # Jogador ataca
+            dano_jogador = pc['dano']
+            current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_jogador)
+            atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
+            
+            print(f"\n{cores['verde']}Você causou {dano_jogador} de dano!{cores['reset']}")
+
+            if current_enemy['hp_atual'] <= 0:
+                print(f"{cores['verde']}Inimigo derrotado!{cores['reset']}")
+                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp']//2)
+                remover_inimigo(conn, current_enemy['id'])
+                inimigos.pop(0)
+                continue
+
+            # Inimigo contra-ataca
+            dano_inimigo = current_enemy['dano']
+            novo_hp = max(0, pc['hp_atual'] - dano_inimigo)
+            atualizar_hp_jogador(conn, pc['id'], novo_hp)
+            
+            print(f"{cores['vermelho']}O inimigo contra-atacou causando {dano_inimigo} de dano!{cores['reset']}")
+            
+            if novo_hp <= 0:
+                print(f"{cores['vermelho']}Você foi derrotado!{cores['reset']}")
+                input("Pressione Enter para continuar...")
+                return False
+
+        elif escolha == "2":
+            if random.random() < 0.5:  # 50% de chance de fugir
+                print(f"{cores['ciano']}Fuga bem sucedida!{cores['reset']}")
+                return True
+            else:
+                print(f"{cores['vermelho']}Falha na fuga!{cores['reset']}")
+                # Inimigo ataca quando a fuga falha
+                dano_inimigo = current_enemy['dano']
+                novo_hp = max(0, pc['hp_atual'] - dano_inimigo)
+                atualizar_hp_jogador(conn, pc['id'], novo_hp)
+                
+                print(f"{cores['vermelho']}O inimigo atacou causando {dano_inimigo} de dano!{cores['reset']}")
+                
+                if novo_hp <= 0:
+                    print(f"{cores['vermelho']}Você foi derrotado!{cores['reset']}")
+                    input("Pressione Enter para continuar...")
+                    return False
+        else:
+            print("Opção inválida!")
+
+        # Atualiza status do PC
+        cursor = conn.cursor()
+        cursor.execute("SELECT hp_atual FROM PC WHERE id_personagem = %s", (pc['id'],))
+        pc['hp_atual'] = cursor.fetchone()[0]
+        cursor.close()
+
+    print(f"{cores['verde']}Todos os inimigos foram derrotados!{cores['reset']}")
+    input("Pressione Enter para continuar...")
+    return True

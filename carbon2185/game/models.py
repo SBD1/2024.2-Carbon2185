@@ -174,16 +174,37 @@ def loja(conn, id_comerciante, id_personagem, id_celula):
     cursor.close()
 
 def get_all_pcs(conn):
-    """
-    Retorna uma lista de todos os personagens do banco de dados no PostgreSQL.
-    """
+    """Retorna uma lista de todos os personagens com todos os atributos necessários."""
     cursor = conn.cursor()
-    cursor.execute("SELECT id_personagem, nome, descricao FROM PC")  # Ajuste os campos conforme necessário
-    PC = cursor.fetchall()  # Obtém todos os personagens
-
-    # Convertendo a lista de tuplas para uma lista de dicionários
-    return [{"id": row[0], "nome": row[1]} for row in PC]
-
+    cursor.execute("""
+        SELECT 
+            id_personagem,
+            nome,
+            descricao,
+            energia,
+            wonglongs,
+            dano,
+            hp,
+            hp_atual,
+            nivel,
+            xp
+        FROM PC
+    """)
+    pcs = cursor.fetchall()
+    
+    # Convertendo para lista de dicionários
+    return [{
+        'id': row[0],
+        'nome': row[1],
+        'descricao': row[2],
+        'energia': row[3],
+        'wonglongs': row[4],
+        'dano': row[5],
+        'hp': row[6],
+        'hp_atual': row[7],
+        'nivel': row[8],
+        'xp': row[9]
+    } for row in pcs]
 
 # Função para buscar a posição inicial do personagem no banco
 def get_player_position(conn, pc_id):
@@ -284,56 +305,69 @@ def deletar_personagem(conn, id_personagem):
         conn.rollback()
         print("Erro ao deletar personagem:", e)
 
-# chance de pc acertar inimigo
-def calcular_chance_ataque(xp, nivel):
-    diff = nivel - xp
-    chance = max(0, 70 + diff)
-    return chance
-
-#chande de inimigo acertar pc
-def calcular_chance_defesa(xp, nivel):
-    diff = xp - nivel
-    chance = max(0, 25 + diff)
-    return chance
-
-def tentar_fugir(nome, nivel):
-    chance_fuga = max(0, 50 + nivel*1.5)
-    if random.randint(0, 100) < chance_fuga:
-        print(f"{nome} conseguiu fugir com sucesso!")
-        return True
-    else:
-        print(f"{nome} falhou na fuga.")
-        return False
-    
-def atualizar_hp_inimigo(conn, id_inimigo, hp_atual):
+def get_inimigos_na_celula(conn, cell_id):
+    """Retorna todas as instâncias de inimigos na célula atual"""
     cursor = conn.cursor()
     cursor.execute("""
-        UPDATE Inimigo
+        SELECT 
+            ii.id_instancia_inimigo,
+            i.nome,
+            ii.hp_atual,
+            i.dano,
+            i.xp,
+            i.hp
+        FROM InstanciaInimigo ii
+        JOIN Inimigo i ON ii.id_inimigo = i.id_inimigo
+        WHERE ii.id_celula = %s
+    """, (cell_id,))
+    inimigos = cursor.fetchall()
+    cursor.close()
+    return [{
+        'id': row[0],
+        'nome': row[1],
+        'hp_atual': row[2],
+        'dano': row[3],
+        'xp': row[4],
+        'hp_max': row[5]
+    } for row in inimigos]
+
+def atualizar_hp_inimigo(conn, instancia_id, novo_hp):
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE InstanciaInimigo
         SET hp_atual = %s
-        WHERE id_inimigo = %s;
-    """, (hp_atual, id_inimigo))
+        WHERE id_instancia_inimigo = %s
+    """, (novo_hp, instancia_id))
     conn.commit()
     cursor.close()
 
-def atualizar_hp_pc(conn, id_personagem, hp_atual):
+def remover_inimigo(conn, instancia_id):
+    cursor = conn.cursor()
+    cursor.execute("""
+        DELETE FROM InstanciaInimigo
+        WHERE id_instancia_inimigo = %s
+    """, (instancia_id,))
+    conn.commit()
+    cursor.close()
+
+def atualizar_hp_jogador(conn, pc_id, novo_hp):
     cursor = conn.cursor()
     cursor.execute("""
         UPDATE PC
         SET hp_atual = %s
-        WHERE id_personagem = %s;
-    """, (hp_atual, id_personagem))
+        WHERE id_personagem = %s
+    """, (novo_hp, pc_id))
     conn.commit()
     cursor.close()
 
-def atacar(agressor, defensor, conn):
-    chance_acerto = calcular_chance_ataque(agressor[3], defensor[2])
-    if random.randint(0, 100) < chance_acerto:
-        novo_hp = defensor[5] - agressor[4]
-        atualizar_hp_pc(conn, defensor[0], novo_hp)
-        print(f"{agressor[1]} atacou {defensor[1]} e causou {agressor[4]} de dano.")
-        if novo_hp <= 0:
-            print(f"{defensor[1]} foi morto!")
-            return True
-    else:
-        print(f"{agressor[1]} tentou atacar {defensor[1]}, mas errou.")
-    return False
+def adicionar_recompensa(conn, pc_id, xp, wonglongs):
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE PC
+        SET 
+            xp = xp + %s,
+            wonglongs = wonglongs + %s
+        WHERE id_personagem = %s
+    """, (xp, wonglongs, pc_id))
+    conn.commit()
+    cursor.close()
