@@ -246,25 +246,14 @@ def create_character(conn):
 import time
 
 def navigate_in_the_map(conn, pc):
-    print(pc)
     game_map = generate_map()
-    
-    # Sempre carrega a posição ATUAL do banco
     player_position = get_player_position(conn, pc['id'])
     
-    # Informações iniciais
-    initial_cell_id = get_cell_id_by_position(conn, *player_position)
-    if initial_cell_id:
-        cell_info = get_cell_info(conn, initial_cell_id)
-        display_cell_info(cell_info)
-
     while True:
         display_map(game_map, player_position)
-        print("\n")
         command = input(f"{cores['amarelo']}Movimento:{cores['reset']} ").lower()
 
         if command == "voltar":
-            # Atualiza a posição FINAL antes de sair
             final_cell_id = get_cell_id_by_position(conn, *player_position)
             update_player_cell(conn, pc['id'], final_cell_id)
             break
@@ -274,12 +263,29 @@ def navigate_in_the_map(conn, pc):
             new_cell_id = get_cell_id_by_position(conn, *new_position)
             
             if new_cell_id:
-                print("\nNavegando...")
-                time.sleep(3)
-                # Atualiza tanto a posição local quanto no banco
+                # Atualiza posição
                 player_position = new_position
                 update_player_cell(conn, pc['id'], new_cell_id)
                 
+                # Verifica comerciante
+                merchant = check_merchant(conn, new_cell_id)
+                if merchant:
+                    # Limpa a tela antes da interação
+                    os.system("cls" if os.name == "nt" else "clear")
+                    
+                    # Mostra diálogo do comerciante
+                    print(f"\n{cores['ciano']}=== {merchant['nome']} ==={cores['reset']}")
+                    print(f"{cores['branco']}{merchant['descricao']}{cores['reset']}\n")
+                    
+                    # Opção de interação
+                    choice = input(f"{cores['amarelo']}Deseja interagir? (s/n): {cores['reset']}").lower()
+                    if choice == 's':
+                        # Chama a interface de compras
+                        interact_with_merchant(conn, merchant['id_comerciante'], pc['id'])
+                        input(f"\n{cores['verde']}Pressione Enter para voltar ao mapa...{cores['reset']}")
+                        continue  # Pula para o início do loop
+                    
+                # Mostra informações da célula APENAS se não interagiu
                 cell_info = get_cell_info(conn, new_cell_id)
                 display_cell_info(cell_info)
                 
@@ -389,7 +395,7 @@ def inventario(conn, id_personagem):
     """, (id_personagem,))
     quantidade, capacidade = cursor.fetchone()
     
-    # Consulta dos itens
+    # Restante do código mantido
     cursor.execute("""
         SELECT 
             ii.id_instancia_item,
@@ -403,20 +409,11 @@ def inventario(conn, id_personagem):
     """, (id_personagem,))
     itens = cursor.fetchall()
     
-    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")
-    
-    # Verificação REAL se há itens
-    if not itens:
-        print(f"{cores['vermelho']}Seu inventário está vazio.{cores['reset']}")
-        cursor.close()
-        return
-    
-    # Listagem de itens
+    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")  # Alterado aqui
     for idx, (id_instancia, nome, desc) in enumerate(itens, start=1):
         print(f"{cores['verde']}{idx}.{cores['reset']} {nome} - {desc}")
 
     escolha = input(f"\n\n{cores['amarelo']}1.{cores['reset']} Descartar item\n\n{cores['amarelo']}2.{cores['reset']} Voltar\n\nEscolha: ")
-    
     if escolha == "1":
         try:
             entrada = input(f"\nEscolha o número do item para descartar ou digite 'voltar' para sair: ").strip().lower()
@@ -429,39 +426,164 @@ def inventario(conn, id_personagem):
                     confirm = input(f"Tem certeza que deseja descartar o item? ({cores['verde']}s{cores['reset']}/{cores['vermelho']}n{cores['reset']}): ").strip().lower()
                     if confirm == 's':
                         descartar_item(conn, itens[item_idx][0], id_personagem)
-                        inventario(conn, id_personagem)  # Atualiza a lista após descarte
                     else:
                         print(f"{cores['amarelo']}\nDescartar item cancelado. Voltando à listagem de itens...{cores['reset']}")
-                        inventario(conn, id_personagem)
+                        inventario(conn, id_personagem)  # Retorna à listagem
                 else:
                     print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
         except ValueError:
             print(f"{cores['vermelho']}Entrada inválida!{cores['reset']}")
+    # Se a escolha for "2" ou qualquer outra opção, apenas retorna ao menu
     cursor.close()
 
 def descartar_item(conn, id_instancia_item, id_personagem):
-    """Descarta um item, removendo a instância do inventário do personagem."""
     cursor = conn.cursor()
     try:
-        # Deletar o item diretamente (já validamos a existência anteriormente)
+        # Deletar o item
         cursor.execute("""
             DELETE FROM InstanciaItem 
             WHERE id_instancia_item = %s 
-              AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+            AND id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
         """, (id_instancia_item, id_personagem))
         
-        # Atualizar quantidade no inventário
+        # Atualizar a quantidade no inventário
         cursor.execute("""
             UPDATE Inventario
-            SET quantidade_itens = GREATEST(quantidade_itens - 1, 0)
+            SET quantidade_itens = quantidade_itens - 1
             WHERE id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
         """, (id_personagem,))
         
         conn.commit()
-        print(f"\n{cores['verde']}Item descartado! Atualizando inventário...{cores['reset']}")
-        
+        print(f"\n{cores['verde']}Item descartado!{cores['reset']}")
     except Exception as e:
         conn.rollback()
-        print(f"{cores['vermelho']}Erro ao descartar item: {str(e)}{cores['reset']}")
+        print(f"{cores['vermelho']}Erro ao descartar item: {e}{cores['reset']}")
+    finally:
+        cursor.close()
+
+def interact_with_merchant(conn, merchant_id, pc_id):
+    cursor = conn.cursor()
+    try:
+        # Consulta melhorada com informações de atributos
+        cursor.execute("""
+            SELECT 
+                i.nome,
+                i.descricao,
+                i.valor,
+                ii.id_instancia_item,
+                i.tipo,
+                COALESCE(a.dano, ar.hp_bonus, ic.dano) AS atributo_principal,
+                COALESCE(a.municao, ic.custo_energia, 0) AS atributo_secundario
+            FROM Loja l
+            JOIN InstanciaItem ii ON l.id_instancia_item = ii.id_instancia_item
+            JOIN Item i ON ii.id_item = i.id_item
+            LEFT JOIN Arma a ON i.id_item = a.id_item
+            LEFT JOIN Armadura ar ON i.id_item = ar.id_item
+            LEFT JOIN ImplanteCibernetico ic ON i.id_item = ic.id_item
+            WHERE l.id_comerciante = %s
+        """, (merchant_id,))
+        
+        items = cursor.fetchall()
+
+        if not items:
+            print(f"\n{cores['amarelo']}A loja está em renovação, volte mais tarde!{cores['reset']}")
+            return
+
+        while True:
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"{cores['ciano']}=== LOJA ==={cores['reset']}")
+            
+            # Mostra saldo
+            cursor.execute("SELECT wonglongs FROM PC WHERE id_personagem = %s", (pc_id,))
+            wonglongs = cursor.fetchone()[0]
+            print(f"{cores['verde']}Saldo Disponível: {wonglongs} Wonglongs{cores['reset']}\n")
+
+            # Lista detalhada de itens
+            for idx, item in enumerate(items, 1):
+                tipo = item[4]
+                detalhes = ""
+                
+                if tipo == 'arma':
+                    detalhes = f"Dano: {item[5]} | Munição: {item[6]}"
+                elif tipo == 'armadura':
+                    detalhes = f"HP Bonus: {item[5]}"
+                elif tipo == 'implantecibernetico':
+                    detalhes = f"Dano: {item[5]} | Custo Energia: {item[6]}"
+                
+                print(f"{cores['amarelo']}{idx}.{cores['reset']} {item[0]} ({tipo})")
+                print(f"   {item[1]}")
+                print(f"   {detalhes}")
+                print(f"   {cores['verde']}Preço: {item[2]} Wonglongs{cores['reset']}\n")
+
+            print(f"{cores['amarelo']}0. Voltar ao Mapa{cores['reset']}")
+            escolha = input("\nEscolha um item: ")
+
+            if escolha == "0":
+                break
+
+            try:
+                idx = int(escolha) - 1
+                if 0 <= idx < len(items):
+                    item_escolhido = items[idx]
+                    
+                    # Verifica saldo
+                    if wonglongs >= item_escolhido[2]:
+                        # Atualiza inventário
+                        cursor.execute("""
+                            UPDATE InstanciaItem
+                            SET id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = %s)
+                            WHERE id_instancia_item = %s
+                        """, (pc_id, item_escolhido[3]))
+                        
+                        # Atualiza Wonglongs
+                        cursor.execute("""
+                            UPDATE PC
+                            SET wonglongs = wonglongs - %s
+                            WHERE id_personagem = %s
+                        """, (item_escolhido[2], pc_id))
+                        
+                        # Remove da loja
+                        cursor.execute("""
+                            DELETE FROM Loja
+                            WHERE id_instancia_item = %s
+                        """, (item_escolhido[3],))
+                        
+                        conn.commit()
+                        print(f"\n{cores['verde']}Compra realizada! {item_escolhido[0]} adicionado ao inventário.{cores['reset']}")
+                    else:
+                        print(f"\n{cores['vermelho']}Saldo insuficiente!{cores['reset']}")
+                    
+                    input(f"\n{cores['amarelo']}Pressione Enter para continuar...{cores['reset']}")
+                else:
+                    print(f"\n{cores['vermelho']}Índice inválido!{cores['reset']}")
+                    time.sleep(1)
+            except ValueError:
+                print(f"\n{cores['vermelho']}Digite um número válido!{cores['reset']}")
+                time.sleep(1)
+                
+    except Exception as e:
+        print(f"\n{cores['vermelho']}Erro na transação: {str(e)}{cores['reset']}")
+        conn.rollback()
+    finally:
+        cursor.close()
+
+def check_merchant(conn, cell_id):
+    """Verifica se há um comerciante na célula atual e retorna um dicionário"""
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT id_comerciante, nome, descricao 
+            FROM Comerciante 
+            WHERE id_celula = %s
+        """, (cell_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            return {
+                'id_comerciante': result[0],  # Primeira coluna: id_comerciante
+                'nome': result[1],           # Segunda coluna: nome
+                'descricao': result[2]       # Terceira coluna: descricao
+            }
+        return None
     finally:
         cursor.close()

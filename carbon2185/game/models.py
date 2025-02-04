@@ -43,34 +43,18 @@ def create_pc(conn, name, description):
     cursor.close()
 
 
-def interact_with_npc(conn, npc_id, id_personagem):
-
-    from game.gameplay import loja 
-
+def interact_with_npc(conn, npc_id, pc_id):
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT tipo, id_personagem FROM NPC WHERE id_personagem = %s", (npc_id,)
-    )
-
-    npc_info = cursor.fetchone()
-    if not npc_info:
-        print("NPC não encontrado.")
-        cursor.close()
-        return
-    
-        npc_type, id_comerciante = npc_info
+    cursor.execute("SELECT tipo FROM NPC WHERE id_personagem = %s", (npc_id,))
+    npc_type = cursor.fetchone()[0]
     
     if npc_type == 'comerciante':
-        print("Este NPC é um comerciante. Você pode comprar itens aqui.")
-        cursor.execute("SELECT id_celula FROM Comerciante WHERE id_personagem = %s", (npc_id,))
-        id_celula = cursor.fetchone()
-        if id_celula:
-            loja(conn, id_comerciante, id_personagem, id_celula[0])
-        else:
-            print("Erro ao localizar a célula do comerciante.")
+        cursor.execute("SELECT id_comerciante FROM Comerciante WHERE id_personagem = %s", (npc_id,))
+        merchant_id = cursor.fetchone()[0]
+        interact_with_merchant(conn, merchant_id, pc_id)
     elif npc_type == 'inimigo':
-        print("Este NPC é um inimigo! Prepare-se para lutar.")
-
+        print(f"{cores['vermelho']}Prepare-se para lutar!{cores['reset']}")
+        # Lógica de combate aqui
     cursor.close()
 
 def create_npc(conn, npc_type, id_celula=None):
