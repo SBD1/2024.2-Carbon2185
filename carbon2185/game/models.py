@@ -301,7 +301,7 @@ def deletar_personagem(conn, id_personagem):
             cur.execute("DELETE FROM PC WHERE id_personagem = %s", (id_personagem,))
             conn.commit()
             print("\n")
-            print(f"{cores['magenta']}Você perdeu, seu personagem deletado!{cores['reset']}")
+            print(f"{cores['magenta']}Você perdeu, seu personagem foi deletado!{cores['reset']}")
             print("\n")
     except Exception as e:
         conn.rollback()

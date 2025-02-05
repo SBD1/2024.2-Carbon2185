@@ -268,38 +268,33 @@ def navigate_in_the_map(conn, pc):
                 player_position = new_position
                 update_player_cell(conn, pc['id'], new_cell_id)
                 
-                # Verifica combate
-                inimigos = get_inimigos_na_celula(conn, new_cell_id)
-                if inimigos:
-                    # Limpa a tela antes do combate
-                    os.system("cls" if os.name == "nt" else "clear")
-                    resultado = handle_combat(conn, pc, inimigos)
-                    if not resultado:  # Se jogador morreu
-                        deletar_personagem(conn, pc['id'])
-                        print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
-                        print("\n")
-                        start_game(conn)
-                        break
+                # Verifica combate com 50% de chance
+                if random.random() < 0.5:  # 50% de probabilidade
+                    inimigos = get_inimigos_na_celula(conn, new_cell_id)
+                    if inimigos:
+                        os.system("cls" if os.name == "nt" else "clear")
+                        resultado = handle_combat(conn, pc, inimigos)
+                        if not resultado:
+                            deletar_personagem(conn, pc['id'])
+                            print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
+                            start_game(conn)
+                            break
+                else:
+                    print("\n")
+                    print(f"\n{cores['ciano']}Você teve sorte! Nenhum inimigo apareceu.{cores['reset']}")
+                    time.sleep(2)
 
-                # Verifica comerciante (mantido do código anterior)
+                # Restante do código para verificar comerciante e mostrar info da célula
                 merchant = check_merchant(conn, new_cell_id)
                 if merchant:
-                    # Limpa a tela antes da interação
                     os.system("cls" if os.name == "nt" else "clear")
-                    
-                    # Mostra diálogo do comerciante
                     print(f"\n{cores['ciano']}=== {merchant['nome']} ==={cores['reset']}")
                     print(f"{cores['branco']}{merchant['descricao']}{cores['reset']}\n")
-                    
-                    # Opção de interação
                     choice = input(f"{cores['amarelo']}Deseja interagir? (s/n): {cores['reset']}").lower()
                     if choice == 's':
-                        # Chama a interface de compras
                         interact_with_merchant(conn, merchant['id_comerciante'], pc['id'])
                         input(f"\n{cores['verde']}Pressione Enter para voltar ao mapa...{cores['reset']}")
-                        continue  # Pula para o início do loop
-                    
-                # Mostra informações da célula APENAS se não interagiu
+                
                 cell_info = get_cell_info(conn, new_cell_id)
                 display_cell_info(cell_info)
                 
