@@ -102,19 +102,39 @@ def start_game(conn):
             display_message(f"{cores['magenta']}Saindo do jogo. Até a próxima!{cores['reset']}")
             break
         else:
+            print("\n")
             display_message(f"{cores['vermelho']}Opção inválida. Tente novamente.{cores['reset']}")
 
 
 def select_character(conn):
     personagens = get_all_pcs(conn)
     
-    print(f"\n{cores['magenta']}Selecione um personagem:{cores['reset']}")
-    for idx, pc in enumerate(personagens, 1):
-        print(f"{cores['amarelo']}{idx}.{cores['reset']} {pc['nome']} (HP: {pc['hp_atual']}/{pc['hp']})")
+    if not personagens:
+        print(f"\n{cores['vermelho']}Nenhum personagem disponível.{cores['reset']}")
+        return None
     
-    escolha = int(input("\nEscolha: ")) - 1
-    return personagens[escolha]
+    while True:
 
+        print(f"\n{cores['magenta']}Selecione um personagem (ou digite 'voltar' para retornar):{cores['reset']}")
+        print("\n")
+        for idx, pc in enumerate(personagens, 1):
+            print(f"{cores['amarelo']}{idx}.{cores['reset']} {pc['nome']} (HP: {pc['hp_atual']}/{pc['hp']})")
+        
+        escolha = input("\nEscolha: ").strip().lower()
+        
+        if escolha == 'voltar':
+            return None
+        
+        try:
+            escolha_int = int(escolha)
+        except ValueError:
+            print(f"{cores['vermelho']}Input inválido. Escolha um número válido.{cores['reset']}")
+            continue
+        
+        if 1 <= escolha_int <= len(personagens):
+            return personagens[escolha_int - 1]
+        else:
+            print(f"{cores['vermelho']}Opção inválida. Tente novamente.{cores['reset']}")
 
 def create_character(conn):
     cursor = conn.cursor()
@@ -256,8 +276,10 @@ def navigate_in_the_map(conn, pc):
                     resultado = handle_combat(conn, pc, inimigos)
                     if not resultado:  # Se jogador morreu
                         deletar_personagem(conn, pc['id'])
-                        print(f"{cores['vermelho']}Game Over!{cores['reset']}")
-                        return
+                        print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
+                        print("\n")
+                        start_game(conn)
+                        break
 
                 # Verifica comerciante (mantido do código anterior)
                 merchant = check_merchant(conn, new_cell_id)
@@ -328,8 +350,10 @@ def playing_with_character(conn, pc):
             display_message(f"Missões disponíveis para {pc['nome']}")
             listar_missoes_progresso(conn, pc['id'])
         elif escolha == "5":  # Agora a opção correta para sair do menu
+            print("\n")
             display_message(f"\n{cores['magenta']}Voltando ao menu principal...{cores['reset']}")
-            break  # Agora sim, sair do menu do personagem
+            start_game(conn)
+            break
         else:
             display_message("Opção inválida. Tente novamente.") 
 
@@ -587,10 +611,13 @@ def handle_combat(conn, pc, inimigos):
         current_enemy = inimigos[0]
         
         print(f"\n{cores['vermelho']}=== COMBATE ==={cores['reset']}")
-        print(f"Inimigo: {current_enemy['nome']}")
-        print(f"HP: {current_enemy['hp_atual']}/{current_enemy['hp_max']}")
-        print(f"{cores['amarelo']}Seu HP: {pc['hp_atual']}{cores['reset']}\n")
-
+        print("\n")
+        print(f"{cores['amarelo']}Inimigo:{cores['reset']} {cores['magenta']}{current_enemy['nome']}{cores['reset']}")
+        print("\n")
+        print(f"{cores['amarelo']}HP do inimigo: {cores['reset']}{cores['amarelo']}{cores['vermelho']}{current_enemy['hp_atual']}/{current_enemy['hp_max']}{cores['reset']}{cores['reset']}")
+        print("\n")
+        print(f"{cores['amarelo']}Seu HP: {cores['reset']}{cores['verde']}{pc['hp_atual']}{cores['reset']}\n")
+        print("\n")
         escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar\n{cores['amarelo']}2.{cores['reset']} Fugir\nEscolha: ")
 
         if escolha == "1":
@@ -599,8 +626,9 @@ def handle_combat(conn, pc, inimigos):
             current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_jogador)
             atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
             
+            print("\n")
             print(f"\n{cores['verde']}Você causou {dano_jogador} de dano!{cores['reset']}")
-
+            
             if current_enemy['hp_atual'] <= 0:
                 print(f"{cores['verde']}Inimigo derrotado!{cores['reset']}")
                 adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp']//2)
@@ -616,15 +644,19 @@ def handle_combat(conn, pc, inimigos):
             print(f"{cores['vermelho']}O inimigo contra-atacou causando {dano_inimigo} de dano!{cores['reset']}")
             
             if novo_hp <= 0:
+                print("\n")
                 print(f"{cores['vermelho']}Você foi derrotado!{cores['reset']}")
                 input("Pressione Enter para continuar...")
                 return False
-
+                
+                
         elif escolha == "2":
             if random.random() < 0.5:  # 50% de chance de fugir
+                print("\n")
                 print(f"{cores['ciano']}Fuga bem sucedida!{cores['reset']}")
                 return True
             else:
+                print("\n")
                 print(f"{cores['vermelho']}Falha na fuga!{cores['reset']}")
                 # Inimigo ataca quando a fuga falha
                 dano_inimigo = current_enemy['dano']
@@ -634,9 +666,11 @@ def handle_combat(conn, pc, inimigos):
                 print(f"{cores['vermelho']}O inimigo atacou causando {dano_inimigo} de dano!{cores['reset']}")
                 
                 if novo_hp <= 0:
+                    print("\n")
                     print(f"{cores['vermelho']}Você foi derrotado!{cores['reset']}")
-                    input("Pressione Enter para continuar...")
+                    input("Pressione Enter para voltar ao menu principal...")
                     return False
+
         else:
             print("Opção inválida!")
 

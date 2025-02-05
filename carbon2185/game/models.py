@@ -300,14 +300,62 @@ def deletar_personagem(conn, id_personagem):
         with conn.cursor() as cur:
             cur.execute("DELETE FROM PC WHERE id_personagem = %s", (id_personagem,))
             conn.commit()
-            print("Personagem deletado com sucesso.")
+            print("\n")
+            print(f"{cores['magenta']}Você perdeu, seu personagem deletado!{cores['reset']}")
+            print("\n")
     except Exception as e:
         conn.rollback()
         print("Erro ao deletar personagem:", e)
 
+import random
+
+import random
+
+import random
+
+import random
+
 def get_inimigos_na_celula(conn, cell_id):
-    """Retorna todas as instâncias de inimigos na célula atual"""
     cursor = conn.cursor()
+    
+    # 1. Obter a posição (eixoX, eixoY) da célula
+    cursor.execute("""
+        SELECT eixoX, eixoY 
+        FROM CelulaMundo 
+        WHERE id_celula = %s;
+    """, (cell_id,))
+    celula = cursor.fetchone()
+    if celula:
+        eixoX, eixoY = celula
+        # Considerando que o grid é de 3 colunas:
+        cell_number = (eixoY * 3) + eixoX + 1
+        # Se a célula for a de número 4, ela é safezone e não haverá combate.
+        if cell_number == 4:
+            cursor.close()
+            return []
+    else:
+        cursor.close()
+        return []
+    
+    # 2. Obter o nome do distrito da célula atual
+    cursor.execute("""
+        SELECT d.nome
+        FROM CelulaMundo cm
+        JOIN Distrito d ON cm.id_distrito = d.id_distrito
+        WHERE cm.id_celula = %s;
+    """, (cell_id,))
+    resultado = cursor.fetchone()
+    distrito_nome = resultado[0].strip().lower() if resultado else ""
+    
+    # 3. Definir as restrições dos inimigos (todos os nomes em minúsculas)
+    restricoes = {
+        "andarilho corrompido": "distrito a - ruínas do noroeste",
+        "drone de supressão": "distrito b - o olho do regime",
+        "carrasco da favela": "distrito c - o abismo de ferro",
+        "mutante das minas": "distrito d - terra devastada"
+    }
+    
+    # 4. Buscar todas as instâncias de inimigos na célula
     cursor.execute("""
         SELECT 
             ii.id_instancia_inimigo,
@@ -318,18 +366,65 @@ def get_inimigos_na_celula(conn, cell_id):
             i.hp
         FROM InstanciaInimigo ii
         JOIN Inimigo i ON ii.id_inimigo = i.id_inimigo
-        WHERE ii.id_celula = %s
+        WHERE ii.id_celula = %s;
     """, (cell_id,))
     inimigos = cursor.fetchall()
     cursor.close()
-    return [{
-        'id': row[0],
-        'nome': row[1],
-        'hp_atual': row[2],
-        'dano': row[3],
-        'xp': row[4],
-        'hp_max': row[5]
-    } for row in inimigos]
+    
+    # 5. Separar os inimigos em restritos e globais
+    inimigos_restritos = []
+    inimigos_globais = []
+    for row in inimigos:
+        instancia_id, enemy_name, hp_atual, dano, xp, hp_max = row
+        enemy_name_lower = enemy_name.strip().lower()
+        
+        if enemy_name_lower in restricoes:
+            # Adiciona somente se o distrito bater com o da restrição
+            if distrito_nome == restricoes[enemy_name_lower]:
+                inimigos_restritos.append({
+                    'id': instancia_id,
+                    'nome': enemy_name,
+                    'hp_atual': hp_atual,
+                    'dano': dano,
+                    'xp': xp,
+                    'hp_max': hp_max
+                })
+            # Se o distrito não bater, ignora este inimigo.
+        else:
+            # Inimigos não restritos são considerados globais
+            inimigos_globais.append({
+                'id': instancia_id,
+                'nome': enemy_name,
+                'hp_atual': hp_atual,
+                'dano': dano,
+                'xp': xp,
+                'hp_max': hp_max
+            })
+    
+    # 6. Seleção ponderada: 75% do inimigo escolhido vem dos restritos e 25% dos globais.
+    # Limitar o número de inimigos a, no máximo, 2.
+    inimigos_selecionados = []
+    vagas = 2
+    while vagas > 0 and (inimigos_restritos or inimigos_globais):
+        if inimigos_restritos and inimigos_globais:
+            if random.random() < 0.75:
+                escolhido = random.choice(inimigos_restritos)
+                inimigos_restritos.remove(escolhido)
+            else:
+                escolhido = random.choice(inimigos_globais)
+                inimigos_globais.remove(escolhido)
+        elif inimigos_restritos:
+            escolhido = random.choice(inimigos_restritos)
+            inimigos_restritos.remove(escolhido)
+        elif inimigos_globais:
+            escolhido = random.choice(inimigos_globais)
+            inimigos_globais.remove(escolhido)
+        inimigos_selecionados.append(escolhido)
+        vagas -= 1
+
+    return inimigos_selecionados
+
+
 
 def atualizar_hp_inimigo(conn, instancia_id, novo_hp):
     cursor = conn.cursor()
