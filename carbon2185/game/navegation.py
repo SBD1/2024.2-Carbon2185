@@ -95,19 +95,19 @@ def insert_initial_data(conn):
             cur.execute("SELECT id_distrito FROM Distrito WHERE nome = %s;", (nome_distrito,))
             id_distrito = cur.fetchone()[0]
 
-        # Insere as regiões como células
-        for index, regiao in enumerate(regioes):
-            i = index // 3  # 0,0,0,1,1,1,2,2,2
-            j = index % 3   # 0,1,2,0,1,2,0,1,2
-            eixoX = eixoX_inicial + i
-            eixoY = eixoY_inicial + j
+        for index, regiao in enumerate(regioes, start=1):
+            i = (index - 1) // 3
+            j = (index - 1) % 3
+            eixoX = distrito["eixoXInicial"] + i
+            eixoY = distrito["eixoYInicial"] + j
 
+            # Usar 'cur' em vez de 'cursor'
             cur.execute("""
-                INSERT INTO CelulaMundo (id_distrito, eixoX, eixoY, nome, descricao)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO CelulaMundo 
+                    (id_distrito, eixoX, eixoY, local_x, local_y, nome, descricao)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (id_distrito, eixoX, eixoY) DO NOTHING;
-            """, (id_distrito, eixoX, eixoY, regiao["nome"], regiao["descricao"]))
+            """, (id_distrito, eixoX, eixoY, i, j, regiao["nome"], regiao["descricao"]))
 
     conn.commit()
     cur.close()
-

@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS CelulaMundo (
     descricao TEXT NOT NULL,
     eixoX INT NOT NULL,
     eixoY INT NOT NULL,
+    local_x INT NOT NULL,
+    local_y INT NOT NULL,
     
     CONSTRAINT unique_position UNIQUE (id_distrito, eixoX, eixoY)
 );

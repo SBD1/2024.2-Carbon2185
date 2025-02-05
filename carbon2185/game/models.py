@@ -318,25 +318,35 @@ import random
 def get_inimigos_na_celula(conn, cell_id):
     cursor = conn.cursor()
     
-    # 1. Obter a posição (eixoX, eixoY) da célula
+    # 1. Obter as coordenadas GLOBAIS (eixoX, eixoY) da célula
     cursor.execute("""
-        SELECT eixoX, eixoY 
-        FROM CelulaMundo 
-        WHERE id_celula = %s;
+        SELECT 
+            cm.eixoX,
+            cm.eixoY,
+            cm.local_x,
+            cm.local_y
+        FROM CelulaMundo cm
+        WHERE cm.id_celula = %s;
     """, (cell_id,))
-    celula = cursor.fetchone()
-    if celula:
-        eixoX, eixoY = celula
-        # Considerando que o grid é de 3 colunas:
-        cell_number = (eixoY * 3) + eixoX + 1
-        # Se a célula for a de número 4, ela é safezone e não haverá combate.
-        if cell_number == 4:
-            cursor.close()
-            return []
-    else:
+    resultado = cursor.fetchone()
+    
+    if not resultado:
         cursor.close()
         return []
     
+    eixoX, eixoY, local_x, local_y = resultado
+    
+     # 1. Verificar se é safezone
+    cursor.execute("""
+        SELECT (local_x * 3 + local_y + 1) 
+        FROM CelulaMundo 
+        WHERE id_celula = %s
+    """, (cell_id,))
+    cell_number = cursor.fetchone()[0]
+    
+    if cell_number == 4:
+        return []  # Safezone
+        
     # 2. Obter o nome do distrito da célula atual
     cursor.execute("""
         SELECT d.nome
@@ -355,7 +365,6 @@ def get_inimigos_na_celula(conn, cell_id):
         "mutante das minas": "distrito d - terra devastada"
     }
     
-    # 4. Buscar todas as instâncias de inimigos na célula
     cursor.execute("""
         SELECT 
             ii.id_instancia_inimigo,
@@ -366,7 +375,7 @@ def get_inimigos_na_celula(conn, cell_id):
             i.hp
         FROM InstanciaInimigo ii
         JOIN Inimigo i ON ii.id_inimigo = i.id_inimigo
-        WHERE ii.id_celula = %s;
+        WHERE ii.id_celula = %s
     """, (cell_id,))
     inimigos = cursor.fetchall()
     cursor.close()

@@ -36,16 +36,16 @@ AND NOT EXISTS (SELECT 1 FROM Arma WHERE id_item = (SELECT id_item FROM Item WHE
 
 INSERT INTO Inimigo (id_inimigo, id_personagem, dano, xp, hp, nome, descricao)
 VALUES
-    (uuid_generate_v4(), NULL, 5, 20, 100, 'Andarilho Corrompido', 
+    (uuid_generate_v4(), NULL, 5, 5, 100, 'Andarilho Corrompido', 
     'Um ex-operário transformado em predador urbano após anos de exposição à poluição tóxica. Seus olhos brilham em vermelho sob a máscara de gás improvisada, e ele ataca qualquer um que invada seu território com lâminas enferrujadas.'),
 
-    (uuid_generate_v4(), NULL, 5, 20, 100, 'Drone de Supressão', 
+    (uuid_generate_v4(), NULL, 5, 5, 100, 'Drone de Supressão', 
     'Criado para manter a ordem, esse drone flutua silenciosamente entre os becos iluminados do Distrito B. Ele dispara pulsos elétricos para neutralizar qualquer suspeito de insubordinação, registrando cada evento para os servidores centrais do Regime.'),
 
-    (uuid_generate_v4(), NULL, 5, 10, 120, 'Carrasco das Favelas', 
+    (uuid_generate_v4(), NULL, 5, 5, 120, 'Carrasco das Favelas', 
     'Um brutamontes contratado por gangues locais para impor o terror entre os desesperados. Vestindo pedaços de armadura improvisada, ele empunha um enorme martelo hidráulico capaz de esmagar concreto e ossos com facilidade.'),
 
-    (uuid_generate_v4(), NULL, 5, 10, 120, 'Mutante das Minas', 
+    (uuid_generate_v4(), NULL, 5, 5, 120, 'Mutante das Minas', 
     'Um mineiro que passou tempo demais exposto à radiação e aos gases tóxicos. Sua pele esverdeada e olhos sem pupilas denunciam a mutação avançada. Ele ataca com unhas endurecidas como lâminas, tentando arrancar o antídoto de qualquer intruso.'),
 
     (uuid_generate_v4(), NULL, 5, 5, 100, 'Saqueador Nômade', 
@@ -189,6 +189,14 @@ WHERE cm.nome IN (
 ORDER BY random()
 LIMIT 50
 ON CONFLICT DO NOTHING;
+
+-- Instanciar inimigos em células específicas (TODAS exceto a 4)
+INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
+SELECT uuid_generate_v4(), i.id_inimigo, cm.id_celula, i.hp
+FROM Inimigo i
+CROSS JOIN CelulaMundo cm
+WHERE cm.local_x IS NOT NULL 
+  AND (cm.local_x * 3 + cm.local_y + 1) != 4;  -- Exclui célula 4
 
 """
 def dml(conn):
