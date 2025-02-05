@@ -45,13 +45,13 @@ VALUES
     (uuid_generate_v4(), NULL, 5, 10, 120, 'Carrasco das Favelas', 
     'Um brutamontes contratado por gangues locais para impor o terror entre os desesperados. Vestindo pedaços de armadura improvisada, ele empunha um enorme martelo hidráulico capaz de esmagar concreto e ossos com facilidade.'),
 
-    (uuid_generate_v4(), NULL, 5 10, 120, 'Mutante das Minas', 
+    (uuid_generate_v4(), NULL, 5, 10, 120, 'Mutante das Minas', 
     'Um mineiro que passou tempo demais exposto à radiação e aos gases tóxicos. Sua pele esverdeada e olhos sem pupilas denunciam a mutação avançada. Ele ataca com unhas endurecidas como lâminas, tentando arrancar o antídoto de qualquer intruso.'),
 
-    (uuid_generate_v4(), NULL, 5 5, 100, 'Saqueador Nômade', 
+    (uuid_generate_v4(), NULL, 5, 5, 100, 'Saqueador Nômade', 
     'Vagando entre os distritos, o Saqueador Nômade sobrevive pilhando suprimentos e eliminando qualquer um que represente uma ameaça. Sua máscara remendada esconde um rosto cheio de cicatrizes, e suas lâminas afiadas refletem a luz neon dos becos escuros.'),
 
-    (uuid_generate_v4(), NULL, 5 5, 100, 'Caçador de Recompensas', 
+    (uuid_generate_v4(), NULL, 5, 5, 100, 'Caçador de Recompensas', 
     'Equipado com sensores térmicos e um arsenal de armas customizadas, o Caçador de Recompensas rastreia alvos para o regime e para os criminosos ricos. Ele não tem lealdade, apenas um preço. Se seu nome estiver em sua lista, prepare-se para fugir... ou lutar pela vida.')
 ON CONFLICT (nome) DO NOTHING;
 
