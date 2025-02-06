@@ -54,7 +54,6 @@ def interact_with_npc(conn, npc_id, pc_id):
         interact_with_merchant(conn, merchant_id, pc_id)
     elif npc_type == 'inimigo':
         print(f"{cores['vermelho']}Prepare-se para lutar!{cores['reset']}")
-        # Lógica de combate aqui
     cursor.close()
 
 def create_npc(conn, npc_type, id_celula=None):
@@ -369,6 +368,7 @@ def get_inimigos_na_celula(conn, cell_id):
         SELECT 
             ii.id_instancia_inimigo,
             i.nome,
+            i.descricao,
             ii.hp_atual,
             i.dano,
             i.xp,
@@ -384,7 +384,7 @@ def get_inimigos_na_celula(conn, cell_id):
     inimigos_restritos = []
     inimigos_globais = []
     for row in inimigos:
-        instancia_id, enemy_name, hp_atual, dano, xp, hp_max = row
+        instancia_id, enemy_name, descricao, hp_atual, dano, xp, hp_max = row
         enemy_name_lower = enemy_name.strip().lower()
         
         if enemy_name_lower in restricoes:
@@ -396,7 +396,8 @@ def get_inimigos_na_celula(conn, cell_id):
                     'hp_atual': hp_atual,
                     'dano': dano,
                     'xp': xp,
-                    'hp_max': hp_max
+                    'hp_max': hp_max,
+                    'descricao': descricao
                 })
             # Se o distrito não bater, ignora este inimigo.
         else:
@@ -407,7 +408,8 @@ def get_inimigos_na_celula(conn, cell_id):
                 'hp_atual': hp_atual,
                 'dano': dano,
                 'xp': xp,
-                'hp_max': hp_max
+                'hp_max': hp_max,
+                'descricao': descricao
             })
     
     # 6. Seleção ponderada: 75% do inimigo escolhido vem dos restritos e 25% dos globais.
@@ -475,3 +477,14 @@ def adicionar_recompensa(conn, pc_id, xp, wonglongs):
     """, (xp, wonglongs, pc_id))
     conn.commit()
     cursor.close()
+
+def is_safezone(conn, cell_id):
+    """Verifica se a célula é uma safezone (célula 4 do distrito)"""
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            SELECT (local_x * 3 + local_y + 1) 
+            FROM CelulaMundo 
+            WHERE id_celula = %s
+        """, (cell_id,))
+        result = cursor.fetchone()
+        return result and result[0] == 4

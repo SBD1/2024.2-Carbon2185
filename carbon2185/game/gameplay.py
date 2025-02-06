@@ -1,6 +1,6 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
-from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo    
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone
 from game.database import create_connection
 from game.utils import get_cell_label, display_map, generate_map, move_player
 import os 
@@ -118,7 +118,7 @@ def select_character(conn):
         print(f"\n{cores['magenta']}Selecione um personagem (ou digite 'voltar' para retornar):{cores['reset']}")
         print("\n")
         for idx, pc in enumerate(personagens, 1):
-            print(f"{cores['amarelo']}{idx}.{cores['reset']} {pc['nome']} (HP: {pc['hp_atual']}/{pc['hp']})")
+            print(f"{cores['amarelo']}{idx}.{cores['reset']} {pc['nome']} (HP: {pc['hp_atual']}/{pc['hp']}) (Nível: {pc['nivel']})")
         
         escolha = input("\nEscolha: ").strip().lower()
         
@@ -265,24 +265,35 @@ def navigate_in_the_map(conn, pc):
             new_cell_id = get_cell_id_by_position(conn, *new_position)
             
             if new_cell_id:
+                print("\n")
+                print(f"\n{cores['magenta']}Viajando por Carbon2185...{cores['reset']}")
+                time.sleep(3)
                 player_position = new_position
                 update_player_cell(conn, pc['id'], new_cell_id)
                 
-                # Verifica combate com 50% de chance
-                if random.random() < 0.5:  # 50% de probabilidade
-                    inimigos = get_inimigos_na_celula(conn, new_cell_id)
-                    if inimigos:
-                        os.system("cls" if os.name == "nt" else "clear")
-                        resultado = handle_combat(conn, pc, inimigos)
-                        if not resultado:
-                            deletar_personagem(conn, pc['id'])
-                            print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
-                            start_game(conn)
-                            break
+                # Verifica se é safezone
+                if is_safezone(conn, new_cell_id):
+                    print(f"\n{cores['verde']}Este é uma safezone devido à movimentação do mercado clandestino!")
+                    print(f"{cores['verde']}Os contrabandistas possuem um acordo de cessar-fogo.{cores['reset']}")
+                    time.sleep(3)
                 else:
-                    print("\n")
-                    print(f"\n{cores['ciano']}Você teve sorte! Nenhum inimigo apareceu.{cores['reset']}")
-                    time.sleep(2)
+                    # Lógica de combate apenas se não for safezone
+                    inimigos = get_inimigos_na_celula(conn, new_cell_id)
+                    
+                    if inimigos:
+                        if random.random() < 0.5:  # 50% de chance de combate
+                            os.system("cls" if os.name == "nt" else "clear")
+                            resultado = handle_combat(conn, pc, inimigos)
+                            if not resultado:
+                                deletar_personagem(conn, pc['id'])
+                                print("\n")
+                                print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
+                                start_game(conn)
+                                break
+                        else:
+                            print("\n")
+                            print(f"\n{cores['ciano']}Você teve sorte! Nenhum inimigo apareceu.{cores['reset']}")
+                            time.sleep(2)
 
                 # Restante do código para verificar comerciante e mostrar info da célula
                 merchant = check_merchant(conn, new_cell_id)
@@ -317,7 +328,7 @@ def display_cell_info(cell_info):
 def playing_with_character(conn, pc):
     
     #Menu principal do jogo quando um personagem é escolhido.
-
+    print("\n")
     display_message(f"\n{cores['magenta']}Bem-vindo ao jogo,{cores['reset']} {cores['amarelo']}{pc['nome']}{cores['reset']}{cores['magenta']}!{cores['reset']}")
     while True:
         print(f"\n{cores['magenta']}O que deseja fazer?{cores['reset']}\n")
@@ -607,13 +618,14 @@ def handle_combat(conn, pc, inimigos):
         
         print(f"\n{cores['vermelho']}=== COMBATE ==={cores['reset']}")
         print("\n")
-        print(f"{cores['amarelo']}Inimigo:{cores['reset']} {cores['magenta']}{current_enemy['nome']}{cores['reset']}")
+        print(f"{cores['amarelo']}Inimigo:{cores['reset']} {cores['magenta']}{current_enemy['nome']}.{cores['reset']}")
+        print(f"{cores['amarelo']}Descrição:{cores['reset']} {cores['magenta']}{current_enemy['descricao']}{cores['reset']}")
         print("\n")
         print(f"{cores['amarelo']}HP do inimigo: {cores['reset']}{cores['amarelo']}{cores['vermelho']}{current_enemy['hp_atual']}/{current_enemy['hp_max']}{cores['reset']}{cores['reset']}")
         print("\n")
         print(f"{cores['amarelo']}Seu HP: {cores['reset']}{cores['verde']}{pc['hp_atual']}{cores['reset']}\n")
         print("\n")
-        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar\n{cores['amarelo']}2.{cores['reset']} Fugir\nEscolha: ")
+        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar\n{cores['amarelo']}2.{cores['reset']} Fugir\n\nEscolha: ")
 
         if escolha == "1":
             # Jogador ataca
@@ -621,8 +633,8 @@ def handle_combat(conn, pc, inimigos):
             current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_jogador)
             atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
             
-            print("\n")
             print(f"\n{cores['verde']}Você causou {dano_jogador} de dano!{cores['reset']}")
+            print("\n")
             
             if current_enemy['hp_atual'] <= 0:
                 print(f"{cores['verde']}Inimigo derrotado!{cores['reset']}")
@@ -678,3 +690,4 @@ def handle_combat(conn, pc, inimigos):
     print(f"{cores['verde']}Todos os inimigos foram derrotados!{cores['reset']}")
     input("Pressione Enter para continuar...")
     return True
+
