@@ -354,19 +354,22 @@ AFTER UPDATE ON ProgressoMissao
 FOR EACH ROW
 EXECUTE FUNCTION concluir_missao();
 
-CREATE OR REPLACE FUNCTION respawn_inimigos()
-RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION respawn_inimigos() 
+RETURNS VOID 
+AS $$
 BEGIN
-    -- Move inimigos da sala escondida após 5 minutos
+    -- Insere os inimigos de volta nas células originais
     INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
-    SELECT se.id_instancia, se.id_inimigo, se.id_celula_origem, i.hp
-    FROM SalaDeRespawnInimigos se
-    JOIN Inimigo i ON se.id_inimigo = i.id_inimigo
-    WHERE se.momento_derrota < NOW() - INTERVAL '5 minutes';
+    SELECT 
+        sr.id_instancia,
+        sr.id_inimigo,
+        sr.id_celula_origem,
+        i.hp
+    FROM SalaRespawnInimigos sr
+    JOIN Inimigo i ON sr.id_inimigo = i.id_inimigo;
 
-    -- Remove da sala escondida após respawn
-    DELETE FROM SalaDeRespawnInimigos 
-    WHERE momento_derrota < NOW() - INTERVAL '5 minutes';
+    -- Limpa a sala de respawn
+    DELETE FROM SalaRespawnInimigos;
 END;
 $$ LANGUAGE plpgsql;
 

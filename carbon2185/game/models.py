@@ -316,6 +316,11 @@ import random
 import random
 
 def get_inimigos_na_celula(conn, cell_id):
+    
+    with conn.cursor() as cur:
+        cur.execute("SELECT respawn_inimigos()")
+        conn.commit()
+
     cursor = conn.cursor()
     
     # 1. Obter as coordenadas GLOBAIS (eixoX, eixoY) da célula
@@ -449,13 +454,36 @@ def atualizar_hp_inimigo(conn, instancia_id, novo_hp):
     cursor.close()
 
 def remover_inimigo(conn, instancia_id):
+    """Move o inimigo para a sala de respawn ao invés de deletar"""
     cursor = conn.cursor()
-    cursor.execute("""
-        DELETE FROM InstanciaInimigo
-        WHERE id_instancia_inimigo = %s
-    """, (instancia_id,))
-    conn.commit()
-    cursor.close()
+    try:
+        # 1. Pega os dados do inimigo
+        cursor.execute("""
+            SELECT id_inimigo, id_celula 
+            FROM InstanciaInimigo 
+            WHERE id_instancia_inimigo = %s
+        """, (instancia_id,))
+        id_inimigo, id_celula = cursor.fetchone()
+
+        # 2. Insere na sala de respawn
+        cursor.execute("""
+            INSERT INTO SalaRespawnInimigos 
+                (id_instancia, id_inimigo, id_celula_origem)
+            VALUES (%s, %s, %s)
+        """, (instancia_id, id_inimigo, id_celula))
+
+        # 3. Remove da tabela principal
+        cursor.execute("""
+            DELETE FROM InstanciaInimigo 
+            WHERE id_instancia_inimigo = %s
+        """, (instancia_id,))
+        
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro ao mover inimigo: {e}")
+    finally:
+        cursor.close()
 
 def atualizar_hp_jogador(conn, pc_id, novo_hp):
     cursor = conn.cursor()
@@ -490,38 +518,6 @@ def is_safezone(conn, cell_id):
         result = cursor.fetchone()
         return result and result[0] == 4
 
-def remover_inimigo(conn, instancia_id):
-    """Move o inimigo para a sala escondida em vez de deletar"""
-    cursor = conn.cursor()
-    try:
-        # Primeiro colete os dados necessários
-        cursor.execute("""
-            SELECT id_inimigo, id_celula, hp_atual 
-            FROM InstanciaInimigo 
-            WHERE id_instancia_inimigo = %s
-        """, (instancia_id,))
-        id_inimigo, id_celula, hp_atual = cursor.fetchone()
-
-        # Insira na sala escondida
-        cursor.execute("""
-            INSERT INTO SalaDeRespawnInimigos 
-                (id_instancia, id_inimigo, id_celula_origem, hp_derrota)
-            VALUES (%s, %s, %s, %s)
-        """, (instancia_id, id_inimigo, id_celula, hp_atual))
-
-        # Depois delete da tabela normal
-        cursor.execute("""
-            DELETE FROM InstanciaInimigo 
-            WHERE id_instancia_inimigo = %s
-        """, (instancia_id,))
-        
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        print(f"Erro ao mover inimigo: {e}")
-    finally:
-        cursor.close()
-
 def inicializar_inimigos(conn):
     """Garante que inimigos estejam instanciados nas células não-safezone"""
     cursor = conn.cursor()
@@ -549,5 +545,31 @@ def inicializar_inimigos(conn):
             
     except Exception as e:
         conn.rollback()
+    finally:
+        cursor.close()
+
+def respawn_inimigos(conn):
+    """Retorna todos os inimigos da sala de respawn para suas células originais"""
+    cursor = conn.cursor()
+    try:
+        # 1. Move os inimigos de volta
+        cursor.execute("""
+            INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
+            SELECT 
+                sr.id_instancia,
+                sr.id_inimigo,
+                sr.id_celula_origem,
+                i.hp
+            FROM SalaRespawnInimigos sr
+            JOIN Inimigo i ON sr.id_inimigo = i.id_inimigo
+        """)
+
+        # 2. Limpa a sala de respawn
+        cursor.execute("DELETE FROM SalaRespawnInimigos")
+        
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro no respawn: {e}")
     finally:
         cursor.close()
