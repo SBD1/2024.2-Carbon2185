@@ -5,6 +5,7 @@ from game.dml import dml
 from game.utils import display_message
 from game.navegation import insert_initial_data
 from game.triggers_procedures import trigger_procedure
+import os
 
 cores = {
     'vermelho': '\033[31m',
@@ -47,6 +48,8 @@ def main():
                 start_game(conn)
                 break
             elif choice == "2":
+                os.system("cls" if os.name == "nt" else "clear")
+                print("\n")
                 print(f"{cores['magenta']}Saindo...{cores['reset']}\n")
                 break
             else:

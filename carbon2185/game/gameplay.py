@@ -19,6 +19,7 @@ cores = {
 }
 
 def start_game(conn):
+    os.system("cls" if os.name == "nt" else "clear")
     """ 
     Inicia o jogo, apresentando as opções e gerenciando o fluxo principal.
     """
@@ -99,18 +100,27 @@ def start_game(conn):
             print("\n")
         elif choice == "4":
             print("\n")
-            display_message(f"{cores['magenta']}Saindo do jogo. Até a próxima!{cores['reset']}")
+            os.system("cls" if os.name == "nt" else "clear")
+            print("\n")
+            display_message(f"{cores['magenta']}Saindo do jogo... Até a próxima!{cores['reset']}")
             break
+            
         else:
             print("\n")
-            display_message(f"{cores['vermelho']}Opção inválida. Tente novamente.{cores['reset']}")
+            print(f"{cores['vermelho']}Opção inválida. Tente novamente.{cores['reset']}")
 
 
 def select_character(conn):
+    os.system("cls" if os.name == "nt" else "clear")
     personagens = get_all_pcs(conn)
     
     if not personagens:
+        os.system("cls" if os.name == "nt" else "clear")
+        
         print(f"\n{cores['vermelho']}Nenhum personagem disponível.{cores['reset']}")
+        time.sleep(1)
+        os.system("cls" if os.name == "nt" else "clear")
+
         return None
     
     while True:
@@ -123,6 +133,7 @@ def select_character(conn):
         escolha = input("\nEscolha: ").strip().lower()
         
         if escolha == 'voltar':
+            os.system("cls" if os.name == "nt" else "clear")
             return None
         
         try:
@@ -137,13 +148,14 @@ def select_character(conn):
             print(f"{cores['vermelho']}Opção inválida. Tente novamente.{cores['reset']}")
 
 def create_character(conn):
+    os.system("cls" if os.name == "nt" else "clear")
     cursor = conn.cursor()
 
     display_message(f"{cores['magenta']}\nCriação de personagem:{cores['reset']}\n")
 
     # 1. Coletar informações básicas primeiro
-    nome_personagem = input("Digite o nome do seu personagem: ")
-    descricao_personagem = input("\nDigite uma breve descrição do seu personagem: ")
+    nome_personagem = input(f"{cores['amarelo']}→ {cores['reset']}Digite o nome do seu personagem: ")
+    descricao_personagem = input(f"\n{cores['amarelo']}→ {cores['reset']}Digite uma breve descrição do seu personagem: ")
 
     # 2. Criar Personagem e Inventário ANTES de outras operações
     cursor.execute(""" 
@@ -192,6 +204,7 @@ def create_character(conn):
         try:
             escolha = int(input("\nEscolha: ")) - 1
             id_classe_escolhida, _, _, hp_bonus, dano_bonus, energia_bonus = classes[escolha]
+            os.system("cls" if os.name == "nt" else "clear")
             break
         except (IndexError, ValueError):
             print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
@@ -245,6 +258,7 @@ def create_character(conn):
     print(f"\nPersonagem {cores['amarelo']}{nome_personagem}{cores['reset']} criado com sucesso!")
 
 # gameplay.py
+
 import time
 
 def navigate_in_the_map(conn, pc):
@@ -253,7 +267,8 @@ def navigate_in_the_map(conn, pc):
     
     while True:
         display_map(game_map, player_position)
-        command = input(f"{cores['amarelo']}Movimento:{cores['reset']} ").lower()
+        print("\n")
+        command = input(f"{cores['amarelo']}→ {cores['amarelo']}Movimento:{cores['reset']} ").lower()
 
         if command == "voltar":
             final_cell_id = get_cell_id_by_position(conn, *player_position)
@@ -286,13 +301,11 @@ def navigate_in_the_map(conn, pc):
                             resultado = handle_combat(conn, pc, inimigos)
                             if not resultado:
                                 deletar_personagem(conn, pc['id'])
-                                print("\n")
-                                print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
                                 start_game(conn)
                                 break
                         else:
                             print("\n")
-                            print(f"\n{cores['ciano']}Você teve sorte! Nenhum inimigo apareceu.{cores['reset']}")
+                            print(f"\n{cores['amarelo']}→ {cores['ciano']}Você teve sorte! Nenhum inimigo apareceu.{cores['reset']}")
                             time.sleep(2)
 
                 # Restante do código para verificar comerciante e mostrar info da célula
@@ -318,14 +331,17 @@ def display_cell_info(cell_info):
     os.system("cls" if os.name == "nt" else "clear")  # Limpa antes de mostrar info
     if cell_info:
         cell_label = get_cell_label(cell_info['eixoX'], cell_info['eixoY'])
-        print(f"\n{cores['magenta']}{cell_info['district_name']} - {cell_info['district_desc']}{cores['reset']}")
+        print(f"\n{cores['amarelo']}→ {cores['magenta']}{cell_info['district_name']} - {cell_info['district_desc']}{cores['reset']}")
         print("\n")
-        display_message(f"{cores['verde']}Região {cell_label} - {cell_info['cell_name']}:{cores['reset']}")
-        print(f"{cores['branco']}{cell_info['cell_desc']}{cores['reset']}\n")
+        print(f"{cores['amarelo']}→ {cores['amarelo']}Você chegou em:{cores['reset']}")
+        print("\n")
+        print(f"{cores['amarelo']}→ {cores['verde']}Região {cell_label} - {cell_info['cell_name']}:{cores['reset']}")
+        print(f"{cores['amarelo']}→ {cores['branco']}{cell_info['cell_desc']}{cores['reset']}\n")
         print("\n")
         input(f"{cores['amarelo']}Pressione Enter para navegar novamente...{cores['reset']}")  # Pausa até confirmação
 
 def playing_with_character(conn, pc):
+    os.system("cls" if os.name == "nt" else "clear")
     
     #Menu principal do jogo quando um personagem é escolhido.
     print("\n")
@@ -374,7 +390,7 @@ def mostrar_informacoes_personagem(conn, id_personagem):
             PC.xp,
             PC.energia,
             PC.dano,
-            PC.hp,
+            PC.hp_atual,
             PC.wonglongs,
             Classe.nome AS nome_classe,
             Faccao.nome AS nome_faccao
@@ -399,13 +415,14 @@ def mostrar_informacoes_personagem(conn, id_personagem):
     print(f"{cores['amarelo']}XP:{cores['reset']} {info[3]}")
     print(f"{cores['amarelo']}Energia:{cores['reset']} {info[4]}")
     print(f"{cores['amarelo']}Dano:{cores['reset']} {info[5]}")
-    print(f"{cores['amarelo']}HP:{cores['reset']} {info[6]}")
+    print(f"{cores['amarelo']}HP:{cores['reset']} {info[6]}/110")
     print(f"{cores['amarelo']}Wonglongs:{cores['reset']} {info[7]}")
     
     cursor.close()
 
     
 def inventario(conn, id_personagem):
+    os.system("cls" if os.name == "nt" else "clear")
     cursor = conn.cursor()
     
     # Primeiro pegar a capacidade do inventário
@@ -438,24 +455,40 @@ def inventario(conn, id_personagem):
     escolha = input(f"\n\n{cores['amarelo']}1.{cores['reset']} Descartar item\n\n{cores['amarelo']}2.{cores['reset']} Voltar\n\nEscolha: ")
     if escolha == "1":
         try:
-            entrada = input(f"\nEscolha o número do item para descartar ou digite 'voltar' para sair: ").strip().lower()
+            entrada = input(f"\n{cores['amarelo']}Escolha o número do item para descartar ou digite '{cores['magenta']}voltar{cores['reset']}{cores['amarelo']}' para sair: {cores['reset']}").strip().lower()
             if entrada == "voltar":
                 print(f"{cores['amarelo']}Voltando à listagem de itens...{cores['reset']}")
+                time.sleep(1)
+                os.system("cls" if os.name == "nt" else "clear")
                 inventario(conn, id_personagem)
             else:
                 item_idx = int(entrada) - 1
                 if 0 <= item_idx < len(itens):
-                    confirm = input(f"Tem certeza que deseja descartar o item? ({cores['verde']}s{cores['reset']}/{cores['vermelho']}n{cores['reset']}): ").strip().lower()
+                    print("\n")
+                    confirm = input(f"{cores['amarelo']}Tem certeza que deseja descartar o item?{cores['reset']} ({cores['verde']}s{cores['reset']}/{cores['reset']}{cores['vermelho']}n{cores['reset']}){cores['amarelo']}:{cores['reset']} ").strip().lower()
                     if confirm == 's':
                         descartar_item(conn, itens[item_idx][0], id_personagem)
+                        os.system("cls" if os.name == "nt" else "clear")                  
                     else:
                         print(f"{cores['amarelo']}\nDescartar item cancelado. Voltando à listagem de itens...{cores['reset']}")
+                        time.sleep(1)
+                        os.system("cls" if os.name == "nt" else "clear")
                         inventario(conn, id_personagem)  # Retorna à listagem
                 else:
+                    print("\n")
                     print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
+                    os.system("cls" if os.name == "nt" else "clear")
+                    time.sleep(1)
+                    os.system("cls" if os.name == "nt" else "clear")
+                    inventario(conn, id_personagem)
         except ValueError:
+            print("\n")
             print(f"{cores['vermelho']}Entrada inválida!{cores['reset']}")
+            time.sleep(1)
+            os.system("cls" if os.name == "nt" else "clear")
+            inventario(conn, id_personagem)
     # Se a escolha for "2" ou qualquer outra opção, apenas retorna ao menu
+    os.system("cls" if os.name == "nt" else "clear")
     cursor.close()
 
 def descartar_item(conn, id_instancia_item, id_personagem):
@@ -477,10 +510,15 @@ def descartar_item(conn, id_instancia_item, id_personagem):
         
         conn.commit()
         print(f"\n{cores['verde']}Item descartado!{cores['reset']}")
+        time.sleep(1)
+        os.system("cls" if os.name == "nt" else "clear")
     except Exception as e:
         conn.rollback()
         print(f"{cores['vermelho']}Erro ao descartar item: {e}{cores['reset']}")
-    finally:
+        time.sleep(1)
+        os.system("cls" if os.name == "nt" else "clear")
+        inventario(conn, id_personagem) 
+    finally: 
         cursor.close()
 
 def interact_with_merchant(conn, merchant_id, pc_id):
@@ -613,6 +651,7 @@ def check_merchant(conn, cell_id):
         cursor.close()
 
 def handle_combat(conn, pc, inimigos):
+    os.system("cls" if os.name == "nt" else "clear")
     while inimigos:
         current_enemy = inimigos[0]
         
@@ -628,17 +667,23 @@ def handle_combat(conn, pc, inimigos):
         escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar\n{cores['amarelo']}2.{cores['reset']} Fugir\n\nEscolha: ")
 
         if escolha == "1":
+            os.system("cls" if os.name == "nt" else "clear")
             # Jogador ataca
             dano_jogador = pc['dano']
             current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_jogador)
             atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
-            
-            print(f"\n{cores['verde']}Você causou {dano_jogador} de dano!{cores['reset']}")
+
+            print(f"\n{cores['amarelo']}→ {cores['verde']}Atacando!{cores['reset']}")
+            time.sleep(1)
+            print(f"\n{cores['amarelo']}→ {cores['verde']}Você causou {cores['amarelo']}{dano_jogador} {cores['verde']}de dano!{cores['reset']}")
             print("\n")
+            time.sleep(1)
             
             if current_enemy['hp_atual'] <= 0:
-                print(f"{cores['verde']}Inimigo derrotado!{cores['reset']}")
-                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp']//2)
+                print(f"{cores['magenta']}{current_enemy['nome']}{cores['reset']} {cores['verde']}derrotado! {cores['amarelo']}+{current_enemy['xp']} de xp{cores['reset']}")
+                time.sleep(4)
+                os.system("cls" if os.name == "nt" else "clear")
+                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'])
                 remover_inimigo(conn, current_enemy['id'])
                 inimigos.pop(0)
                 continue
@@ -647,39 +692,56 @@ def handle_combat(conn, pc, inimigos):
             dano_inimigo = current_enemy['dano']
             novo_hp = max(0, pc['hp_atual'] - dano_inimigo)
             atualizar_hp_jogador(conn, pc['id'], novo_hp)
-            
-            print(f"{cores['vermelho']}O inimigo contra-atacou causando {dano_inimigo} de dano!{cores['reset']}")
+
+            print(f"{cores['amarelo']}→ {cores['vermelho']}O {current_enemy['nome']} está atacando!{cores['reset']}")
+            time.sleep(1)
+            print("\n")
+            print(f"{cores['amarelo']}→ {cores['vermelho']}O inimigo contra-atacou causando {cores['amarelo']}{dano_inimigo} {cores['vermelho']}de dano!{cores['reset']}")
+            time.sleep(2)
+            os.system("cls" if os.name == "nt" else "clear")
+
             
             if novo_hp <= 0:
                 print("\n")
-                print(f"{cores['vermelho']}Você foi derrotado!{cores['reset']}")
-                input("Pressione Enter para continuar...")
+                print(f"{cores['amarelo']}→ {cores['vermelho']}Você foi derrotado e seu personagem foi deletado.{cores['reset']}")
+                print("\n")
+                print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
+                print("\n")
+                input("Pressione Enter para voltar ao menu principal...")
                 return False
                 
                 
         elif escolha == "2":
             if random.random() < 0.5:  # 50% de chance de fugir
                 print("\n")
-                print(f"{cores['ciano']}Fuga bem sucedida!{cores['reset']}")
+                print(f"{cores['amarelo']}→ {cores['ciano']}Fuga bem sucedida!{cores['reset']}")
                 return True
             else:
                 print("\n")
-                print(f"{cores['vermelho']}Falha na fuga!{cores['reset']}")
+                print(f"{cores['amarelo']}→ {cores['vermelho']}Falha na fuga!{cores['reset']}")
                 # Inimigo ataca quando a fuga falha
                 dano_inimigo = current_enemy['dano']
                 novo_hp = max(0, pc['hp_atual'] - dano_inimigo)
                 atualizar_hp_jogador(conn, pc['id'], novo_hp)
                 
-                print(f"{cores['vermelho']}O inimigo atacou causando {dano_inimigo} de dano!{cores['reset']}")
+                print("\n")
+
+                print(f"{cores['amarelo']}→ {cores['vermelho']}O {current_enemy['nome']} atacou causando {cores['amarelo']}{dano_inimigo} {cores['vermelho']}de dano!{cores['reset']}")
+                time.sleep(1)
+                os.system("cls" if os.name == "nt" else "clear")
                 
                 if novo_hp <= 0:
                     print("\n")
-                    print(f"{cores['vermelho']}Você foi derrotado!{cores['reset']}")
+                    print(f"{cores['amarelo']}→ {cores['vermelho']}Você foi derrotado e seu personagem foi deletado.{cores['reset']}")
+                    print("\n")
+                    print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
+                    print("\n")
                     input("Pressione Enter para voltar ao menu principal...")
                     return False
 
         else:
-            print("Opção inválida!")
+            print("\n")
+            print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
 
         # Atualiza status do PC
         cursor = conn.cursor()
@@ -687,7 +749,57 @@ def handle_combat(conn, pc, inimigos):
         pc['hp_atual'] = cursor.fetchone()[0]
         cursor.close()
 
-    print(f"{cores['verde']}Todos os inimigos foram derrotados!{cores['reset']}")
-    input("Pressione Enter para continuar...")
+    print(f"{cores['amarelo']}→ {cores['verde']}Todos os inimigos foram derrotados!{cores['reset']}")
+    print("\n")
+    print(f"{cores['verde']}Você conseguiu saquear estes inimigos e encontrou {cores['amarelo']}{current_enemy['xp']*2}{cores['reset']} {cores['verde']}wonglongs! {cores['reset']}")
+    print("\n")
+    cursor = conn.cursor()
+    cursor.execute("SELECT wonglongs FROM PC WHERE id_personagem = %s", (pc['id'],))
+    wonglongs = cursor.fetchone()[0]
+    
+    if wonglongs >= 10:
+        escolha = input(f"{cores['amarelo']}Deseja usar RegenX por 10 Wonglongs? (s/n): {cores['reset']}").lower()
+        if escolha == 's':
+
+
+            atualizar_hp_jogador(conn, pc['id'], pc['hp'])
+
+            cursor.execute("""
+                UPDATE PC 
+                SET wonglongs = wonglongs - 10 
+                WHERE id_personagem = %s
+            """, (pc['id'],))
+
+            cursor.execute("""
+                UPDATE PC 
+                SET hp_atual = hp 
+                WHERE id_personagem = %s
+            """, (pc['id'],))
+
+            pc['hp_atual'] = pc['hp']
+                       
+            # Mostra animação de recuperação
+            print(f"\n{cores['amarelo']}→ {cores['verde']}Recuperando suas forças...{cores['reset']}")
+            for i in range(10, 0, -1):
+                print(f"{cores['ciano']}{i} segundos restantes...{cores['reset']}", end='\r')
+                time.sleep(1)
+
+            os.system("cls" if os.name == "nt" else "clear")
+            print("\n")    
+            print(f"\n{cores['amarelo']}→ {cores['verde']}HP totalmente recuperado!{cores['reset']}")
+            time.sleep(2)
+
+            conn.commit()
+        else:
+            print("\n")
+            os.system("cls" if os.name == "nt" else "clear")
+            print("\n")
+            print(f"\n{cores['magenta']}Seguindo viajem...{cores['reset']}")
+            time.sleep(2)
+    else:   
+        print(f"\n{cores['vermelho']}Wonglongs insuficientes para comprar RegenX!{cores['reset']}")
+    
+    cursor.close()
     return True
+
 
