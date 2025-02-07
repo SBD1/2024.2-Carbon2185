@@ -1,6 +1,6 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
-from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone, inicializar_inimigos
 from game.database import create_connection
 from game.utils import get_cell_label, display_map, generate_map, move_player
 import os 
@@ -19,6 +19,10 @@ cores = {
 }
 
 def start_game(conn):
+    inicializar_inimigos(conn)
+    with conn.cursor() as cur:
+        cur.execute("SELECT respawn_inimigos()")
+        conn.commit()
     os.system("cls" if os.name == "nt" else "clear")
     """ 
     Inicia o jogo, apresentando as opções e gerenciando o fluxo principal.
@@ -715,10 +719,12 @@ def handle_combat(conn, pc, inimigos):
             if random.random() < 0.5:  # 50% de chance de fugir
                 print("\n")
                 print(f"{cores['amarelo']}→ {cores['ciano']}Fuga bem sucedida!{cores['reset']}")
+                time.sleep(1)
                 return True
             else:
                 print("\n")
                 print(f"{cores['amarelo']}→ {cores['vermelho']}Falha na fuga!{cores['reset']}")
+                time.sleep(1)
                 # Inimigo ataca quando a fuga falha
                 dano_inimigo = current_enemy['dano']
                 novo_hp = max(0, pc['hp_atual'] - dano_inimigo)

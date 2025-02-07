@@ -175,17 +175,6 @@ FROM Item
 WHERE tipo = 'implantecibernetico'
 AND NOT EXISTS (SELECT 1 FROM ImplanteCibernetico WHERE ImplanteCibernetico.id_item = Item.id_item);
 
--- Instanciar inimigos em células NÃO-SAFE (excluindo célula 4 de cada distrito)
-INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
-SELECT 
-    uuid_generate_v4(),
-    i.id_inimigo,
-    cm.id_celula,
-    i.hp
-FROM Inimigo i
-CROSS JOIN CelulaMundo cm
-WHERE (cm.local_x * 3 + cm.local_y + 1) != 4  -- Exclui células safe (número 4)
-ORDER BY random()
 """
 def dml(conn):
     cursor = conn.cursor()

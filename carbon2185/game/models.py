@@ -1,5 +1,6 @@
 import random
-import psycopg2
+import psycopg2 
+import time
 
 cores = {
     'vermelho': '\033[31m',
@@ -488,3 +489,65 @@ def is_safezone(conn, cell_id):
         """, (cell_id,))
         result = cursor.fetchone()
         return result and result[0] == 4
+
+def remover_inimigo(conn, instancia_id):
+    """Move o inimigo para a sala escondida em vez de deletar"""
+    cursor = conn.cursor()
+    try:
+        # Primeiro colete os dados necessários
+        cursor.execute("""
+            SELECT id_inimigo, id_celula, hp_atual 
+            FROM InstanciaInimigo 
+            WHERE id_instancia_inimigo = %s
+        """, (instancia_id,))
+        id_inimigo, id_celula, hp_atual = cursor.fetchone()
+
+        # Insira na sala escondida
+        cursor.execute("""
+            INSERT INTO SalaDeRespawnInimigos 
+                (id_instancia, id_inimigo, id_celula_origem, hp_derrota)
+            VALUES (%s, %s, %s, %s)
+        """, (instancia_id, id_inimigo, id_celula, hp_atual))
+
+        # Depois delete da tabela normal
+        cursor.execute("""
+            DELETE FROM InstanciaInimigo 
+            WHERE id_instancia_inimigo = %s
+        """, (instancia_id,))
+        
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro ao mover inimigo: {e}")
+    finally:
+        cursor.close()
+
+def inicializar_inimigos(conn):
+    """Garante que inimigos estejam instanciados nas células não-safezone"""
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT COUNT(*) FROM InstanciaInimigo")
+        if cursor.fetchone()[0] == 0:
+            
+            # Query corrigida (sem comentários inline)
+            cursor.execute("""
+                INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
+                SELECT
+                    uuid_generate_v4(),
+                    i.id_inimigo,
+                    cm.id_celula,
+                    i.hp
+                FROM Inimigo i
+                CROSS JOIN CelulaMundo cm
+                WHERE (cm.local_x * 3 + cm.local_y + 1) != 4
+                AND cm.id_celula NOT IN (
+                    SELECT id_celula FROM Comerciante
+                )
+            """)  # Comentário movido para fora da string SQL
+            conn.commit()
+            
+    except Exception as e:
+        conn.rollback()
+    finally:
+        cursor.close()

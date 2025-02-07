@@ -20,7 +20,9 @@ cores = {
 
 
 def main():
-
+    
+    display_message(f"{cores['magenta']}Bem-vindo ao Carbon2185!{cores['reset']}")
+    # Resto do código do menu principal...
     while True:
         print("\n")
         from colorama import Fore, Style
