@@ -180,11 +180,17 @@ CREATE TABLE IF NOT EXISTS ArmaduraEquipada (
     id_armadura UUID REFERENCES Armadura(id_item) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS ImplanteEquipado (
+    id_personagem UUID PRIMARY KEY REFERENCES PC(id_personagem) ON DELETE CASCADE,
+    id_implante UUID REFERENCES ImplanteCibernetico(id_item) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS SalaRespawnInimigos (
     id_instancia UUID PRIMARY KEY,
     id_inimigo UUID REFERENCES Inimigo(id_inimigo) ON DELETE CASCADE,
     id_celula_origem UUID REFERENCES CelulaMundo(id_celula) ON DELETE CASCADE
 );
+
 """
 
 def create_tables(conn):

@@ -414,8 +414,8 @@ def mostrar_informacoes_personagem(conn, id_personagem):
 
     print(f"{cores['amarelo']}Nome:{cores['reset']} {info[0]}")
     print(f"{cores['amarelo']}Descrição:{cores['reset']} {info[1]}")
-    print(f"{cores['amarelo']}Classe:{cores['reset']} {info[8]}")
-    print(f"{cores['amarelo']}Facção:{cores['reset']} {info[9]}")
+    print(f"{cores['amarelo']}Classe:{cores['reset']} {info[9]}")
+    print(f"{cores['amarelo']}Facção:{cores['reset']} {info[10]}")
     print(f"{cores['amarelo']}Nível:{cores['reset']} {info[2]}")
     print(f"{cores['amarelo']}XP:{cores['reset']} {info[3]}")
     print(f"{cores['amarelo']}Energia:{cores['reset']} {info[4]}")
@@ -430,7 +430,7 @@ def inventario(conn, id_personagem):
     os.system("cls" if os.name == "nt" else "clear")
     cursor = conn.cursor()
     
-    # Primeiro pegar a capacidade do inventário
+    # Busca a capacidade do inventário
     cursor.execute("""
         SELECT inv.quantidade_itens, inv.capacidade_maxima 
         FROM Inventario inv
@@ -439,7 +439,7 @@ def inventario(conn, id_personagem):
     """, (id_personagem,))
     quantidade, capacidade = cursor.fetchone()
     
-    # Restante do código mantido
+    # Busca os itens no inventário
     cursor.execute("""
         SELECT 
             ii.id_instancia_item,
@@ -453,14 +453,91 @@ def inventario(conn, id_personagem):
     """, (id_personagem,))
     itens = cursor.fetchall()
     
-    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")  # Alterado aqui
+    print("\n")
+    mostrar_equipados(conn, id_personagem)
+    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")
     for idx, (id_instancia, nome, desc) in enumerate(itens, start=1):
         print(f"{cores['verde']}{idx}.{cores['reset']} {nome} - {desc}")
-
-    escolha = input(f"\n\n{cores['amarelo']}1.{cores['reset']} Descartar item\n\n{cores['amarelo']}2.{cores['reset']} Voltar\n\nEscolha: ")
+    
+    # Novo menu com opção para desequipar
+    escolha = input(
+        f"\n\n{cores['amarelo']}1.{cores['reset']} Equipar armadura ou implante cibernético\n\n"
+        f"{cores['amarelo']}2.{cores['reset']} Desequipar item\n\n"
+        f"{cores['amarelo']}3.{cores['reset']} Descartar item\n\n"
+        f"{cores['amarelo']}4.{cores['reset']} Voltar\n\n"
+        f"Escolha: "
+    )
+    
     if escolha == "1":
+        os.system("cls" if os.name == "nt" else "clear")
+        equipaveis = listar_equipaveis(conn, id_personagem)
+        
+        if not equipaveis:
+            os.system("cls" if os.name == "nt" else "clear")
+            print("\n")
+            print(f"{cores['vermelho']}Nenhum item equipável no inventário!{cores['reset']}")
+            time.sleep(1)
+            os.system("cls" if os.name == "nt" else "clear")
+            return
+            
+        print(f"\n{cores['ciano']}Itens Equipáveis:{cores['reset']}\n")
+        for idx, item in enumerate(equipaveis, 1):
+            print(f"{cores['verde']}{idx}.{cores['reset']} {item['nome']} ({item['tipo'].capitalize()}) - {item['desc']}\n")
+            
         try:
-            entrada = input(f"\n{cores['amarelo']}Escolha o número do item para descartar ou digite '{cores['magenta']}voltar{cores['reset']}{cores['amarelo']}' para sair: {cores['reset']}").strip().lower()
+            escolha_item = int(input(f"{cores['amarelo']}→{cores['reset']} Escolha o item para equipar: ")) - 1
+            item = equipaveis[escolha_item]
+            
+            # Verifica se já existe um item equipado para o mesmo tipo
+            if item['tipo'] == 'armadura':
+                cursor.execute("SELECT id_armadura FROM ArmaduraEquipada WHERE id_personagem = %s", (id_personagem,))
+                if cursor.fetchone() is not None:
+                    print(f"\n{cores['vermelho']}Já existe um item equipado. Desequipe-o e depois tente novamente.{cores['reset']}")
+                    time.sleep(2)
+                    inventario(conn, id_personagem)
+                    return
+                cursor.execute("""
+                    INSERT INTO ArmaduraEquipada (id_personagem, id_armadura)
+                    VALUES (%s, (SELECT id_item FROM InstanciaItem WHERE id_instancia_item = %s))
+                """, (id_personagem, item['id']))
+                
+            elif item['tipo'] == 'implantecibernetico':
+                cursor.execute("SELECT id_implante FROM ImplanteEquipado WHERE id_personagem = %s", (id_personagem,))
+                if cursor.fetchone() is not None:
+                    print(f"\n{cores['vermelho']}Já existe um item equipado. Desequipe-o e depois tente novamente.{cores['reset']}")
+                    time.sleep(2)
+                    inventario(conn, id_personagem)
+                    return
+                cursor.execute("""
+                    INSERT INTO ImplanteEquipado (id_personagem, id_implante)
+                    VALUES (%s, (SELECT id_item FROM InstanciaItem WHERE id_instancia_item = %s))
+                """, (id_personagem, item['id']))
+                
+            conn.commit()
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"\n{cores['amarelo']}{item['nome']}{cores['verde']} equipado com sucesso!{cores['reset']}")
+            time.sleep(2)
+            os.system("cls" if os.name == "nt" else "clear")
+            inventario(conn, id_personagem)
+            
+        except (IndexError, ValueError):
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
+            time.sleep(1)
+            inventario(conn, id_personagem)
+            cursor.close()
+            
+    elif escolha == "2":
+        # Nova opção: Desequipar item
+        os.system("cls" if os.name == "nt" else "clear")
+        desequipar_item(conn, id_personagem)
+        
+    elif escolha == "3":
+        try:
+            entrada = input(
+                f"\n{cores['amarelo']}Escolha o número do item para descartar ou digite "
+                f"'{cores['magenta']}voltar{cores['reset']}{cores['amarelo']}' para sair: {cores['reset']}"
+            ).strip().lower()
             if entrada == "voltar":
                 print(f"{cores['amarelo']}Voltando à listagem de itens...{cores['reset']}")
                 time.sleep(1)
@@ -470,15 +547,18 @@ def inventario(conn, id_personagem):
                 item_idx = int(entrada) - 1
                 if 0 <= item_idx < len(itens):
                     print("\n")
-                    confirm = input(f"{cores['amarelo']}Tem certeza que deseja descartar o item?{cores['reset']} ({cores['verde']}s{cores['reset']}/{cores['reset']}{cores['vermelho']}n{cores['reset']}){cores['amarelo']}:{cores['reset']} ").strip().lower()
+                    confirm = input(
+                        f"{cores['amarelo']}Tem certeza que deseja descartar o item?{cores['reset']} "
+                        f"({cores['verde']}s{cores['reset']}/{cores['vermelho']}n{cores['reset']}): "
+                    ).strip().lower()
                     if confirm == 's':
                         descartar_item(conn, itens[item_idx][0], id_personagem)
-                        os.system("cls" if os.name == "nt" else "clear")                  
+                        os.system("cls" if os.name == "nt" else "clear")
                     else:
                         print(f"{cores['amarelo']}\nDescartar item cancelado. Voltando à listagem de itens...{cores['reset']}")
                         time.sleep(1)
                         os.system("cls" if os.name == "nt" else "clear")
-                        inventario(conn, id_personagem)  # Retorna à listagem
+                        inventario(conn, id_personagem)
                 else:
                     print("\n")
                     print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
@@ -492,14 +572,31 @@ def inventario(conn, id_personagem):
             time.sleep(1)
             os.system("cls" if os.name == "nt" else "clear")
             inventario(conn, id_personagem)
-    # Se a escolha for "2" ou qualquer outra opção, apenas retorna ao menu
-    os.system("cls" if os.name == "nt" else "clear")
+    
+    else:  # Opção "4" (ou qualquer outra que não as anteriores) – Volta ao menu anterior
+        os.system("cls" if os.name == "nt" else "clear")
+    
     cursor.close()
+
 
 def descartar_item(conn, id_instancia_item, id_personagem):
     cursor = conn.cursor()
     try:
         # Deletar o item
+        cursor.execute("""
+            DELETE FROM ArmaduraEquipada
+            WHERE id_armadura = (
+                SELECT id_item FROM InstanciaItem WHERE id_instancia_item = %s
+            ) AND id_personagem = %s
+        """, (id_instancia_item, id_personagem))
+        
+        cursor.execute("""
+            DELETE FROM ImplanteEquipado
+            WHERE id_implante = (
+                SELECT id_item FROM InstanciaItem WHERE id_instancia_item = %s
+            ) AND id_personagem = %s
+        """, (id_instancia_item, id_personagem))
+
         cursor.execute("""
             DELETE FROM InstanciaItem 
             WHERE id_instancia_item = %s 
@@ -909,4 +1006,151 @@ def handle_combat(conn, pc, inimigos):
     cursor.close()
     return True
 
+def mostrar_equipados(conn, id_personagem):
+    cursor = conn.cursor()
+    
+    # Busca armadura equipada
+    cursor.execute("""
+        SELECT a.nome 
+        FROM ArmaduraEquipada ae
+        JOIN Armadura ar ON ae.id_armadura = ar.id_item
+        JOIN Item a ON ar.id_item = a.id_item
+        WHERE ae.id_personagem = %s
+    """, (id_personagem,))
+    armadura = cursor.fetchone()
+    
+    # Busca implante equipado
+    cursor.execute("""
+        SELECT i.nome 
+        FROM ImplanteEquipado ie
+        JOIN ImplanteCibernetico ic ON ie.id_implante = ic.id_item
+        JOIN Item i ON ic.id_item = i.id_item
+        WHERE ie.id_personagem = %s
+    """, (id_personagem,))
+    implante = cursor.fetchone()
+    
+    print(f"\n{cores['verde']}=== Itens Equipados ==={cores['reset']}")
+    print("\n")
+    print(f"{cores['ciano']}Armadura:{cores['reset']} {armadura[0] if armadura else 'Nenhuma'}")
+    print(f"{cores['ciano']}Implante Cibernético:{cores['reset']} {implante[0] if implante else 'Nenhum'}")
+    cursor.close()
+    
+def listar_equipaveis(conn, id_personagem):
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 
+            ii.id_instancia_item,
+            i.nome,
+            i.descricao,
+            i.tipo
+        FROM InstanciaItem ii
+        JOIN Item i ON ii.id_item = i.id_item
+        WHERE ii.id_inventario = (
+            SELECT id_inventario FROM PC WHERE id_personagem = %s
+        )
+        AND i.tipo IN ('armadura', 'implantecibernetico')
+    """, (id_personagem,))
+    
+    equipaveis = [{
+        'id': row[0],
+        'nome': row[1],
+        'desc': row[2],
+        'tipo': row[3]
+    } for row in cursor.fetchall()]
+    
+    cursor.close()
+    return equipaveis
 
+def desequipar_item(conn, id_personagem):
+    cursor = conn.cursor()
+    try:
+        print(f"\n{cores['verde']}Desequipar armadura ou implante cibernético:{cores['reset']}\n")
+        print(f"{cores['amarelo']}1.{cores['reset']} Armadura")
+        print(f"{cores['amarelo']}2.{cores['reset']} Implante Cibernético")
+        print(f"{cores['amarelo']}3.{cores['reset']} Cancelar\n")
+        opc = input(f"{cores['amarelo']}Escolha: {cores['reset']}").strip()
+        
+        if opc == "1":
+            # Desequipar armadura
+            cursor.execute("""
+                SELECT ae.id_armadura
+                FROM ArmaduraEquipada ae
+                WHERE ae.id_personagem = %s
+            """, (id_personagem,))
+            resultado = cursor.fetchone()
+            if resultado:
+                id_armadura = resultado[0]
+                # Obter hp_bonus da armadura
+                cursor.execute("""
+                    SELECT hp_bonus FROM Armadura WHERE id_item = %s
+                """, (id_armadura,))
+                hp_bonus = cursor.fetchone()[0]
+                
+                # Remover o registro da armadura equipada
+                cursor.execute("""
+                    DELETE FROM ArmaduraEquipada WHERE id_personagem = %s
+                """, (id_personagem,))
+                # Atualizar o HP do PC
+                cursor.execute("""
+                    UPDATE PC
+                    SET hp = hp - %s
+                    WHERE id_personagem = %s
+                """, (hp_bonus, id_personagem))
+                conn.commit()
+                print(f"\n{cores['verde']}Armadura desequipada com sucesso!{cores['reset']}")
+                time.sleep(1)
+                inventario(conn, id_personagem)
+            else:
+                print(f"\n{cores['amarelo']}Nenhuma armadura equipada.{cores['reset']}")
+                time.sleep(1)
+                inventario(conn, id_personagem)
+                
+        elif opc == "2":
+            # Desequipar implante
+            cursor.execute("""
+                SELECT ie.id_implante
+                FROM ImplanteEquipado ie
+                WHERE ie.id_personagem = %s
+            """, (id_personagem,))
+            resultado = cursor.fetchone()
+            if resultado:
+                id_implante = resultado[0]
+                # Obter energia_bonus do implante
+                cursor.execute("""
+                    SELECT energia_bonus FROM ImplanteCibernetico WHERE id_item = %s
+                """, (id_implante,))
+                energia_bonus = cursor.fetchone()[0]
+                
+                # Remover o registro do implante equipado
+                cursor.execute("""
+                    DELETE FROM ImplanteEquipado WHERE id_personagem = %s
+                """, (id_personagem,))
+                # Atualizar a energia do PC
+                cursor.execute("""
+                    UPDATE PC
+                    SET energia = energia - %s
+                    WHERE id_personagem = %s
+                """, (energia_bonus, id_personagem))
+                conn.commit()
+                print(f"\n{cores['verde']}Implante desequipado com sucesso!{cores['reset']}")
+                time.sleep(1)
+                inventario(conn, id_personagem)
+            else:
+                print(f"\n{cores['amarelo']}Nenhum implante equipado.{cores['reset']}")
+                time.sleep(1)
+                inventario(conn, id_personagem)
+                
+        else:
+            print(f"\n{cores['amarelo']}Operação cancelada.{cores['reset']}")
+            time.sleep(1)
+            inventario(conn, id_personagem)
+        
+        time.sleep(1)
+        os.system("cls" if os.name == "nt" else "clear")
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"{cores['vermelho']}Erro ao desequipar item: {e}{cores['reset']}")
+        time.sleep(1)
+    finally:
+        cursor.close()
