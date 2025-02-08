@@ -497,16 +497,51 @@ def atualizar_hp_jogador(conn, pc_id, novo_hp):
 
 def adicionar_recompensa(conn, pc_id, xp, wonglongs):
     cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE PC
-        SET 
-            xp = xp + %s,
-            wonglongs = wonglongs + %s
-        WHERE id_personagem = %s
-    """, (xp, wonglongs, pc_id))
-    conn.commit()
-    cursor.close()
-
+    try:
+        # 1. Atualiza XP e Wonglongs
+        cursor.execute("""
+            UPDATE PC
+            SET 
+                xp = xp + %s,
+                wonglongs = wonglongs + %s
+            WHERE id_personagem = %s
+            RETURNING xp, nivel, hp
+        """, (xp, wonglongs, pc_id))
+        
+        novo_xp, nivel_atual, hp_max = cursor.fetchone()
+        
+        # 2. Verifica level up
+        niveis_ganhos = novo_xp // 100
+        if niveis_ganhos > 0:
+            novo_nivel = nivel_atual + niveis_ganhos
+            novo_hp = hp_max + (10 * niveis_ganhos)  # +10 HP por nível
+            
+            cursor.execute("""
+                UPDATE PC
+                SET 
+                    nivel = %s,
+                    hp = %s,
+                    hp_atual = %s,  
+                    xp = xp %% 100  
+                WHERE id_personagem = %s
+            """, (novo_nivel, novo_hp, novo_hp, pc_id))
+            
+            conn.commit()
+            
+            # 3. Mostra mensagem colorida
+            print(f"\n{cores['magenta']}=== LEVEL UP! ==={cores['reset']}")
+            print(f"{cores['verde']}Novo nível: {cores['amarelo']}{novo_nivel}{cores['reset']}")
+            print(f"{cores['verde']}HP máximo aumentou para: {cores['amarelo']}{novo_hp}{cores['reset']}")
+            time.sleep(5)
+            
+        else:
+            conn.commit()
+            
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro ao atualizar recompensas: {e}")
+    finally:
+        cursor.close()
 def is_safezone(conn, cell_id):
     """Verifica se a célula é uma safezone (célula 4 do distrito)"""
     with conn.cursor() as cursor:

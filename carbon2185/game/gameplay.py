@@ -300,7 +300,7 @@ def navigate_in_the_map(conn, pc):
                     inimigos = get_inimigos_na_celula(conn, new_cell_id)
                     
                     if inimigos:
-                        if random.random() < 0.5:  # 50% de chance de combate
+                        if random.random() < 0.7:  # 50% de chance de combate
                             os.system("cls" if os.name == "nt" else "clear")
                             resultado = handle_combat(conn, pc, inimigos)
                             if not resultado:
@@ -396,6 +396,7 @@ def mostrar_informacoes_personagem(conn, id_personagem):
             PC.dano,
             PC.hp_atual,
             PC.wonglongs,
+            PC.hp,
             Classe.nome AS nome_classe,
             Faccao.nome AS nome_faccao
         FROM PC
@@ -419,7 +420,7 @@ def mostrar_informacoes_personagem(conn, id_personagem):
     print(f"{cores['amarelo']}XP:{cores['reset']} {info[3]}")
     print(f"{cores['amarelo']}Energia:{cores['reset']} {info[4]}")
     print(f"{cores['amarelo']}Dano:{cores['reset']} {info[5]}")
-    print(f"{cores['amarelo']}HP:{cores['reset']} {info[6]}/110")
+    print(f"{cores['amarelo']}HP:{cores['reset']} {info[6]}/{info[8]}")
     print(f"{cores['amarelo']}Wonglongs:{cores['reset']} {info[7]}")
     
     cursor.close()
@@ -787,7 +788,7 @@ def handle_combat(conn, pc, inimigos):
             # Mostra animação de recuperação
             print(f"\n{cores['amarelo']}→ {cores['verde']}Recuperando suas forças...{cores['reset']}")
             for i in range(10, 0, -1):
-                print(f"{cores['ciano']}{i} segundos restantes...{cores['reset']}", end='\r')
+                print(f"{cores['amarelo']}→ {cores['ciano']}{i} segundos restantes...{cores['reset']}", end='\r')
                 time.sleep(1)
 
             os.system("cls" if os.name == "nt" else "clear")
