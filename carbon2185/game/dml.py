@@ -26,7 +26,7 @@ SELECT uuid_generate_v4(), 'triad', 'Triad', 'organização secreta chinesa, mes
 WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'triad');
 
 INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade)
-SELECT uuid_generate_v4(), 'arma', 'Glock', 'Uma pistola básica', 100, 'comum'
+SELECT uuid_generate_v4(), 'arma', 'Glock', 'Uma pistola básica', 100, 'Comum'
 WHERE NOT EXISTS (SELECT 1 FROM Item WHERE nome = 'Glock');
 
 INSERT INTO Arma (id_item, id_celula, municao, dano)

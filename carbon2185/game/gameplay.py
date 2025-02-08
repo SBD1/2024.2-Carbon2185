@@ -427,6 +427,7 @@ def mostrar_informacoes_personagem(conn, id_personagem):
 
     
 def inventario(conn, id_personagem):
+    import os, time  # Certifique-se de ter os imports necessários
     os.system("cls" if os.name == "nt" else "clear")
     cursor = conn.cursor()
     
@@ -439,14 +440,24 @@ def inventario(conn, id_personagem):
     """, (id_personagem,))
     quantidade, capacidade = cursor.fetchone()
     
-    # Busca os itens no inventário
+    # Consulta para obter os itens do inventário com detalhes extras
     cursor.execute("""
         SELECT 
             ii.id_instancia_item,
             i.nome,
-            i.descricao
+            i.descricao,
+            i.raridade,
+            i.tipo,
+            a.dano AS arma_dano,
+            a.municao AS arma_municao,
+            ar.hp_bonus AS armadura_hp,
+            ic.dano AS implante_dano,
+            ic.custo_energia AS implante_custo
         FROM InstanciaItem ii
         JOIN Item i ON ii.id_item = i.id_item
+        LEFT JOIN Arma a ON i.id_item = a.id_item
+        LEFT JOIN Armadura ar ON i.id_item = ar.id_item
+        LEFT JOIN ImplanteCibernetico ic ON i.id_item = ic.id_item
         WHERE ii.id_inventario = (
             SELECT id_inventario FROM PC WHERE id_personagem = %s
         )
@@ -454,12 +465,52 @@ def inventario(conn, id_personagem):
     itens = cursor.fetchall()
     
     print("\n")
+    # Exibe os itens atualmente equipados (a função 'mostrar_equipados' já deve exibir os detalhes desejados)
     mostrar_equipados(conn, id_personagem)
-    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")
-    for idx, (id_instancia, nome, desc) in enumerate(itens, start=1):
-        print(f"{cores['verde']}{idx}.{cores['reset']} {nome} - {desc}")
     
-    # Novo menu com opção para desequipar
+    print(f"\n{cores['verde']}Itens no Inventário ({quantidade}/{capacidade}):{cores['reset']}\n")
+
+    for idx, item in enumerate(itens, start=1):
+        # Desempacotando os dados do item
+
+        id_instancia = item[0]
+        nome = item[1]
+        desc = item[2]
+        raridade = item[3]
+        tipo = item[4]
+        arma_dano = item[5]
+        arma_municao = item[6]
+        armadura_hp = item[7]
+        implante_dano = item[8]
+        implante_custo = item[9]
+        
+        if raridade.lower() == 'comum':
+            cor_raridade = cores['ciano']
+        elif raridade.lower() == 'raro':
+            cor_raridade = cores['magenta']
+        elif raridade.lower() in ('lendário', 'lendario'):
+            cor_raridade = cores['amarelo']
+        else:
+            cor_raridade = cores['reset']
+    
+    # Formatação conforme o tipo do item
+        if tipo == 'arma':
+            linha = (f"{cor_raridade}[{raridade}]{cores['reset']} {nome} - {desc} "
+                    f"(Dano: {cores['vermelho']}+{arma_dano}{cores['reset']}  | "
+                    f"Munição: {cores['amarelo']}{arma_municao}{cores['reset']})")
+        elif tipo == 'armadura':
+            linha = (f"{cor_raridade}[{raridade}]{cores['reset']} {nome} - {desc} "
+                    f"(HP Bônus: {cores['verde']}+{armadura_hp}{cores['reset']})")
+        elif tipo == 'implantecibernetico':
+            linha = (f"{cor_raridade}[{raridade}]{cores['reset']} {nome} - {desc} "
+                    f"(Dano: {cores['vermelho']}+{implante_dano}{cores['reset']}  | "
+                    f"Custo Energia: {cores['vermelho']}-{cores['reset']}{cores['amarelo']}{implante_custo}{cores['reset']})")
+        else:
+            linha = f"[{cor_raridade}{raridade}{cores['reset']}] {nome} - {desc}"
+            
+        print(f"{cores['verde']}{idx}.{cores['reset']} {linha}")
+    
+    # Novo menu com opções
     escolha = input(
         f"\n\n{cores['amarelo']}1.{cores['reset']} Equipar armadura ou implante cibernético\n\n"
         f"{cores['amarelo']}2.{cores['reset']} Desequipar item\n\n"
@@ -488,7 +539,7 @@ def inventario(conn, id_personagem):
             escolha_item = int(input(f"{cores['amarelo']}→{cores['reset']} Escolha o item para equipar: ")) - 1
             item = equipaveis[escolha_item]
             
-            # Verifica se já existe um item equipado para o mesmo tipo
+            # Verifica se já existe um item equipado do mesmo tipo
             if item['tipo'] == 'armadura':
                 cursor.execute("SELECT id_armadura FROM ArmaduraEquipada WHERE id_personagem = %s", (id_personagem,))
                 if cursor.fetchone() is not None:
@@ -525,7 +576,6 @@ def inventario(conn, id_personagem):
             print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
             time.sleep(1)
             inventario(conn, id_personagem)
-            cursor.close()
             
     elif escolha == "2":
         # Nova opção: Desequipar item
@@ -564,16 +614,14 @@ def inventario(conn, id_personagem):
                     print(f"{cores['vermelho']}Opção inválida!{cores['reset']}")
                     os.system("cls" if os.name == "nt" else "clear")
                     time.sleep(1)
-                    os.system("cls" if os.name == "nt" else "clear")
                     inventario(conn, id_personagem)
         except ValueError:
             print("\n")
             print(f"{cores['vermelho']}Entrada inválida!{cores['reset']}")
             time.sleep(1)
-            os.system("cls" if os.name == "nt" else "clear")
             inventario(conn, id_personagem)
     
-    else:  # Opção "4" (ou qualquer outra que não as anteriores) – Volta ao menu anterior
+    else:  # Opção "4" ou qualquer outra – Volta ao menu anterior
         os.system("cls" if os.name == "nt" else "clear")
     
     cursor.close()
