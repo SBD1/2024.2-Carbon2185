@@ -684,9 +684,57 @@ def handle_combat(conn, pc, inimigos):
         print("\n")
         print(f"{cores['amarelo']}Seu HP: {cores['reset']}{cores['verde']}{pc['hp_atual']}{cores['reset']}\n")
         print("\n")
-        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar\n{cores['amarelo']}2.{cores['reset']} Fugir\n\nEscolha: ")
+        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar com socos\n{cores['amarelo']}2.{cores['reset']} Usar item\n{cores['amarelo']}3.{cores['reset']} Fugir\n\nEscolha: ")
 
         if escolha == "1":
+            os.system("cls" if os.name == "nt" else "clear")
+            try:
+                dano_base = pc['dano']
+                current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_base)
+                atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
+
+                print(f"\n{cores['amarelo']}→ {cores['verde']}Atacando!{cores['reset']}")
+                time.sleep(1)
+                print(f"\n{cores['amarelo']}→ {cores['verde']}Você bateu no inimigo causando {cores['amarelo']}{dano_base} {cores['verde']}de dano!{cores['reset']}")
+                print("\n")
+                time.sleep(1)
+
+            except (IndexError, ValueError):
+                print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
+                continue
+
+            if current_enemy['hp_atual'] <= 0:
+                print(f"{cores['magenta']}{current_enemy['nome']}{cores['reset']} {cores['verde']}derrotado! {cores['amarelo']}+{current_enemy['xp']}{cores['verde']} de xp{cores['reset']}")
+                time.sleep(4)
+                os.system("cls" if os.name == "nt" else "clear")
+                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'])
+                remover_inimigo(conn, current_enemy['id'])
+                inimigos.pop(0)
+                continue
+
+            # Inimigo contra-ataca
+            dano_inimigo = current_enemy['dano']
+            novo_hp = max(0, pc['hp_atual'] - dano_inimigo)
+            atualizar_hp_jogador(conn, pc['id'], novo_hp)
+
+            print(f"{cores['amarelo']}→ {cores['vermelho']}O {current_enemy['nome']} está atacando!{cores['reset']}")
+            time.sleep(1)
+            print("\n")
+            print(f"{cores['amarelo']}→ {cores['vermelho']}O inimigo contra-atacou causando {cores['amarelo']}{dano_inimigo} {cores['vermelho']}de dano!{cores['reset']}")
+            time.sleep(2)
+            os.system("cls" if os.name == "nt" else "clear")
+
+            
+            if novo_hp <= 0:
+                print("\n")
+                print(f"{cores['amarelo']}→ {cores['vermelho']}Você foi derrotado e seu personagem foi deletado.{cores['reset']}")
+                print("\n")
+                print(f"{cores['vermelho']}=== GAME OVER! ==={cores['reset']}")
+                print("\n")
+                input("Pressione Enter para voltar ao menu principal...")
+                return False
+
+        elif escolha == "2":
             os.system("cls" if os.name == "nt" else "clear")
             armas = get_armas_inventario(conn, pc['id'])
             if not armas:
@@ -768,7 +816,7 @@ def handle_combat(conn, pc, inimigos):
                 return False
                 
                 
-        elif escolha == "2":
+        elif escolha == "3":
             if random.random() < 0.5:  # 50% de chance de fugir
                 print("\n")
                 print(f"{cores['amarelo']}→ {cores['ciano']}Fuga bem sucedida!{cores['reset']}")
