@@ -30,7 +30,7 @@ SELECT uuid_generate_v4(), 'arma', 'Glock', 'Uma pistola básica', 100, 'comum'
 WHERE NOT EXISTS (SELECT 1 FROM Item WHERE nome = 'Glock');
 
 INSERT INTO Arma (id_item, id_celula, municao, dano)
-SELECT id_item, NULL, 10, 5 
+SELECT id_item, NULL, 5, 5 
 FROM Item WHERE nome = 'Glock'
 AND NOT EXISTS (SELECT 1 FROM Arma WHERE id_item = (SELECT id_item FROM Item WHERE nome = 'Glock'));
 

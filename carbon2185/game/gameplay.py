@@ -1,6 +1,6 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
-from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone, inicializar_inimigos, respawn_inimigos
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone, inicializar_inimigos, respawn_inimigos, get_armas_inventario
 from game.database import create_connection
 from game.utils import get_cell_label, display_map, generate_map, move_player
 import os 
@@ -292,7 +292,7 @@ def navigate_in_the_map(conn, pc):
                 
                 # Verifica se é safezone
                 if is_safezone(conn, new_cell_id):
-                    print(f"\n{cores['verde']}Este é uma safezone devido à movimentação do mercado clandestino!")
+                    print(f"\n{cores['verde']}Esta é uma safezone devido à movimentação do mercado clandestino!")
                     print(f"{cores['verde']}Os contrabandistas possuem um acordo de cessar-fogo.{cores['reset']}")
                     time.sleep(3)
                 else:
@@ -580,11 +580,26 @@ def interact_with_merchant(conn, merchant_id, pc_id):
                 print(f"   {detalhes}")
                 print(f"   {cores['verde']}Preço: {item[2]} Wonglongs{cores['reset']}\n")
 
-            print(f"{cores['amarelo']}0. Voltar ao Mapa{cores['reset']}")
-            escolha = input("\nEscolha um item: ")
+            print(f"\n{cores['amarelo']}→ {cores['ciano']}Escreva '{cores['amarelo']}munição{cores['ciano']}' para comprar munições por {cores['amarelo']}20 {cores['ciano']}wonglongs{cores['reset']}")
+            print("\n")
+            print(f"{cores['amarelo']}0.{cores['reset']} Voltar ao Mapa")
+            escolha = input("\nEscolha um item ou escreva 'munição': ").strip().lower()
 
             if escolha == "0":
                 break
+            elif escolha == 'munição':
+                os.system("cls" if os.name == "nt" else "clear")
+                cursor.execute("SELECT wonglongs FROM PC WHERE id_personagem = %s", (pc_id,))
+                wonglongs = cursor.fetchone()[0]
+        
+                if wonglongs >= 20:
+                    cursor.execute("CALL repor_municao(%s)", (pc_id,))
+                    conn.commit()
+                    print(f"\n{cores['amarelo']}→ {cores['verde']}Munições repostas!{cores['reset']}")
+                    time.sleep(2)
+                else:
+                    print(f"{cores['vermelho']}Wonglongs insuficientes!{cores['reset']}")
+                continue
 
             try:
                 idx = int(escolha) - 1
@@ -673,19 +688,56 @@ def handle_combat(conn, pc, inimigos):
 
         if escolha == "1":
             os.system("cls" if os.name == "nt" else "clear")
-            # Jogador ataca
-            dano_jogador = pc['dano']
-            current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_jogador)
-            atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
+            armas = get_armas_inventario(conn, pc['id'])
+            if not armas:
+                print(f"{cores['vermelho']}Nenhuma arma no inventário!{cores['reset']}")
+                time.sleep(1)
+                continue
 
-            print(f"\n{cores['amarelo']}→ {cores['verde']}Atacando!{cores['reset']}")
-            time.sleep(1)
-            print(f"\n{cores['amarelo']}→ {cores['verde']}Você causou {cores['amarelo']}{dano_jogador} {cores['verde']}de dano!{cores['reset']}")
+            print(f"\n{cores['amarelo']}→ {cores['ciano']}Armas disponíveis:{cores['reset']}")
             print("\n")
-            time.sleep(1)
+            for idx, arma in enumerate(armas, 1):
+                print(f"{cores['amarelo']}{idx}.{cores['reset']} {cores['verde']}{arma['nome']}{cores['reset']} (Dano: {cores['amarelo']}{arma['dano']}{cores['reset']} | Munição: {cores['amarelo']}{arma['municao']}{cores['reset']})")
+                print("\n")
+
+            try:
+                escolha_arma = int(input("Escolha a arma: ")) - 1
+                arma_escolhida = armas[escolha_arma]
+                
+                if arma_escolhida['municao'] <= 0:
+                    print("\n")
+                    print(f"{cores['vermelho']}Sem munição nesta arma! Viaje até um comerciante para repor seu carregamento.{cores['reset']}")
+                    time.sleep(1)
+                    continue
+                
+                # Atualiza munição
+                cursor = conn.cursor()
+                cursor.execute("""
+                    UPDATE Arma
+                    SET municao = municao - 1
+                    WHERE id_item = (
+                        SELECT id_item FROM InstanciaItem
+                        WHERE id_instancia_item = %s
+                    )
+                """, (arma_escolhida['id'],))
+                conn.commit()
+                dano_base = pc['dano']
+                dano_jogador = pc['dano'] + arma_escolhida['dano']
+                current_enemy['hp_atual'] = max(0, current_enemy['hp_atual'] - dano_jogador)
+                atualizar_hp_inimigo(conn, current_enemy['id'], current_enemy['hp_atual'])
+
+                print(f"\n{cores['amarelo']}→ {cores['verde']}Atacando!{cores['reset']}")
+                time.sleep(1)
+                print(f"\n{cores['amarelo']}→ {cores['verde']}Você usou {cores['amarelo']}{arma_escolhida['nome']}{cores['verde']} + seu dano base ({cores['amarelo']}{dano_base}{cores['reset']}{cores['verde']}) causando {cores['amarelo']}{dano_jogador} {cores['verde']}de dano!{cores['reset']}")
+                print("\n")
+                time.sleep(1)
+
+            except (IndexError, ValueError):
+                print(f"{cores['vermelho']}Escolha inválida!{cores['reset']}")
+                continue
             
             if current_enemy['hp_atual'] <= 0:
-                print(f"{cores['magenta']}{current_enemy['nome']}{cores['reset']} {cores['verde']}derrotado! {cores['amarelo']}+{current_enemy['xp']} de xp{cores['reset']}")
+                print(f"{cores['magenta']}{current_enemy['nome']}{cores['reset']} {cores['verde']}derrotado! {cores['amarelo']}+{current_enemy['xp']}{cores['verde']} de xp{cores['reset']}")
                 time.sleep(4)
                 os.system("cls" if os.name == "nt" else "clear")
                 adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'])

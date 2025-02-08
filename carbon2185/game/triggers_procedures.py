@@ -373,6 +373,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE repor_municao(pc_id UUID)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE Arma a
+    SET municao = CASE i.raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+    FROM InstanciaItem ii
+    JOIN Item i ON ii.id_item = i.id_item
+    WHERE a.id_item = i.id_item
+    AND ii.id_inventario = (SELECT id_inventario FROM PC WHERE id_personagem = pc_id);
+    
+    UPDATE PC
+    SET wonglongs = wonglongs - 20
+    WHERE id_personagem = pc_id;
+END;
+$$;
+
+
 """
 def trigger_procedure(conn):
     cursor = conn.cursor()

@@ -608,3 +608,32 @@ def respawn_inimigos(conn):
         print(f"Erro no respawn: {e}")
     finally:
         cursor.close()
+
+def get_armas_inventario(conn, pc_id):
+    """Retorna todas as armas no inventário do jogador com seus dados"""
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT 
+            ii.id_instancia_item,
+            i.nome,
+            a.dano,
+            a.municao,
+            i.raridade
+        FROM InstanciaItem ii
+        JOIN Item i ON ii.id_item = i.id_item
+        JOIN Arma a ON i.id_item = a.id_item
+        WHERE ii.id_inventario = (
+            SELECT id_inventario FROM PC WHERE id_personagem = %s
+        )
+    """, (pc_id,))
+    
+    armas = [{
+        'id': row[0],
+        'nome': row[1],
+        'dano': row[2],
+        'municao': row[3],
+        'raridade': row[4]
+    } for row in cursor.fetchall()]
+    
+    cursor.close()
+    return armas
