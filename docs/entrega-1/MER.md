@@ -24,9 +24,6 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - Yazuka
     - Triad
 - Classe
-    - Daimyo
-    - Hacker
-    - Scoundrel
 - Distrito
 - Célula do mundo
 - Instância Inimigo
