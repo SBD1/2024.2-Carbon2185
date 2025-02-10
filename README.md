@@ -58,19 +58,25 @@
 git clone git@github.com:SBD1/2024.2-Carbon2185.git
 ```
 
-1. **Acesse o diretório do jogo**
+2. **Baixe os requisitos** 
+
+```
+pip install -r requirements.txt
+```
+
+3. **Acesse o diretório do jogo**
 
 ```bash
 cd carbon2185
 ```
 
-3. **Contruir as imagens Docker**
+4. **Contruir as imagens Docker**
 
 ```bash
 docker-compose build
 ```
 
-4. **Rodar o App**
+5. **Rodar o App**
 
 ```bash
 docker-compose run app
