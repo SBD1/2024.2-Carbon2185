@@ -15,10 +15,9 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
 - Missão
 - Diálogo
 - Item
-    - Equipamento
-        - Armadura
-        - Arma
-        - Implante cibernético
+    - Armadura
+    - Arma
+    - Implante cibernético
 - Instância Item
 - Facção
     - Yazuka
@@ -39,22 +38,26 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
 - Instância Inimigo: [_<ins>id_instancia_inimigo</ins>,id_inimigo,id_celula,hp_atual_]
 - Inventário: [_<ins>id_inventario</ins>,quatidade_itens,capacidade_maxima_]
 - Missão: [_<ins>id_missao</ins>,nome,descrição,dificuldade,objetivo,goal,recompensa_]
-- Interacao: [_<ins>id_interacao</ins>,personagem_origem,personagem_destino]
+- Interacao: [_<ins>id_interacao</ins>,personagem_origem,personagem_destino_]
     - Diálogo: [_<ins>id_interacao</ins>,mensagem_atual_]
 - Item: [_<ins>id_item</ins>,tipo,nome,descricao,valor,raridade_]
     - Equipamento: [_<ins>id_item</ins>,tipo_]
-        - Armadura: [_<ins>id_item</ins>,id_celula,hp_bonus]
+        - Armadura: [_<ins>id_item</ins>,id_celula,hp_bonus_]
         - Arma: [_<ins>id_item</ins>,id_celula,municao,dano_]
         - Implante cibernético: [_<ins>id_item</ins>,id_celula,custo_energia,dano_]
-- Instância Item: [_<ins>id_instancia_item</ins>,id_inventario,id_item]
+- Instância Item: [_<ins>id_instancia_item</ins>,id_inventario,id_item_]
 - Facção: [_<ins>id_faccao</ins>,tipo_]
     - Yazuka: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
     - Triad: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
-- Classe: [_<ins>id_classe</ins>,tipo_,nome,descricao,ideologia]
-- Distrito: [_<ins>id_distrito</ins>,nome,descricao,eixoX,eixoY,local_x,local_y] 
+- Classe: [_<ins>id_classe</ins>,tipo,nome,descricao,ideologia_]
+- Distrito: [_<ins>id_distrito</ins>,nome,descricao,eixoX,eixoY,local_x,local_y_] 
 - Célula do mundo: [_<ins>id_celula</ins>,id_disrito,nome,descricao,destino_]
     - SalaRespawnInimigos: [_<ins>id_instancia</ins>,id_inimigo,id_celula_origem_]
 - Loja: [_<ins>id_loja</ins>,id_comerciante,id_instancia_item_]
+- ProgressoMissao: [_<ins>id_missao</ins>,<ins>id_personagem</ins>,progresso_]
+- ArmaduraEquipada: [_<ins>id_personagem</ins>,id_armadura_]
+- ImplanteEquipado: [_<ins>id_personagem</ins>,id_implante_]
+- SalaRespawnInimigos: [_<ins>id_instancia</ins>,id_inimigo,id_celula_origem_]
 
 
 ## **Relacionamentos**
