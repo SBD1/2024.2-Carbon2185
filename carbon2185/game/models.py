@@ -316,11 +316,6 @@ import random
 import random
 
 def get_inimigos_na_celula(conn, cell_id):
-    
-    with conn.cursor() as cur:
-        cur.execute("SELECT respawn_inimigos()")
-        conn.commit()
-
     cursor = conn.cursor()
     
     # 1. Obter as coordenadas GLOBAIS (eixoX, eixoY) da célula
@@ -329,8 +324,10 @@ def get_inimigos_na_celula(conn, cell_id):
             cm.eixoX,
             cm.eixoY,
             cm.local_x,
-            cm.local_y
+            cm.local_y,
+            d.nome
         FROM CelulaMundo cm
+        JOIN Distrito d ON cm.id_distrito = d.id_distrito
         WHERE cm.id_celula = %s;
     """, (cell_id,))
     resultado = cursor.fetchone()
@@ -339,9 +336,9 @@ def get_inimigos_na_celula(conn, cell_id):
         cursor.close()
         return []
     
-    eixoX, eixoY, local_x, local_y = resultado
+    eixoX, eixoY, local_x, local_y, distrito_nome = resultado
     
-     # 1. Verificar se é safezone
+    # 2. Verificar se é safezone
     cursor.execute("""
         SELECT (local_x * 3 + local_y + 1) 
         FROM CelulaMundo 
@@ -351,23 +348,55 @@ def get_inimigos_na_celula(conn, cell_id):
     
     if cell_number == 4:
         return []  # Safezone
+
+    # 3. Verificar 5% de chance de spawn do boss do distrito
+    if random.random() <= 0.03:
+        boss_district_mapping = {
+            "Distrito A - Ruínas do Noroeste": "Zero.exe",
+            "Distrito B - O Olho do Regime": "Tyrant",
+            "Distrito C - O Abismo de Ferro": "Orion",
+            "Distrito D - Terra devastada": "Viper"
+        }
         
-    # 2. Obter o nome do distrito da célula atual
-    cursor.execute("""
-        SELECT d.nome
-        FROM CelulaMundo cm
-        JOIN Distrito d ON cm.id_distrito = d.id_distrito
-        WHERE cm.id_celula = %s;
-    """, (cell_id,))
-    resultado = cursor.fetchone()
-    distrito_nome = resultado[0].strip().lower() if resultado else ""
-    
-    # 3. Definir as restrições dos inimigos (todos os nomes em minúsculas)
+        boss_name = boss_district_mapping.get(distrito_nome)
+        
+        if boss_name:
+            # Buscar instância do boss na célula atual
+            cursor.execute("""
+                SELECT 
+                    ii.id_instancia_inimigo,
+                    i.nome,
+                    i.descricao,
+                    ii.hp_atual,
+                    i.dano,
+                    i.xp,
+                    i.hp
+                FROM InstanciaInimigo ii
+                JOIN Inimigo i ON ii.id_inimigo = i.id_inimigo
+                WHERE i.nome = %s
+                AND ii.id_celula = %s
+            """, (boss_name, cell_id))
+            
+            boss = cursor.fetchone()
+            
+            if boss:
+                cursor.close()
+                return [{
+                    'id': boss[0],
+                    'nome': boss[1],
+                    'hp_atual': boss[3],
+                    'dano': boss[4],
+                    'xp': boss[5],
+                    'hp_max': boss[6],
+                    'descricao': boss[2]
+                }]
+
+    # 4. Lógica original para inimigos normais
     restricoes = {
-        "andarilho corrompido": "distrito a - ruínas do noroeste",
-        "drone de supressão": "distrito b - o olho do regime",
-        "carrasco da favela": "distrito c - o abismo de ferro",
-        "mutante das minas": "distrito d - terra devastada"
+        "andarilho corrompido": "Distrito A - Ruínas do Noroeste",
+        "drone de supressão": "Distrito B - O Olho do Regime",
+        "carrasco da favela": "Distrito C - O Abismo de Ferro",
+        "mutante das minas": "Distrito D - Terra devastada"
     }
     
     cursor.execute("""
@@ -394,7 +423,6 @@ def get_inimigos_na_celula(conn, cell_id):
         enemy_name_lower = enemy_name.strip().lower()
         
         if enemy_name_lower in restricoes:
-            # Adiciona somente se o distrito bater com o da restrição
             if distrito_nome == restricoes[enemy_name_lower]:
                 inimigos_restritos.append({
                     'id': instancia_id,
@@ -405,9 +433,7 @@ def get_inimigos_na_celula(conn, cell_id):
                     'hp_max': hp_max,
                     'descricao': descricao
                 })
-            # Se o distrito não bater, ignora este inimigo.
         else:
-            # Inimigos não restritos são considerados globais
             inimigos_globais.append({
                 'id': instancia_id,
                 'nome': enemy_name,
@@ -417,9 +443,8 @@ def get_inimigos_na_celula(conn, cell_id):
                 'hp_max': hp_max,
                 'descricao': descricao
             })
-    
-    # 6. Seleção ponderada: 75% do inimigo escolhido vem dos restritos e 25% dos globais.
-    # Limitar o número de inimigos a, no máximo, 2.
+
+    # 6. Seleção ponderada de inimigos normais
     inimigos_selecionados = []
     vagas = 2
     while vagas > 0 and (inimigos_restritos or inimigos_globais):
@@ -495,53 +520,73 @@ def atualizar_hp_jogador(conn, pc_id, novo_hp):
     conn.commit()
     cursor.close()
 
-def adicionar_recompensa(conn, pc_id, xp, wonglongs):
+def adicionar_recompensa(conn, pc_id, xp, wonglongs, inimigo_nome):
     cursor = conn.cursor()
-    try:
-        # 1. Atualiza XP e Wonglongs
+    try:       
+
+        # 1. Atualiza XP e Wonglongs do jogador
         cursor.execute("""
             UPDATE PC
             SET 
                 xp = xp + %s,
                 wonglongs = wonglongs + %s
             WHERE id_personagem = %s
-            RETURNING xp, nivel, hp
+            RETURNING xp, nivel, hp, energia
         """, (xp, wonglongs, pc_id))
-        
-        novo_xp, nivel_atual, hp_max = cursor.fetchone()
-        
-        # 2. Verifica level up
+        novo_xp, nivel_atual, hp_max, energia = cursor.fetchone()
+
+        # 2. Verifica se houve level up (a cada 100 xp)
         niveis_ganhos = novo_xp // 100
         if niveis_ganhos > 0:
             novo_nivel = nivel_atual + niveis_ganhos
-            novo_hp = hp_max + (10 * niveis_ganhos)  # +10 HP por nível
-            
+            novo_hp = hp_max + (10 * niveis_ganhos)      # +10 HP por nível ganho
+            nova_energia = energia + (10 * novo_nivel)     # Energia base +10 por nível
+
             cursor.execute("""
                 UPDATE PC
                 SET 
                     nivel = %s,
                     hp = %s,
-                    hp_atual = %s,  
+                    hp_atual = %s,
+                    energia = %s, 
                     xp = xp %% 100  
                 WHERE id_personagem = %s
-            """, (novo_nivel, novo_hp, novo_hp, pc_id))
-            
+            """, (novo_nivel, novo_hp, novo_hp, nova_energia, pc_id))
             conn.commit()
-            
-            # 3. Mostra mensagem colorida
+
+            # Exibe mensagem de level up
             print(f"\n{cores['magenta']}=== LEVEL UP! ==={cores['reset']}")
             print(f"{cores['verde']}Novo nível: {cores['amarelo']}{novo_nivel}{cores['reset']}")
             print(f"{cores['verde']}HP máximo aumentou para: {cores['amarelo']}{novo_hp}{cores['reset']}")
+            print(f"\n{cores['verde']}Energia aumentada para: {cores['amarelo']}{nova_energia}{cores['reset']}")
             time.sleep(5)
-            
         else:
             conn.commit()
-            
+
+        # 3. Atualiza o progresso das missões
+        # A consulta agora retorna 3 colunas (id_missao, objetivo e goal) para que o desempacotamento funcione corretamente
+        cursor.execute("""
+            SELECT id_missao, objetivo, goal
+            FROM Missao 
+            WHERE objetivo ILIKE %s
+        """, (f'%{inimigo_nome}%',))
+        missoes = cursor.fetchall()
+
+        for id_missao, objetivo, goal in missoes:
+            cursor.execute("""
+                UPDATE ProgressoMissao
+                SET progresso = progresso + 1
+                WHERE id_missao = %s AND id_personagem = %s
+            """, (id_missao, pc_id))
+                    
+        conn.commit()
+
     except Exception as e:
         conn.rollback()
         print(f"Erro ao atualizar recompensas: {e}")
     finally:
         cursor.close()
+
 def is_safezone(conn, cell_id):
     """Verifica se a célula é uma safezone (célula 4 do distrito)"""
     with conn.cursor() as cursor:
@@ -554,14 +599,13 @@ def is_safezone(conn, cell_id):
         return result and result[0] == 4
 
 def inicializar_inimigos(conn):
-    """Garante que inimigos estejam instanciados nas células não-safezone"""
+    """Garante que inimigos normais estejam instanciados nas células não-safezone"""
     cursor = conn.cursor()
     
     try:
         cursor.execute("SELECT COUNT(*) FROM InstanciaInimigo")
         if cursor.fetchone()[0] == 0:
-            
-            # Query corrigida (sem comentários inline)
+            # Query corrigida e modificada para excluir bosses
             cursor.execute("""
                 INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
                 SELECT
@@ -571,15 +615,90 @@ def inicializar_inimigos(conn):
                     i.hp
                 FROM Inimigo i
                 CROSS JOIN CelulaMundo cm
-                WHERE (cm.local_x * 3 + cm.local_y + 1) != 4
-                AND cm.id_celula NOT IN (
-                    SELECT id_celula FROM Comerciante
-                )
-            """)  # Comentário movido para fora da string SQL
+                WHERE 
+                    (cm.local_x * 3 + cm.local_y + 1) != 4  -- Condição de safezone corrigida
+                    AND i.nome NOT IN (
+                        'Zero.exe', 'Tyrant', 'Orion', 'Viper'  -- Exclui bosses
+                    )
+                    AND cm.id_celula NOT IN (
+                        SELECT id_celula FROM Comerciante  -- Exclui células com comerciantes
+                    )
+            """)
             conn.commit()
+            print(f"Inimigos normais inicializados: {cursor.rowcount} instâncias criadas")
             
     except Exception as e:
         conn.rollback()
+        print(f"Erro ao inicializar inimigos normais: {str(e)}")
+    finally:
+        cursor.close()
+
+def inicializar_bosses(conn):
+    """Inserir 1 boss em TODAS as células não-safezone do distrito correspondente"""
+    boss_district_map = {
+        'Zero.exe': 'Distrito A - Ruínas do Noroeste',
+        'Tyrant': 'Distrito B - O Olho do Regime',
+        'Orion': 'Distrito C - O Abismo de Ferro',
+        'Viper': 'Distrito D - Terra devastada'
+    }
+
+    cursor = conn.cursor()
+    
+    try:
+        for boss_name, district_name in boss_district_map.items():
+            # 1. Obter ID e HP do boss
+            cursor.execute("""
+                SELECT id_inimigo, hp 
+                FROM Inimigo 
+                WHERE nome = %s 
+                LIMIT 1
+            """, (boss_name,))
+            boss_data = cursor.fetchone()
+            
+            if not boss_data:
+                print(f"Boss {boss_name} não encontrado!")
+                continue
+                
+            boss_id, boss_hp = boss_data
+            
+            # 2. Buscar TODAS as células não-safezone do distrito
+            cursor.execute("""
+                SELECT cm.id_celula 
+                FROM CelulaMundo cm
+                JOIN Distrito d ON cm.id_distrito = d.id_distrito
+                WHERE 
+                    d.nome = %s AND
+                    (cm.local_x * 3 + cm.local_y + 1) != 4
+            """, (district_name,))
+            
+            celulas = cursor.fetchall()
+            
+            if not celulas:
+                print(f"Nenhuma célula válida em {district_name}")
+                continue
+                
+            # 3. Inserir em todas as células
+            inseridos = 0
+            for celula in celulas:
+                cell_id = celula[0]
+                try:
+                    cursor.execute("""
+                        INSERT INTO InstanciaInimigo 
+                            (id_instancia_inimigo, id_inimigo, id_celula, hp_atual)
+                        VALUES 
+                            (uuid_generate_v4(), %s, %s, %s)
+                        ON CONFLICT (id_inimigo, id_celula) DO NOTHING
+                    """, (boss_id, cell_id, boss_hp))
+                    if cursor.rowcount > 0:
+                        inseridos += 1
+                except Exception as e:
+                    print(f"Erro na célula {cell_id}: {str(e)}")
+                    continue
+        conn.commit()
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro: {str(e)}")
     finally:
         cursor.close()
 

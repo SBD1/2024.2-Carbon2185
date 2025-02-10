@@ -94,13 +94,14 @@ CREATE TABLE IF NOT EXISTS Inimigo (
     descricao VARCHAR(1000) NOT NULL,
 
     CONSTRAINT unique_inimigo_nome UNIQUE (nome)
+
 );
 
 CREATE TABLE IF NOT EXISTS Missao (
     id_missao UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome VARCHAR(100) NOT NULL UNIQUE,
     descricao VARCHAR(100) NOT NULL,
-    dificuldade INT NOT NULL,
+    dificuldade VARCHAR(100) NOT NULL,
     objetivo VARCHAR(100) NOT NULL,
     goal INT NOT NULL,
     recompensa INT NOT NULL
@@ -158,7 +159,10 @@ CREATE TABLE IF NOT EXISTS InstanciaInimigo (
     id_instancia_inimigo UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     id_inimigo UUID REFERENCES Inimigo(id_inimigo),
     id_celula UUID REFERENCES CelulaMundo(id_celula),
-    hp_atual INT NOT NULL
+    hp_atual INT NOT NULL,
+
+    CONSTRAINT unique_boss_per_district UNIQUE (id_inimigo, id_celula)
+
 );
 
 CREATE TABLE IF NOT EXISTS Loja (

@@ -53,20 +53,30 @@ VALUES
 
     (uuid_generate_v4(), NULL, 5, 10, 100, 'Caçador de Recompensas', 
     'Equipado com sensores térmicos e um arsenal de armas customizadas, o Caçador de Recompensas rastreia alvos para o regime e para os criminosos ricos. Ele não tem lealdade, apenas um preço. Se seu nome estiver em sua lista, prepare-se para fugir... ou lutar pela vida.')
+    
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Inimigo (id_inimigo, id_personagem, dano, xp, hp, nome, descricao)
+VALUES
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Zero.exe', 'Um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.'),
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Tyrant', 'Um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.'), 
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Orion', 'A megacorp Shinsei Biotech criou um super-soldado para proteger seus segredos.'),
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Viper', 'Um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.')
+
 ON CONFLICT (nome) DO NOTHING;
 
 -- Missoes
 INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal, recompensa) VALUES
-    (uuid_generate_v4(), 'Saque diário', 'Derrote alguns Saqueadores Nômade.', 1, 'Destruir 5 Saqueador Nômade', 5, 50),
-    (uuid_generate_v4(), 'O Caçador se Torna a Presa', 'Derrote alguns Caçadores de Recompensas.', 1, 'Eliminar 5 Caçador de Recompensas', 5, 50),
-    (uuid_generate_v4(), 'Expurgo Urbano', 'Elimine os Andarilhos Corrompidos que espreitam nos becos abandonados.', 3, 'Derrotar 30 Andarilhos Corrompidos', 30, 1000),
-    (uuid_generate_v4(), 'Caçada Radioativa', 'Neutralize os Mutantes das Minas antes que se espalhem pela cidade.', 4, 'Eliminar 30 Mutantes das Minas', 30, 1200),
-    (uuid_generate_v4(), 'O Regime não Dorme', 'Enfrente os Drones de Supressão e impeça a vigilância implacável.', 5, 'Destruir 30 Drones de Supressão', 30, 1100),
-    (uuid_generate_v4(), 'Justiça nas Sombras', 'Acabe com a rede de violência imposta pelos Carrascos das Favelas.', 5, 'Eliminar 30 Carrascos das Favelas', 30, 1500),
-    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 6, 'Derrotar Zero.exe', 1, 5000),
-    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 6, 'Derrotar Tyrant', 1, 5200),
-    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 7, 'Derrotar Orion', 1, 7000),
-    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 8, 'Derrotar Viper', 1, 100000)
+    (uuid_generate_v4(), 'Saque diário', 'Derrote alguns Saqueadores Nômade.', 'Médio', 'Destruir 5 Saqueador Nômade', 5, 50),
+    (uuid_generate_v4(), 'O Caçador se Torna a Presa', 'Derrote alguns Caçadores de Recompensas.', 'Médio', 'Eliminar 5 Caçador de Recompensas', 5, 50),
+    (uuid_generate_v4(), 'Expurgo Urbano', 'Elimine os Andarilhos Corrompidos que espreitam nos becos abandonados.', 'Fácil', 'Derrotar 30 Andarilho Corrompido', 30, 1000),
+    (uuid_generate_v4(), 'Caçada Radioativa', 'Neutralize os Mutantes das Minas antes que se espalhem pela cidade.', 'Fácil', 'Eliminar 30 Mutante das Minas', 30, 1200),
+    (uuid_generate_v4(), 'O Regime não Dorme', 'Enfrente os Drones de Supressão e impeça a vigilância implacável.', 'Fácil', 'Destruir 30 Drone de Supressão', 30, 1100),
+    (uuid_generate_v4(), 'Justiça nas Sombras', 'Acabe com a rede de violência imposta pelos Carrascos das Favelas.', 'Fácil', 'Eliminar 30 Carrasco das Favelas', 30, 1500),
+    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 'Difícil', 'Derrotar Zero.exe', 1, 5000),
+    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 'Difícil', 'Derrotar Tyrant', 1, 5200),
+    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 'Difícil', 'Derrotar Orion', 1, 7000),
+    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 'Difícil', 'Derrotar Viper', 1, 100000)
 ON CONFLICT (nome) DO NOTHING;
 
 -- Itens Comuns (5)

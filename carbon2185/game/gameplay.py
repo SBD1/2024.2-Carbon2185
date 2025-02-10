@@ -1,6 +1,6 @@
 from game.models import create_pc, create_npc, interact_with_npc
 from game.utils import display_message, generate_map, display_map, move_player
-from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone, inicializar_inimigos, respawn_inimigos, get_armas_inventario
+from game.models import get_all_pcs, get_cell_id_by_position, get_player_position, update_player_cell, get_cell_info, listar_missoes_progresso, deletar_personagem, get_inimigos_na_celula, atualizar_hp_inimigo, atualizar_hp_jogador, random, adicionar_recompensa, remover_inimigo, is_safezone, inicializar_inimigos, respawn_inimigos, get_armas_inventario, inicializar_bosses
 from game.database import create_connection
 from game.utils import get_cell_label, display_map, generate_map, move_player
 import os 
@@ -20,6 +20,7 @@ cores = {
 
 def start_game(conn):
     inicializar_inimigos(conn)
+    inicializar_bosses(conn)
     os.system("cls" if os.name == "nt" else "clear")
     """ 
     Inicia o jogo, apresentando as opções e gerenciando o fluxo principal.
@@ -98,6 +99,52 @@ def start_game(conn):
             display_message(f"{cores['magenta']}Distrito D - Terra devastada{cores['reset']}")
             print("\n")
             print("Um experimento fracassado de terraformação deixou o solo do Distrito C envenenado. Seus habitantes, chamados de “Os Condenados”, são forçados a trabalhar nas minas subterrâneas em troca de doses de antídoto para a contaminação. O céu sobre o distrito brilha com uma aurora artificial, enquanto os gritos ecoam nos becos da cidade morta.")
+            print("\n")
+            display_message(f"{cores['magenta']}Itens{cores['reset']}")
+            print("\n")
+            print("Em Carbon 2185, os itens desempenham um papel crucial na sobrevivência e evolução dos personagens. Eles se dividem em três categorias principais:")
+            print("\n")
+            print("Armas: Essenciais para o combate, aumentam o dano causado aos inimigos.")
+            print("Armaduras: Proporcionam um bônus de HP, tornando o personagem mais resistente.")
+            print("Implantes Cibernéticos: Melhoram as capacidades físicas e de combate, oferecendo dano extra. No entanto, consomem energia, e o custo varia de acordo com a classe do personagem.")
+            print("\n")
+            print("Cada item possui três níveis de raridade:")
+            print("\n")
+            print("Comum: Funcional, mas básico.")
+            print("Raro: Melhorado, oferecendo bônus superiores.")
+            print("Lendário: Extremamente poderoso, concedendo vantagens significativas em combate.")
+            print("\n")
+            display_message(f"{cores['magenta']}Combate{cores['reset']}")
+            print("\n")
+            print("Ao viajar pelo mundo de Carbon 2185, cada movimento entre células pode resultar em um confronto inesperado.")
+            print("\n")
+            print("75% de chance de iniciar um combate ao mudar de célula.")
+            print("Durante o combate, o jogador pode escolher entre usar itens, atacar ou tentar fugir.")
+            print("Cada distrito abriga um boss, um inimigo poderoso que pode surgir com 3% de chance.")
+            print("Safezones: As células 4 de cada distrito são seguras e não possuem encontros hostis.")
+            print("\n")
+            display_message(f"{cores['magenta']}Comerciantes/Loja{cores['reset']}")
+            print("\n")
+            print("A economia do submundo de Carbon 2185 gira em torno de itens ilegais e contrabando. A moeda em vigor se chama Wonglong.")
+            print("\n")
+            print("Em toda célula 4 de um distrito, há um comerciante disposto a negociar.")
+            print("Os itens vendidos são de qualidade duvidosa, mas muitas vezes podem ser a única alternativa para sobreviver.")
+            print("Os preços variam e podem ser influenciados por suas ações e reputação na cidade.")
+            print("\n")
+            display_message(f"{cores['magenta']}Inventário{cores['reset']}")
+            print("\n")
+            print("Para sobreviver no mundo implacável de Carbon 2185, o gerenciamento de recursos é essencial.")
+            print("\n")
+            print("O jogador pode acessar seu inventário a qualquer momento para verificar os itens adquiridos.")
+            print("Equipamento: Armas e armaduras podem ser trocadas para melhor desempenho em combate.")
+            print("Implantes cibernéticos podem ser ativados para aumentar o dano, mas exigem um gerenciamento cuidadoso da energia.")
+            print("\n")
+            display_message(f"{cores['magenta']}Missões{cores['reset']}")
+            print("\n")
+            print("O progresso em Carbon 2185 é impulsionado por missões que desafiam os jogadores a explorar o mundo e enfrentar ameaças perigosas.")
+            print("As missões envolvem a eliminação de inimigos e só são concluídas quando o jogador atinge a quantidade pré-estabelecida de alvos derrotados.")
+            print("Os objetivos podem incluir eliminar saqueadores, mutantes, drones, AI hackers, super-soldados e chefes do crime.")
+            print("O nível de dificuldade varia, influenciando as recompensas recebidas ao completar a missão.")
             print("\n")
         elif choice == "4":
             print("\n")
@@ -274,6 +321,7 @@ def navigate_in_the_map(conn, pc):
         if command == "voltar":
             final_cell_id = get_cell_id_by_position(conn, *player_position)
             update_player_cell(conn, pc['id'], final_cell_id)
+            os.system("cls" if os.name == "nt" else "clear")
             break
             
         elif command in ["w", "a", "s", "d"]:
@@ -373,7 +421,7 @@ def playing_with_character(conn, pc):
             navigate_in_the_map(conn, pc)
         elif escolha == "4":
             print("\n")
-            display_message(f"Missões disponíveis para {pc['nome']}")
+            display_message(f"Missões disponíveis para {cores['amarelo']}{pc['nome']}")
             listar_missoes_progresso(conn, pc['id'])
         elif escolha == "5":  # Agora a opção correta para sair do menu
             print("\n")
@@ -430,7 +478,6 @@ def inventario(conn, id_personagem):
     import os, time  # Certifique-se de ter os imports necessários
     os.system("cls" if os.name == "nt" else "clear")
     cursor = conn.cursor()
-    
     # Busca a capacidade do inventário
     cursor.execute("""
         SELECT inv.quantidade_itens, inv.capacidade_maxima 
@@ -463,6 +510,9 @@ def inventario(conn, id_personagem):
         )
     """, (id_personagem,))
     itens = cursor.fetchall()
+    
+    cursor.execute("SELECT energia FROM PC WHERE id_personagem = %s", (id_personagem,))
+    energia = cursor.fetchone()[0]
     
     print("\n")
     # Exibe os itens atualmente equipados (a função 'mostrar_equipados' já deve exibir os detalhes desejados)
@@ -502,9 +552,10 @@ def inventario(conn, id_personagem):
             linha = (f"{cor_raridade}[{raridade}]{cores['reset']} {nome} - {desc} "
                     f"(HP Bônus: {cores['verde']}+{armadura_hp}{cores['reset']})")
         elif tipo == 'implantecibernetico':
+            status_energia = f"{cores['verde']}✔  Disponível{cores['reset']}" if implante_custo <= energia else f"{cores['vermelho']}✖ Energia Insuficiente{cores['reset']}"
             linha = (f"{cor_raridade}[{raridade}]{cores['reset']} {nome} - {desc} "
                     f"(Dano: {cores['vermelho']}+{implante_dano}{cores['reset']}  | "
-                    f"Custo Energia: {cores['vermelho']}-{cores['reset']}{cores['amarelo']}{implante_custo}{cores['reset']})")
+                    f"Custo Energia: {cores['vermelho']}-{cores['reset']}{cores['amarelo']}{implante_custo} {status_energia}{cores['reset']})")
         else:
             linha = f"[{cor_raridade}{raridade}{cores['reset']}] {nome} - {desc}"
             
@@ -553,6 +604,18 @@ def inventario(conn, id_personagem):
                 """, (id_personagem, item['id']))
                 
             elif item['tipo'] == 'implantecibernetico':
+                cursor.execute("""
+                    SELECT custo_energia 
+                    FROM ImplanteCibernetico 
+                    WHERE id_item = (
+                        SELECT id_item FROM InstanciaItem WHERE id_instancia_item = %s
+                    )
+                """, (item['id'],))
+                custo_energia = cursor.fetchone()[0]
+                if custo_energia > energia:
+                    print(f"\n{cores['vermelho']}Erro: Custo de energia ({custo_energia}) excede sua capacidade atual ({energia})!{cores['reset']}")
+                    time.sleep(2)
+                    return
                 cursor.execute("SELECT id_implante FROM ImplanteEquipado WHERE id_personagem = %s", (id_personagem,))
                 if cursor.fetchone() is not None:
                     print(f"\n{cores['vermelho']}Já existe um item equipado. Desequipe-o e depois tente novamente.{cores['reset']}")
@@ -815,21 +878,44 @@ def check_merchant(conn, cell_id):
     finally:
         cursor.close()
 
+RED = "\033[91m"  # Código ANSI para vermelho
+RESET = "\033[0m"  # Reset da cor para evitar afetar o restante do terminal
+
 def handle_combat(conn, pc, inimigos):
     os.system("cls" if os.name == "nt" else "clear")
+    boss_alert_showed = False
     while inimigos:
         current_enemy = inimigos[0]
-        
+
+        is_boss = current_enemy['nome'] in ['Zero.exe', 'Tyrant', 'Orion', 'Viper']
+
+        if is_boss and not boss_alert_showed:
+            print(f"\n{cores['vermelho']}⚡⚡⚡ ALERTA DE BOSS! ⚡⚡⚡{cores['reset']}")
+            print(f"{cores['vermelho']}Você encontrou {current_enemy['nome']}!{cores['reset']}")
+            print(f"{cores['magenta']}{current_enemy['descricao']}{cores['reset']}")
+            time.sleep(6)
+            boss_alert_showed = True
+            os.system("cls" if os.name == "nt" else "clear")
+            
+
         print(f"\n{cores['vermelho']}=== COMBATE ==={cores['reset']}")
         print("\n")
         print(f"{cores['amarelo']}Inimigo:{cores['reset']} {cores['magenta']}{current_enemy['nome']}.{cores['reset']}")
         print(f"{cores['amarelo']}Descrição:{cores['reset']} {cores['magenta']}{current_enemy['descricao']}{cores['reset']}")
-        print("\n")
-        print(f"{cores['amarelo']}HP do inimigo: {cores['reset']}{cores['amarelo']}{cores['vermelho']}{current_enemy['hp_atual']}/{current_enemy['hp_max']}{cores['reset']}{cores['reset']}")
-        print("\n")
-        print(f"{cores['amarelo']}Seu HP: {cores['reset']}{cores['verde']}{pc['hp_atual']}{cores['reset']}\n")
-        print("\n")
-        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar com socos\n{cores['amarelo']}2.{cores['reset']} Usar item\n{cores['amarelo']}3.{cores['reset']} Fugir\n\nEscolha: ")
+        if is_boss:
+            hp_percent = (current_enemy['hp_atual'] / current_enemy['hp_max']) * 100
+            hp_bar = f"{RED}{'█' * int(hp_percent // 10)}{'░' * (10 - int(hp_percent // 10))}{RESET}"
+            print(f"{cores['amarelo']}HP:{cores['reset']} {hp_bar} {current_enemy['hp_atual']}/{current_enemy['hp_max']}")
+            print("\n")
+            print(f"{cores['amarelo']}Seu HP: {cores['reset']}{cores['verde']}{pc['hp_atual']}{cores['reset']}\n")
+            print("\n")
+        else:
+            print("\n")
+            print(f"{cores['amarelo']}HP do inimigo: {cores['reset']}{cores['amarelo']}{cores['vermelho']}{current_enemy['hp_atual']}/{current_enemy['hp_max']}{cores['reset']}{cores['reset']}")
+            print("\n")
+            print(f"{cores['amarelo']}Seu HP: {cores['reset']}{cores['verde']}{pc['hp_atual']}{cores['reset']}\n")
+            print("\n")
+        escolha = input(f"{cores['amarelo']}1.{cores['reset']} Atacar com socos\n{cores['amarelo']}2.{cores['reset']} Usar item\n{cores['amarelo']}3.{cores['reset']} Fugir (50% chance)\n\nEscolha: ")
 
         if escolha == "1":
             os.system("cls" if os.name == "nt" else "clear")
@@ -852,7 +938,7 @@ def handle_combat(conn, pc, inimigos):
                 print(f"{cores['magenta']}{current_enemy['nome']}{cores['reset']} {cores['verde']}derrotado! {cores['amarelo']}+{current_enemy['xp']}{cores['verde']} de xp{cores['reset']}")
                 time.sleep(4)
                 os.system("cls" if os.name == "nt" else "clear")
-                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'])
+                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'], current_enemy['nome'])
                 remover_inimigo(conn, current_enemy['id'])
                 inimigos.pop(0)
                 continue
@@ -933,7 +1019,7 @@ def handle_combat(conn, pc, inimigos):
                 print(f"{cores['magenta']}{current_enemy['nome']}{cores['reset']} {cores['verde']}derrotado! {cores['amarelo']}+{current_enemy['xp']}{cores['verde']} de xp{cores['reset']}")
                 time.sleep(4)
                 os.system("cls" if os.name == "nt" else "clear")
-                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'])
+                adicionar_recompensa(conn, pc['id'], current_enemy['xp'], current_enemy['xp'], current_enemy['nome'])
                 remover_inimigo(conn, current_enemy['id'])
                 inimigos.pop(0)
                 continue
@@ -1163,22 +1249,22 @@ def desequipar_item(conn, id_personagem):
             resultado = cursor.fetchone()
             if resultado:
                 id_implante = resultado[0]
-                # Obter energia_bonus do implante
+                # CORREÇÃO AQUI: usar custo_energia e adicionar de volta à energia
                 cursor.execute("""
-                    SELECT energia_bonus FROM ImplanteCibernetico WHERE id_item = %s
+                    SELECT custo_energia FROM ImplanteCibernetico WHERE id_item = %s
                 """, (id_implante,))
-                energia_bonus = cursor.fetchone()[0]
+                custo_energia = cursor.fetchone()[0]
                 
                 # Remover o registro do implante equipado
                 cursor.execute("""
                     DELETE FROM ImplanteEquipado WHERE id_personagem = %s
                 """, (id_personagem,))
-                # Atualizar a energia do PC
+                # CORREÇÃO AQUI: ADICIONAR o custo de energia de volta
                 cursor.execute("""
                     UPDATE PC
-                    SET energia = energia - %s
+                    SET energia = energia + %s
                     WHERE id_personagem = %s
-                """, (energia_bonus, id_personagem))
+                """, (custo_energia, id_personagem))
                 conn.commit()
                 print(f"\n{cores['verde']}Implante desequipado com sucesso!{cores['reset']}")
                 time.sleep(1)
