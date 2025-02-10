@@ -168,6 +168,6 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
 | :-: | :-: | :-: | :-: | 
 | `1.0`  | 20/11/2024 | Adição MER | [Arthur Fonseca](https://github.com/arthrfonsecaa), [Daniel Nunes](https://github.com/DanNunes777), [Lucas Caldas](https://github.com/lucascaldasb), [Mateus Santos](https://github.com/14luke08), [Rudson Martins](https://github.com/RudsonMartin) |
 | `2.0`  | 08/01/2025 | Versão 2 MER | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
-| `3.0`  | 10/02/2025 | Versão 3 MER | [Mateus Santos](https://github.com/14luke08) |
+| `3.0`  | 10/02/2025 | Versão 3 Final MER | [Mateus Santos](https://github.com/14luke08) |
 
 </center>
