@@ -58,7 +58,7 @@
 git clone git@github.com:SBD1/2024.2-Carbon2185.git
 ```
 
-1. **Acesse o diretório do jogo**
+2. **Acesse o diretório do jogo**
 
 ```bash
 cd carbon2185
