@@ -28,9 +28,6 @@ Dicionário de Dados é um registro detalhado que documenta os elementos de um b
 ![cnpImg](../img/item_dd.png)
 
 
-![cnpImg](../img/equipamento_dd.png)
-
-
 ![cnpImg](../img/armadura_dd.png)
 
 
@@ -55,25 +52,7 @@ Dicionário de Dados é um registro detalhado que documenta os elementos de um b
 ![cnpImg](../img/classes_dd.png)
 
 
-![cnpImg](../img/scoundrel_dd.png)
-
-
-![cnpImg](../img/hacker_dd.png)
-
-
-![cnpImg](../img/daimyo_dd.png)
-
-
 ![cnpImg](../img/faccao_dd.png)
-
-
-![cnpImg](../img/yazuka_dd.png)
-
-
-![cnpImg](../img/triad_dd.png)
-
-
-![cnpImg](../img/habilidade_dd.png)
 
 
 ![cnpImg](../img/dialogo_dd.png)
@@ -84,6 +63,16 @@ Dicionário de Dados é um registro detalhado que documenta os elementos de um b
 
 ![cnpImg](../img/missao_dd.png)
 
+
+![cnpImg](../img/progresso_missao_dd.png)
+
+
+![cnpImg](../img/armadura_equipada_dd.png)
+
+
+![cnpImg](../img/implante_equipado_dd.png)
+
+![cnpImg](../img/salarespawninimigo_dd.png)
 
 <center>
 
