@@ -39,7 +39,7 @@
   - [DML](./docs/entrega-2/DML.md)
   - [DQL](./docs/entrega-2/DQL.md)
 
-- Entrega do módulo 2
+- Entrega do módulo 3
 
   - [Apresentação](./docs/entrega-3/Apresentação.md)
 
