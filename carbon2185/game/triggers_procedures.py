@@ -42,7 +42,7 @@ CREATE OR REPLACE FUNCTION listar_missoes_progresso(id_personagem UUID)
 RETURNS TABLE (
     nome VARCHAR(100),
     descricao VARCHAR(100),
-    dificuldade INT,
+    dificuldade VARCHAR(100),
     objetivo VARCHAR(100),
     progresso INT,
     recompensa INT
@@ -340,7 +340,7 @@ BEGIN
         WHERE id_personagem = NEW.id_personagem;
     ELSIF TG_TABLE_NAME = 'implanteequipado' THEN
         UPDATE PC
-        SET energia = energia + (SELECT energia_bonus FROM ImplanteCibernetico WHERE id_item = NEW.id_implante)
+        SET energia = energia + (SELECT custo_energia FROM ImplanteCibernetico WHERE id_item = NEW.id_implante)
         WHERE id_personagem = NEW.id_personagem;
     END IF;
     RETURN NEW;
