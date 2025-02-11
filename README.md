@@ -76,6 +76,12 @@ docker-compose build
 docker-compose run app
 ```
 
+5. **Rodar a main.py**
+
+```bash
+python main.py
+```
+
 ### Acessando o Banco de Dados
 
 Para visualizar o banco de dados, você pode usar um cliente como o DBeaver. Utilize as credenciais do banco local, que podem ser encontradas no arquivo `game/database.py`. Certifique-se de usar o host localhost para a conexão com o banco.
