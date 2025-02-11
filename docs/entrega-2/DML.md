@@ -10,95 +10,185 @@ A DML (Data Manipulation Language), ao contrário da DDL, foca na manipulação 
 
 BEGIN TRANSACTION;
 
-INSERT INTO Personagem (id_personagem, tipo) VALUES 
-(1, 'PC'),
-(2, 'NPC'),
+INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
+SELECT uuid_generate_v4(), 'daimyo', 'Daimyo', 'Um soldado forte e resistente, especializado em táticas de combate.', 10, 5, 5
+WHERE NOT EXISTS (SELECT 1 FROM Classe WHERE tipo = 'daimyo');
 
-INSERT INTO PC (id_personagem, id_celula, id_faccao, id_classe, id_inventario, descricao, dano, hp, hp_atual, nome, level, energia, xp) VALUES
-(1, 10, 20, 30, 40, 'Descrição 1', 50, 60, 0, 'Personagem 1', 80, 90, 100),
-(2, 11, 21, 31, 41, 'Descrição 2', 51, 61, 25, 'Personagem 2', 81, 91, 1),
-(3, 12, 22, 32, 42, 'Descrição 3', 52, 62, 50, 'Personagem 3', 82, 92, 2),
-(4, 13, 23, 33, 43, 'Descrição 4', 53, 63, 75, 'Personagem 4', 83, 93, 3),
-(5, 14, 24, 34, 44, 'Descrição 5', 54, 64, 100, 'Personagem 5', 84, 94, 4);
+INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
+SELECT uuid_generate_v4(), 'hacker', 'Hacker', 'Especialista em tecnologia e ataques estratégicos, possui muita energia', 5, 5, 10
+WHERE NOT EXISTS (SELECT 1 FROM Classe WHERE tipo = 'hacker');
 
-INSERT INTO NPC (id_personagem, tipo) VALUES 
-(2, 'Comerciante'),
-(3, 'Inimigo');
+INSERT INTO Classe (id_classe, tipo, nome, descricao, hp_bonus, dano_bonus, energia_bonus)
+SELECT uuid_generate_v4(), 'scoundrel', 'Scoundrel', 'Ágil e letal, focado em ataques rápidos, mas com baixa resistência.', 3, 10, 5
+WHERE NOT EXISTS (SELECT 1 FROM Classe WHERE tipo = 'scoundrel');
 
-INSERT INTO Inimigo (id_inimigo, id_personagem, id_celula, nome) VALUES 
-(1, 3, 10, 'Inimigo 1');
+INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
+SELECT uuid_generate_v4(), 'yakuza', 'Yakuza', 'máfia japonesa, conhecida por sua honra e disciplina.', 'Lealdade acima de tudo.'
+WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'yakuza');
 
-INSERT INTO InstanciaInimigo (id_instancia_inimigo, id_inimigo, id_celula, hp, hp_atual, xp, dano, dificuldade) VALUES 
-(1, 1, 3, 50, 5, 10, 5, 'Normal');
+INSERT INTO Faccao (id_faccao, tipo, nome, descricao, ideologia) 
+SELECT uuid_generate_v4(), 'triad', 'Triad', 'organização secreta chinesa, mestre do submundo.', 'O poder nasce da sombra.'
+WHERE NOT EXISTS (SELECT 1 FROM Faccao WHERE tipo = 'triad');
 
-INSERT INTO Comerciante (id_comerciante, id_personagem, id_celula, nome, descricao) VALUES 
-(1, 2, 3, 'Comerciante 1', 'Descrição do comerciante 1');
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade)
+SELECT uuid_generate_v4(), 'arma', 'Glock', 'Uma pistola básica', 100, 'Comum'
+WHERE NOT EXISTS (SELECT 1 FROM Item WHERE nome = 'Glock');
 
-INSERT INTO Loja (id_comerciante, id_instancia_item) VALUES 
-(1, 1);
+INSERT INTO Arma (id_item, id_celula, municao, dano)
+SELECT id_item, NULL, 5, 5 
+FROM Item WHERE nome = 'Glock'
+AND NOT EXISTS (SELECT 1 FROM Arma WHERE id_item = (SELECT id_item FROM Item WHERE nome = 'Glock'));
 
-INSERT INTO Item (id_item, nome, descricao) VALUES 
-(1, 'Item 1', 'Descricao 1'),
-(2, 'Item 2', 'Descricao 2');
+INSERT INTO Inimigo (id_inimigo, id_personagem, dano, xp, hp, nome, descricao)
+VALUES
+    (uuid_generate_v4(), NULL, 5, 10, 100, 'Andarilho Corrompido', 
+    'Um ex-operário transformado em predador urbano após anos de exposição à poluição tóxica. Seus olhos brilham em vermelho sob a máscara de gás improvisada, e ele ataca qualquer um que invada seu território com lâminas enferrujadas.'),
 
-INSERT INTO Equipamento (id_item, tipo) VALUES 
-(1, 'Arma'),
-(2, 'Consumível');
+    (uuid_generate_v4(), NULL, 5, 10, 100, 'Drone de Supressão', 
+    'Criado para manter a ordem, esse drone flutua silenciosamente entre os becos iluminados do Distrito B. Ele dispara pulsos elétricos para neutralizar qualquer suspeito de insubordinação, registrando cada evento para os servidores centrais do Regime.'),
 
-INSERT INTO Armadura (id_item, id_celula, nome, descricao, valor, hp_bonus, raridade) VALUES 
-(1, 1, 'Armadura Básica', 'Descrição da armadura básica', 100, 10, 'Comum'),
-(2, 2, 'Armadura Avançada', 'Descrição da armadura avançada', 200, 20, 'Rara');
+    (uuid_generate_v4(), NULL, 5, 10, 120, 'Carrasco das Favelas', 
+    'Um brutamontes contratado por gangues locais para impor o terror entre os desesperados. Vestindo pedaços de armadura improvisada, ele empunha um enorme martelo hidráulico capaz de esmagar concreto e ossos com facilidade.'),
 
-INSERT INTO Arma (id_item, id_celula, nome, descricao, valor, raridade, municao, dano) VALUES 
-(1, 1, 'Espada de Ferro', 'Descrição da espada de ferro', 150, 'Comum', 0, 10),
-(2, 2, 'Pistola', 'Descrição da pistola', 300, 'Rara', 15, 25);
+    (uuid_generate_v4(), NULL, 5, 10, 120, 'Mutante das Minas', 
+    'Um mineiro que passou tempo demais exposto à radiação e aos gases tóxicos. Sua pele esverdeada e olhos sem pupilas denunciam a mutação avançada. Ele ataca com unhas endurecidas como lâminas, tentando arrancar o antídoto de qualquer intruso.'),
 
-INSERT INTO ImplanteCibernetico (id_item, id_celula, nome, descricao, valor, raridade, custo_energia, dano) VALUES 
-(1, 1, 'Braço Cibernético', 'Descrição do braço cibernético', 500, 'Épico', 5, 15),
-(2, 2, 'Olho Cibernético', 'Descrição do olho cibernético', 400, 'Raro', 3, 10);
+    (uuid_generate_v4(), NULL, 5, 10, 100, 'Saqueador Nômade', 
+    'Vagando entre os distritos, o Saqueador Nômade sobrevive pilhando suprimentos e eliminando qualquer um que represente uma ameaça. Sua máscara remendada esconde um rosto cheio de cicatrizes, e suas lâminas afiadas refletem a luz neon dos becos escuros.'),
 
-INSERT INTO InstanciaItem (id_instancia_item, id_inventario, id_item) VALUES 
-(1, 1, 1),
-(2, 1, 2);
+    (uuid_generate_v4(), NULL, 5, 10, 100, 'Caçador de Recompensas', 
+    'Equipado com sensores térmicos e um arsenal de armas customizadas, o Caçador de Recompensas rastreia alvos para o regime e para os criminosos ricos. Ele não tem lealdade, apenas um preço. Se seu nome estiver em sua lista, prepare-se para fugir... ou lutar pela vida.')
+    
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Inventario (id_inventario, quantidade_itens, capacidade_maxima) VALUES
-(1, 10, 20);
+INSERT INTO Inimigo (id_inimigo, id_personagem, dano, xp, hp, nome, descricao)
+VALUES
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Zero.exe', 'Um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.'),
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Tyrant', 'Um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.'), 
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Orion', 'A megacorp Shinsei Biotech criou um super-soldado para proteger seus segredos.'),
+    (uuid_generate_v4(), NULL, 20, 100, 400, 'Viper', 'Um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.')
 
-INSERT INTO Inventario_tem_item (id_inventario, id_instancia_item) VALUES
-(1, 10, 20);
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Distrito (id_distrito, nome, descricao, range_maximo, quantidade_personagens) VALUES 
-(1, 'Distrito 1', 'Descrição do distrito 1', 100, 10);
+-- Missoes
+INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo, goal, recompensa) VALUES
+    (uuid_generate_v4(), 'Saque diário', 'Derrote alguns Saqueadores Nômade.', 'Médio', 'Destruir 5 Saqueador Nômade', 5, 50),
+    (uuid_generate_v4(), 'O Caçador se Torna a Presa', 'Derrote alguns Caçadores de Recompensas.', 'Médio', 'Eliminar 5 Caçador de Recompensas', 5, 50),
+    (uuid_generate_v4(), 'Expurgo Urbano', 'Elimine os Andarilhos Corrompidos que espreitam nos becos abandonados.', 'Fácil', 'Derrotar 30 Andarilho Corrompido', 30, 1000),
+    (uuid_generate_v4(), 'Caçada Radioativa', 'Neutralize os Mutantes das Minas antes que se espalhem pela cidade.', 'Fácil', 'Eliminar 30 Mutante das Minas', 30, 1200),
+    (uuid_generate_v4(), 'O Regime não Dorme', 'Enfrente os Drones de Supressão e impeça a vigilância implacável.', 'Fácil', 'Destruir 30 Drone de Supressão', 30, 1100),
+    (uuid_generate_v4(), 'Justiça nas Sombras', 'Acabe com a rede de violência imposta pelos Carrascos das Favelas.', 'Fácil', 'Eliminar 30 Carrasco das Favelas', 30, 1500),
+    (uuid_generate_v4(), 'Terror Cibernético', 'Zero.exe, um hacker AI autoconsciente, está tomando o controle de sistemas de defesa.', 'Difícil', 'Derrotar Zero.exe', 1, 5000),
+    (uuid_generate_v4(), 'Caçada ao Tyrant', 'Tyrant, um cyber-ogro modificado, lidera os Steel Fangs em massacres brutais.', 'Difícil', 'Derrotar Tyrant', 1, 5200),
+    (uuid_generate_v4(), 'O Guardião do Labirinto', 'A megacorp Shinsei Biotech criou um super-soldado, Orion, para proteger seus segredos.', 'Difícil', 'Derrotar Orion', 1, 7000),
+    (uuid_generate_v4(), 'Rei dos Bairros Baixos', 'Viper, um ex-executivo transformado em rei do crime, governa o submundo com punho de ferro.', 'Difícil', 'Derrotar Viper', 1, 100000)
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Celula (id_celula, id_distrito, nome, descricao, destino) VALUES 
-(1, 1, 'Célula 1', 'Descrição da célula 1', 'Destino 1'),
-(2, 1, 'Célula 2', 'Descrição da célula 2', 'Destino 2');
+-- Itens Comuns (5)
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'arma', 'Pistola de Choque', 'Pistola que dispara pulsos elétricos', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Faca Serrilhada', 'Lâmina com fio molecular para cortes precisos', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Revólver Magnético', 'Arma que dispara projéteis ferromagnéticos', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Espingarda Térmica', 'Dispara cartuchos de calor concentrado', 100, 'Comum'),
+(uuid_generate_v4(), 'arma', 'Submetralhadora de Plasma', 'Versão básica para combate urbano', 100, 'Comum')
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Classes (id_classe, tipo, enegia_bonus, hp_bonus, descricao, dano_bonus) VALUES 
-(1, 'Scoundrel', 5, 5, 'Descrição da Classe Scoundrel', 5),
-(1, 'Hacker', 5, 5, 'Descrição da Classe Hacker', 5),
-(1, 'Daimyo', 5, 5, 'Descrição da Classe Daimyo', 5),
+-- Itens Raros (3)
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'arma', 'Lança-Chamas Criogênico', 'Congela alvos com jatos de -200°C', 200, 'Raro'),
+(uuid_generate_v4(), 'arma', 'Fuzil de Precisão Quântica', 'Mira através de paredes usando partículas entrelaçadas', 200, 'Raro'),
+(uuid_generate_v4(), 'arma', 'Espada de Fótons', 'Lâmina de energia corta ligas metálicas', 200, 'Raro')
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Faccao (id_faccao, nome, descricao, ideologia) VALUES 
-(1, 'Yazuka', 'A Yakuza é um dos pilares do submundo criminal de Carbon2185, misturando tradições ancestrais com a realidade distópica do cyberpunk', 'A Yazuka segue uma ideologia baseada em honra, lealdade e dever, mantendo códigos rígidos que governam suas operações, mesmo em um mundo caótico e decadente. Embora envolvida em atividades criminosas, como tráfico de dados, contrabando e segurança privada, a Yakuza frequentemente se apresenta como protetora de comunidades locais, oferecendo "justiça" e proteção onde governos e corporações falham. Seus membros valorizam a hierarquia e o respeito, e um juramento de vida é feito ao clã que servem. Para a Yakuza, a reputação é tudo, e qualquer traição é tratada com severidade mortal.'),
-(2, 'Triad', 'Com raízes em tradições chinesas e estrutura hierárquica rígida, a Triad equilibra cultura ancestral e tecnologia futurista, usando cyberware e IA para dominar territórios e mercados ilegais, como tráfico humano e comércio tecnológico.' 'Triad em Carbon2185 é uma organização criminosa poderosa e pragmática, movida por lealdade ao clã, expansão implacável e lucro acima de tudo.  Diferente de outras facções, a Triad vê o mundo como um jogo estratégico, punindo traições com brutalidade exemplar e consolidando poder tanto nas sombras quanto nos altos escalões da sociedade.');
+-- Itens Lendários (1)
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'arma', 'Canhão de Singularidade', 'Cria micro buracos negros que distorcem a realidade', 300, 'Lendário'),
+(uuid_generate_v4(), 'arma', 'Raio Desintegrador', 'Aniquila matéria a nível molecular', 300, 'Lendário')
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Habilidade (id_habilidade, nome, tipo_habilidade, descricao, custo_de_uso, dano, velocidade_movimento) VALUES 
-(1, 'Ataque Rápido', 'Ofensiva', 'Ataque rápido e preciso', 5, 10, 2),
-(2, 'Defesa Forte', 'Defensiva', 'Aumenta a defesa temporariamente', 8, 0, 0);
+INSERT INTO Arma (id_item, id_celula, municao, dano)
+SELECT id_item, NULL, 
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END,
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+FROM Item 
+WHERE tipo = 'arma'
+AND NOT EXISTS (SELECT 1 FROM Arma WHERE Arma.id_item = Item.id_item);
 
-INSERT INTO Dialogo (id_interacao, mensagem_atual, responsavel_mensagem) VALUES 
-(1, 'Olá, como posso ajudar?', 'Comerciante'),        
-(2, 'Prepare-se para a batalha!', 'Inimigo');
 
-INSERT INTO Interacao (id_interacao, id_personagem, id_dialogo) VALUES 
-(1, 2, 1),
-(2, 3, 2);
+-- Armaduras Corrigidas
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'armadura', 'Colete Nanotecnológico', 'Fibras autoregenerativas', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Capacete de Sensor Térmico', 'Detecta assinaturas de calor', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Grevas de Carbono', 'Proteção leve para pernas', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Manto de Camuflagem', 'Distorção visual básica', 100, 'Comum'),
+(uuid_generate_v4(), 'armadura', 'Placas de Cerâmica', 'Blindagem anti-projéteis', 100, 'Comum')
+ON CONFLICT (nome) DO NOTHING;
 
-INSERT INTO Missao (id_missao, nome, descricao, dificuldade, objetivo) VALUES 
-(1, 'Derrotar os Inimigos', 'Encontre e elimine os Inimigos.', 'Média', 'Elimine todos os Inimigos');
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'armadura', 'Exoesqueleto Hidráulico', 'Amplifica força em 300%', 200, 'Raro'),
+(uuid_generate_v4(), 'armadura', 'Escudo de Energia', 'Campo de força portátil', 200, 'Raro'),
+(uuid_generate_v4(), 'armadura', 'Traje de Absorção', 'Converte dano em energia', 200, 'Raro')
+ON CONFLICT (nome) DO NOTHING;
 
-COMMIT;
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'armadura', 'Armadura de Nanobots', 'Líquido metálico adaptativo', 300, 'Lendário'),
+(uuid_generate_v4(), 'armadura', 'Manto de Invisibilidade', 'Dobra a luz ao redor do usuário', 300, 'Lendário')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Armadura (id_item, id_celula, hp_bonus)
+SELECT id_item, NULL, 
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+FROM Item 
+WHERE tipo = 'armadura'
+AND NOT EXISTS (SELECT 1 FROM Armadura WHERE Armadura.id_item = Item.id_item);
+
+-- Implantes Corrigidos
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'implantecibernetico', 'Olos Biônicos', 'Visão noturna e zoom 5x', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Pulmões de Filtro', 'Filtra toxinas do ar', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Membros de Titânio', 'Próteses básicas para força aumentada', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Interface Neural', 'Controle dispositivos com a mente', 100, 'Comum'),
+(uuid_generate_v4(), 'implantecibernetico', 'Dermaplacas', 'Pele reforçada com ligas metálicas', 100, 'Comum')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'implantecibernetico', 'Garras Retráteis', 'Lâminas de adamantium embutidas', 200, 'Raro'),
+(uuid_generate_v4(), 'implantecibernetico', 'Sistema de Adrenalina', 'Extrai o melhor do soldado', 200, 'Raro'),
+(uuid_generate_v4(), 'implantecibernetico', 'Glândula de Toxinas', 'Produz venenos orgânicos letais', 200, 'Raro')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO Item (id_item, tipo, nome, descricao, valor, raridade) VALUES 
+(uuid_generate_v4(), 'implantecibernetico', 'Chip de IA', 'Consciência artificial auxiliar', 300, 'Lendário'),
+(uuid_generate_v4(), 'implantecibernetico', 'Núcleo de Antimatéria', 'Capacidade de utilizar energia para atacar os inimigos', 300, 'Lendário')
+ON CONFLICT (nome) DO NOTHING;
+
+INSERT INTO ImplanteCibernetico (id_item, id_celula, custo_energia, dano)
+SELECT id_item, NULL, 
+    CASE raridade
+        WHEN 'Lendário' THEN 10
+        WHEN 'Raro' THEN 5
+        ELSE 2
+    END,
+    CASE raridade
+        WHEN 'Lendário' THEN 15
+        WHEN 'Raro' THEN 10
+        ELSE 5
+    END
+FROM Item 
+WHERE tipo = 'implantecibernetico'
+AND NOT EXISTS (SELECT 1 FROM ImplanteCibernetico WHERE ImplanteCibernetico.id_item = Item.id_item);
 
 ```
 
