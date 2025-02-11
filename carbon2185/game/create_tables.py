@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS Interacao (
 
 CREATE TABLE IF NOT EXISTS Dialogo (
     id_interacao UUID PRIMARY KEY REFERENCES Interacao(id_interacao),
-    mensagem_atual VARCHAR(100) NOT NULL
+    mensagem_atual VARCHAR(1000) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Item (

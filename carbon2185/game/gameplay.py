@@ -309,6 +309,103 @@ def create_character(conn):
 
 import time
 
+def dialogo_comerciante(conn, merchant, pc):
+    """
+    Exibe um diálogo personalizado com o comerciante e retorna a ação escolhida:
+      - "voltar": se o jogador estiver apenas viajando.
+      - "loja": se o jogador quiser ver os itens do comerciante.
+    """
+    cursor = conn.cursor()
+
+    # Se o dicionário 'merchant' não tiver o id_personagem, busque-o na tabela Comerciante
+    if 'id_personagem' not in merchant:
+        cursor.execute("SELECT id_personagem FROM Comerciante WHERE id_comerciante = %s", (merchant['id_comerciante'],))
+        result = cursor.fetchone()
+        if result:
+            merchant_npc_id = result[0]
+        else:
+            print(f"{cores['vermelho']}Erro: Não foi possível obter o id do NPC para o comerciante.{cores['reset']}")
+            cursor.close()
+            return "voltar"
+    else:
+        merchant_npc_id = merchant['id_personagem']
+
+    # Registra a interação no banco (opcional, para histórico)
+    cursor.execute("""
+        INSERT INTO Interacao (personagem_origem, personagem_destino)
+        VALUES (%s, %s)
+        RETURNING id_interacao
+    """, (merchant_npc_id, pc['id']))
+    interaction_id = cursor.fetchone()[0]
+    conn.commit()
+
+    # Dicionário com diálogos iniciais personalizados para cada comerciante (mensagens <= 100 caracteres)
+    dialogos_personalizados = {
+        "Doc Carnificina": "O que você veio fazer aqui? Tenho as melhores tranqueiras pra você!",
+        "Dr. Vex - \"O Escultor de Aço\"": "Olá, visitante! O que te traz a este labirinto de metal? Posso ajudar.",
+        "Relíquia": "Bem-vindo, viajante! Procurando segredos ou relíquias? Posso ajudar.",
+        "Lídia \"Mãos Leves\"": "E aí, meu caro! Quer ver minhas criações ou está de passagem? Estou à disposição."
+    }
+    
+    # Seleciona a mensagem inicial personalizada ou usa uma mensagem padrão
+    mensagem = dialogos_personalizados.get(
+        merchant['nome'], 
+        "O que você veio fazer aqui? Tenho o que você precisa!"
+    )
+    
+    # Registra o diálogo do comerciante
+    cursor.execute("""
+        INSERT INTO Dialogo (id_interacao, mensagem_atual)
+        VALUES (%s, %s)
+    """, (interaction_id, mensagem))
+    conn.commit()
+    cursor.close()
+
+    # Exibe o diálogo para o jogador, usando o nome do comerciante
+    print(f"\n{cores['ciano']}{merchant['nome']}: {mensagem}{cores['reset']}\n")
+    print("1. Estou apenas viajando")
+    print("\n")
+    print("2. Estou precisando de umas paradinhas, fiquei sabendo que você é a pessoa ideal para isso...")
+    print("\n")
+    resposta = input(f"{cores['amarelo']}Escolha sua resposta (1 ou 2): {cores['reset']}").strip()
+
+    # Dicionário com respostas únicas para cada comerciante, conforme a opção escolhida
+    respostas_personalizadas = {
+        "Doc Carnificina": {
+            "voltar": "Então, boa viagem! Mantenha-se seguro por aí.",
+            "loja": "Vamos ver as melhores tranqueiras que tenho, meu chapa!"
+        },
+        "Dr. Vex - \"O Escultor de Aço\"": {
+            "voltar": "Então, siga em frente, e lembre-se: metal nunca mente.",
+            "loja": "Excelente escolha! Tenho armas experimentais esperando por você."
+        },
+        "Relíquia": {
+            "voltar": "Que a sabedoria te guie. Boa viagem, viajante.",
+            "loja": "Perfeito, vou mostrar relíquias que desafiam o tempo."
+        },
+        "Lídia \"Mãos Leves\"": {
+            "voltar": "Então, se cuida! Volte quando quiser mais.",
+            "loja": "Ótimo! Vamos conferir minhas últimas criações exclusivas."
+        }
+    }
+    
+    # Escolhe a resposta personalizada de acordo com o comerciante e a opção selecionada
+    merchant_nome = merchant['nome']
+    if resposta == "1":
+        resposta_msg = respostas_personalizadas.get(merchant_nome, {}).get("voltar", "Então, boa viagem!")
+        print(f"\n{cores['amarelo']}{merchant_nome}:{cores['reset']} {resposta_msg}")
+        time.sleep(2)
+        return "voltar"
+    elif resposta == "2":
+        resposta_msg = respostas_personalizadas.get(merchant_nome, {}).get("loja", "Certo, vamos ver o que tenho para você...")
+        print(f"\n{cores['amarelo']}{merchant_nome}:{cores['reset']} {resposta_msg}")
+        time.sleep(2)
+        return "loja"
+    else:
+        print(f"\n{cores['vermelho']}Resposta inválida. Tente novamente.{cores['reset']}")
+        return dialogo_comerciante(conn, merchant, pc)  # Repete o diálogo até obter uma resposta válida
+
+
 def navigate_in_the_map(conn, pc):
     game_map = generate_map()
     player_position = get_player_position(conn, pc['id'])
@@ -346,9 +443,8 @@ def navigate_in_the_map(conn, pc):
                 else:
                     # Lógica de combate apenas se não for safezone
                     inimigos = get_inimigos_na_celula(conn, new_cell_id)
-                    
                     if inimigos:
-                        if random.random() < 0.7:  # 50% de chance de combate
+                        if random.random() < 0.7:  # 70% de chance de combate
                             os.system("cls" if os.name == "nt" else "clear")
                             resultado = handle_combat(conn, pc, inimigos)
                             if not resultado:
@@ -360,14 +456,13 @@ def navigate_in_the_map(conn, pc):
                             print(f"\n{cores['amarelo']}→ {cores['ciano']}Você teve sorte! Nenhum inimigo apareceu.{cores['reset']}")
                             time.sleep(2)
 
-                # Restante do código para verificar comerciante e mostrar info da célula
+                # Verifica se há comerciante na célula e inicia o diálogo
                 merchant = check_merchant(conn, new_cell_id)
                 if merchant:
                     os.system("cls" if os.name == "nt" else "clear")
-                    print(f"\n{cores['ciano']}=== {merchant['nome']} ==={cores['reset']}")
-                    print(f"{cores['branco']}{merchant['descricao']}{cores['reset']}\n")
-                    choice = input(f"{cores['amarelo']}Deseja interagir? (s/n): {cores['reset']}").lower()
-                    if choice == 's':
+                    # Chama a função de diálogo
+                    acao = dialogo_comerciante(conn, merchant, pc)
+                    if acao == "loja":
                         interact_with_merchant(conn, merchant['id_comerciante'], pc['id'])
                         input(f"\n{cores['verde']}Pressione Enter para voltar ao mapa...{cores['reset']}")
                 
