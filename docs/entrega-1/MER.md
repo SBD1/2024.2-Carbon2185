@@ -20,8 +20,6 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - Implante cibernético
 - Instância Item
 - Facção
-    - Yazuka
-    - Triad
 - Classe
 - Distrito
 - Célula do mundo
@@ -45,12 +43,10 @@ O Modelo Entidade-Relacionamento é uma abordagem conceitual que organiza as inf
     - Arma: [_<ins>id_item</ins>,id_celula,municao,dano_]
     - Implante cibernético: [_<ins>id_item</ins>,id_celula,custo_energia,dano_]
 - Instância Item: [_<ins>id_instancia_item</ins>,id_inventario,id_item_]
-- Facção: [_<ins>id_faccao</ins>,tipo_]
-    - Yazuka: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
-    - Triad: [_<ins>id_faccao</ins>,nome,descricao,ideologia_]
-- Classe: [_<ins>id_classe</ins>,tipo,nome,descricao,ideologia_]
-- Distrito: [_<ins>id_distrito</ins>,nome,descricao,eixoX,eixoY,local_x,local_y_] 
-- Célula do mundo: [_<ins>id_celula</ins>,id_disrito,nome,descricao,destino_]
+- Facção: [_<ins>id_faccao</ins>,tipo,nome,descricao,ideologia_]
+- Classe: [_<ins>id_classe</ins>,tipo,nome,descricao,hp_bonus,dano_bonus,energia_bonus_]
+- Distrito: [_<ins>id_distrito</ins>,nome,descricao_] 
+- Célula do mundo: [_<ins>id_celula</ins>,id_disrito,nome,descricao,eixoX,eixoY,local_x,local_y_]
     - SalaRespawnInimigos: [_<ins>id_instancia</ins>,id_inimigo,id_celula_origem_]
 - Loja: [_<ins>id_loja</ins>,id_comerciante,id_instancia_item_]
 - ProgressoMissao: [_<ins>id_missao</ins>,<ins>id_personagem</ins>,progresso_]
