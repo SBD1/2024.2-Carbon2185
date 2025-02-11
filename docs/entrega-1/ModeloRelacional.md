@@ -18,5 +18,6 @@ Segue link para o Modelo Relacional:
 | :-: | :-: | :-: | :-: | 
 | `1.0`  | 20/11/2024 | Adição Modelo Relacional | [Arthur Fonseca](https://github.com/arthrfonsecaa), [Daniel Nunes](https://github.com/DanNunes777), [Lucas Caldas](https://github.com/lucascaldasb), [Mateus Santos](https://github.com/14luke08), [Rudson Martins](https://github.com/RudsonMartin) |
 | `2.0`  | 08/01/2025 | Versão 2 Modelo Relacional | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
+| `3.0 Final`  | 08/01/2025 | Versão 3 Modelo Relacional | [Arthur Fonseca](https://github.com/arthrfonsecaa), [Mateus Santos](https://github.com/14luke08) |
 
 </center>

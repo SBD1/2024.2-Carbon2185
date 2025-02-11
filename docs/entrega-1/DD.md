@@ -84,5 +84,5 @@ Dicionário de Dados é um registro detalhado que documenta os elementos de um b
 | `2.0` | 08/11/2024 | Update Dicionário de Dados | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
 | `2.1` | 08/11/2024 | Update Dicionário de Dados | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
 | `2.2` | 08/11/2024 | Update Dicionário de Dados | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
-| `2.3 Final` | 10/02/2025 | Update Dicionário de Dados | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
+| `3.0 Final` | 10/02/2025 | Update Dicionário de Dados | [Arthur Fonseca](https://github.com/arthrfonsecaa) |
 </center>
