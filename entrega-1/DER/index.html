@@ -1,0 +1,992 @@
+
+<!doctype html>
+<html lang="pt" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://sbd1.github.io/2024.2-Carbon-2185/entrega-1/DER/">
+      
+      
+        <link rel="prev" href="../MER/">
+      
+      
+        <link rel="next" href="../ModeloRelacional/">
+      
+      
+      <link rel="icon" href="../../img/favicon-16x16.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
+    
+    
+      
+        <title>Diagrama Entidade Relacionamento - Carbon 2185</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Diagrama Entidade Relacionamento - Carbon 2185" >
+      
+        <meta  property="og:description"  content="None" >
+      
+        <meta  property="og:image"  content="https://sbd1.github.io/2024.2-Carbon-2185/assets/images/social/entrega-1/DER.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://sbd1.github.io/2024.2-Carbon-2185/entrega-1/DER/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Diagrama Entidade Relacionamento - Carbon 2185" >
+      
+        <meta  name="twitter:description"  content="None" >
+      
+        <meta  name="twitter:image"  content="https://sbd1.github.io/2024.2-Carbon-2185/assets/images/social/entrega-1/DER.png" >
+      
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="white">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#entrega-do-trabalho-1-modelagem" class="md-skip">
+          Ir para o conteúdo
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
+    <a href="../.." title="Carbon 2185" class="md-header__button md-logo" aria-label="Carbon 2185" data-md-component="logo">
+      
+  <img src="../../img/carbonlogowhite.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Carbon 2185
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Diagrama Entidade Relacionamento
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="white"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="white"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Buscar" placeholder="Buscar" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Pesquisar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpar" aria-label="Limpar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando a pesquisa
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Abas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Menu
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../Apresenta%C3%A7%C3%A3o/" class="md-tabs__link">
+          
+  
+  Entrega 01
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../entrega-2/Apresenta%C3%A7%C3%A3o/" class="md-tabs__link">
+          
+  
+  Entrega 02
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../entrega-3/Apresenta%C3%A7%C3%A3o/" class="md-tabs__link">
+          
+  
+  Entrega 03
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navegação" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Carbon 2185" class="md-nav__button md-logo" aria-label="Carbon 2185" data-md-component="logo">
+      
+  <img src="../../img/carbonlogowhite.png" alt="logo">
+
+    </a>
+    Carbon 2185
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Menu
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Entrega 01
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Entrega 01
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Apresenta%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apresentação
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MER/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelo Entidade Relacionamento
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Diagrama Entidade Relacionamento
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Diagrama Entidade Relacionamento
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#der-diagrama-entidade-relacionamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      DER - Diagrama Entidade Relacionamento
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historico-de-versao" class="md-nav__link">
+    <span class="md-ellipsis">
+      Histórico de Versão
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ModeloRelacional/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Modelo Relacional
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DD/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dicionário de Dados
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Entrega 02
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Entrega 02
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-2/Apresenta%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apresentação
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-2/AlgebraRelacional/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Algebra Relacional
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-2/Normaliza%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Normalização
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-2/DDL/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DDL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-2/DML/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DML
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-2/DQL/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DQL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Entrega 03
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Entrega 03
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-3/Apresenta%C3%A7%C3%A3o/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apresentação
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entrega-3/Apresenta%C3%A7%C3%A3o2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Apresentação com melhorias
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="entrega-do-trabalho-1-modelagem"><center>Entrega do Trabalho 1 - Modelagem</center></h1>
+<h2 id="der-diagrama-entidade-relacionamento"><strong>DER - Diagrama Entidade Relacionamento</strong></h2>
+<p>O Diagrama Entidade-Relacionamento é uma representação gráfica do MER, que utiliza símbolos para demonstrar as entidades, seus atributos e os vínculos entre elas. Ele facilita o entendimento da estrutura de dados, promovendo a comunicação eficiente entre equipes técnicas e partes interessadas.</p>
+<p>Segue o link para o DER:</p>
+<p><a href="https://viewer.diagrams.net/#G1jwFfDf54Y0syDP8PyWOZ2OZu6pEPBTmq#%7B%22pageId%22%3A%22R2lEEEUBdFMjLlhIrx00%22%7D">Versão 1 do DER</a></p>
+<p><a href="https://viewer.diagrams.net/?tags=%7B%7D&amp;lightbox=1&amp;highlight=0000ff&amp;edit=_blank&amp;layers=1&amp;nav=1&amp;title=DER%20-%20Grupo%208.drawio#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D1jwFfDf54Y0syDP8PyWOZ2OZu6pEPBTmq%26export%3Ddownload">Versão 2 do DER</a></p>
+<p><a href="https://viewer.diagrams.net/?tags=%7B%7D&amp;lightbox=1&amp;highlight=0000ff&amp;edit=_blank&amp;layers=1&amp;nav=1&amp;title=Diagrama%20sem%20nome.drawio#R%3Cmxfile%3E%3Cdiagram%20id%3D%22R2lEEEUBdFMjLlhIrx00%22%20name%3D%22Page-1%22%3E7V1bd9rIsv41XmvvB7PULbUuj44TTzKTZLI9uUzy4iWDjBUDckD4kl%2B%2FJaCF1FWADFJfgJyz9tiAZFH3qq766sQ%2BHz79MQ7vbz8kvWhwQq3e04n9%2BoRSYjk0%2B0%2F%2ByvP8Feb58xf647i3%2BNDyhX%2Fi3xG%2FcvHqNO5Fk8oH0yQZpPF99cVuMhpF3bTyWjgeJ4%2BLjy1ud5MMqn%2F1PuxH4IV%2FuuEAvvot7qW381dt27KWb7yN4v7t4k9nbwXzd4Yh%2F%2FTio5PbsJc8Vl6KntKLZJQunvFTNB6Go2iUZu98CMd30fiEvblN0%2Fyrnp3Qi%2Bz%2Fb%2FJPd%2FpJ0h9E4X086XSTYfZyd5J95OImHMaDnM6lG71a3Cj7c%2FabE%2Ft8nCTp%2FKfh03k0yJnF%2BTB%2FposV7xaEGOf3rXHBnTP556r34%2FL8afjh8uP0w9XzRXTqu%2FPbPISD6YLCC%2BKkz5zk42Q66kX5XciJ%2FerxNk6jf%2B7Dbv7uYyZk2Wu36XCwePsmHgzOk0Eyzn4fJaPsQ6%2Fggy6e%2FSEap9FT6aXFg%2F8RJcMoHT9nH1m863v2%2FJKF1BLqLjj2uBQCJ1hw%2BrbEf%2BJ6C%2BFbMLVf3HxJq%2ByHBblw0j0%2F%2Fhr2vt56j9Gru97Pxy%2F%2B88WbU2L7gFRRLxPWxa%2FJOL1N%2BskoHLxZvvpqSUwr%2B235mfdJcr8g4c8oTZ8XmhdO06RK4OgpTv9dXJ7%2F%2FD3%2FuUPZ4tfXT6X3Xj%2FzX0bZN%2F6X3yH%2FZX4Z478uL5v9tryud5Yr7ZKZ2SsXcU6o2fsrWTtJpuNuVEPw0nDcj9K1ZF4wMKftWlkZR4MwjR%2BqhgJj%2B%2BzS7HuFz6UP3CdxrvjLO3%2FKX1gjgraob8IFLhfRFRdkP8yfYSmCxZfZXiqpq1IoSUUoa8qkpUAmvz96b%2F%2B%2BHLDnwcWXH174%2BBAkv08JFEn0c1QLgSQO9aoCRpjfvoBxe6rI6hVC9b30joZGr66A4TS2m5aw3TwdtfXhuWW%2BUVlB5MbNSl2mr3vuUmCYRbGTjIH9aLgmRMyJFY67C6YSa3PEGA7i%2Fij7uZuRNguMsxAyi6n59bSZ%2BJHYFhVsZRYxiQFk8Vo5gGRWSwSmkMDJZDKNAXGzPOU%2B%2F3F8mwyvp9ljvLqPxnH2EDm1%2BKufli%2B9mOBV7jVBbifwRXL7CLktSG63AXKj%2BuUoDYyM8Vs47WraMIdp5bccoGHvUhONV2ALmYRDiDzjhZKWAdKeD8LJJDKPuLbPOqxCXp%2F7CmXUDZTGW1oncRttEC8sNJydwfTLolWxIfYi%2FSpuMreri%2BsEkWggEwvU1p%2BM9mh1q0%2BBHsWnwHUFWfOdskhtvsDxqCCDbdQGgFf4%2BOncOJcQELFwZzuKHQKB2diHeDI5ObdPzuzEOAoT5opON0t%2FJSZkOJEZjGqUWFiVNYwVNfiaVnDB31OrY1mLm7dcBPVYNbH3SaUGuvkCFpDVhhG53PLRv7fJ6YM7UYsfTAoPUtxp7pzW3Il%2FMLm5mUSthBic8SWNuAi7M7PjmWt8fEswPl4gMeJHj8OCGpZnMIjvJ1ENIk7u5yfvN%2FFTzofKmewJtS2W%2F59A3MYqP%2BBQwoJ23YWUdVsiLPEAZdP4Hkpt9v3SDbKYUyHuhoOzxRvDuNebW%2FxoEv8Or2e3yum4MFrZfdmrE%2FY6v1dm5CcLSme%2FTtJxchcJx%2BTIyXmJQX5b%2FLF8yB8HKczRBkT%2F3Dp3nv%2F8Gr%2F9TJ%2B%2B%2Ff3u6%2Fur759PEUnXPIspueLv5fek%2B2XuQcppDG5egpoOvG1v7Qp1Ydtff4hOXG%2F9Fe0kMja0x%2BeZLs5cXgAriAZW6MU4hmR%2BEfGBLVXoUSFVFG2j%2FTR1q16dgNrVKD0PfDfZg%2By3kjS03GmD2Ih1B36qTYRDhT4bYjXb1ZC%2Bidib%2FruB1T%2B76F3%2B%2Bjj6MyKnpEYfXGMB2MXsX0sBmOcJibWFBLftBGCf%2FEny1fnE2Ic370%2Bfz6bdr%2FQGo%2By70UO0MKZkHMNYjJvTeUg2zAQ3zq1hrmi9ZDqPs2q0IgIr2gh5iXiyaSMnmxZiN50G7CYquzJzB8mi68FzLomiyzlmlEPy5MemKPFsWecwju92PPEEj3Ts6o1WFFO28B9rv%2B0eJPBC60YWsnNatq6F%2BCk%2B3Uxa7jEG8eiuSsuqOm5dWt3iaLSW6qzrDCpHbGtda%2BsqxhwxWeDFsZdWPZG8Q7xVc5qKixMsaRIgT2JFpyRQmO7ySGM81wZQKbpO0jQZojKxVuQXQzSLBzkpajAvUOf5BTsKwCkRYpdGKs54IA7Zsy%2FRjOJKKN0bysIaprQUB6Usb88qUTbuXd2vbpc93GJzAJMlv6ViM%2B4yAyjzx2pzvYie1G2a4dVT%2BW2guEuB6tme4Ws1NocJMpNl%2BM7%2Fff%2Fqr%2B9%2F9z5%2B%2B%2FeP%2F9n0%2BvHJf39q3ljIzg1ok0z602aaqllNdWKOKnVa%2B9zr1Ckdx%2BGoP6ihT714nOlTnIxmJB7nQtxMz7TLOoHgfZiFDA07HeSc32a7Ew8NFRxHqcpsV1Ly3bLWzJp7nI2KI%2FWMg8e28g85dvJMVI00bGBDifN5ACey3t%2BG9bVYu%2FZkRlU1ZIszbqF91ApYWVJqXEEW5cQ1V5C1V2zsYoN%2FUYi4m6vC4FzdfYr4NuzeTsfRH7lHee1sqwqFqNMXRdl5dHfB4T3Oxt3cyXVzsbCyv5K5kWXzGpfvOW4IZTlyCMuxQ9gq9BA2xw%2FJPsoRRLIfK3%2BE0VelP9OIWV0bOZuje45weGwxtlovGmt7N%2FGcSJMWJh7cbo6CG5%2FE2CkK5gZYh9xH40LCjjxv3KzsNvTog8znbDwMe9NxCIRB%2By5ol9gdR0iQPA8mSJLnSpFukeH9IMwIkb16Hl9H49G8Cy%2BNuwb2nge%2BllSHk9KAtOpTet%2B2AO1cH0npkYKyGN5uQ7r33%2F4anN8kd6H16uGvr5PEZT9eF7V%2FE%2FxAa8OUde15kWXIN%2Bg485BCsJo5a%2BPmZxGW4yRWVnFBK9ZEaf1NzWR9cyVrjOs4maleXGf6cL0uUqORbG8ct2y7MoAjAqbYzoaCGriCOTIKBzDuMnBenlAiRGW2DTsGJUe0cOwvT9XMo63n%2B2oThofrD78%2F3939%2FPvnh%2FHdv9Eff7z6%2BngKqdsNMzrFvbAXXQ3Dpxgh9aE0vXgeEbENLB8BkMBmBJroe8FRcfQ5d9wm0pUR56KCzvuFNkOfteL5ENQA1xGlyyFCf0dzZzdraSKnn2b276SVfhpqBUBVMWg1ic3ubo0mTfWVGGJVoSsIxcowBJKtiTIMelLl1KhgmdHj5fpeh1RPsTyHdJDp3HbEElV5WJX9NQ1H6dzfZ7QcTQ7Y3bvA3bvQ3bfV5YqyC3ZoHfuRT9D%2BSQeqVVucwvMUjfqRa0ZmBh4j%2Bk0HZ7v5ePOQiF%2FI85U8lc8BtF2FQTi9E%2BoO0lnI9JD92E9n32L%2B0vVYfCX7o8jnkJcm9%2BGowmn31zTf9zMzbqdzo3iWfcC%2Ff5pdZV2H3bv%2BjNen3bk5zN9Ox%2BFowsmZf6z03iC3Uqe9cHz3n3H%2F%2Bj%2BZocpoYvH%2F%2FHf%2B3%2FwdmrfC5L%2BUf%2Fjvf%2BdPu3gs%2FvyZu7gJu90wKX3j%2BXd5KWlqe5pBdIONzrXvZxoJ2gIbBG3EQYO2lpABUEvjmberQxvv4iItxWuLuPJtGxr72dC2ZdrcxdG5DyXwc%2FiAYDHUTrChdpkxOoIY0Ism3XE8s7oHyifLqsIWuwgUu1wuHeEDBUUSkDMZLJe1hR6IW1%2BlR7tmJ1DNr5nCi9aBS8USSXFCuKFm%2FXKgdHFRZNDsOS6eT2BV28aSAjE4T64z4YwfNsXmrSUp4vOsTQaUPlkvvom700FepdTmkZY%2BXo8HGmXSv9Wz5Pff5Q9nUWkFw774W%2FMbH1oCKWJSE4qc8mOxT3GQ3Hjws0eIISKoFXOlgVqtIK3a2fly1KLzzBDubpHC7woq06YjnN3qjvCU8nWcmZk4NW%2BUgRKhZc5n2Iq%2FlrqScPJiyAStOc7Mf%2FUK5unhy8fhqL%2Fov9LmmfSJDnUprtcNASWeOzQWFO76h0ttBcV5dd5csOJRDiI4zKKQoCMsiwksuwMPFwiRHB%2Fq01W4ZRCzGau9tSAGwbUwI4iBhevz%2BUjmYDowr8M6I%2B8KvA6FgQysOh9WIJO5yDQe6fQ4x6INl5VuNNfzQ67XUIcJRoMgnWRYtSZoyxnzdlujfLEroNV38gPATR45bQlZbG0NrH0Ye8%2Fr2AiOPQtK%2F6p3bRnT3sSjtao0SZmPxj24D6O7dYvUNYntjGxNfBly19Y8Vz3USgO7I64c52FpTdg36nviqoyAQzS%2FGMnfpqDxnbSH5b9Wy8rzs7kPH3Vhq5OBO9ooE2e9fAToHOtXbwK%2FFJ%2F9smD2B02GCWdC1OFbFgrpdZEDN0jbto6EiIVlfXtCWt9TS9p92ZEFSUstOGwkk7Ry0dXbnAaFpFU7dEc4isoeSi3BmhtkktbE43e%2FCsRNsmy5WD6qR7ZchAcbEWPVQTuuEAgTjzI86lcT3iDQrHxS2DDzBEJt9WPLehrxdBcIHuWaJxBqayPbCYTjB4JAeJ5uAoFArJghELD6YGh4Rl0bNBgsoVFUhWh7k7Nh5PWw%2Fg2Z5KUy8zbp5HUt1eSVmbu1CUiDkpf4qsm7L63pKHmpcvKamA25jhDqFMmRJpEOl9HWQeKogzQMFjIlCyZOMTT6dkJke5WUmijddbbec7cvRsTtcHSDQoyCjidZjExsbGGu7rZIUl8LpbYWtggJD7QXIhqIHi3Qrd7Lk7T2xchyOwTaonynJ%2F9HJIuUiUcI1Kq2v2vo3kjjaG0rRIoErGMRBmRKtn9TCwH4Ajnagal8UqT1NkrXdzoOswLfsgNKmAhMz1iHv%2BX6LvUls3qPUGoBDLXNlE5UEwehpZ56VD7Bkz%2BNtEI0624j5%2FjYulThbWzo18RKEKpTVG0dCAEp2yPi2nBgXSpx96XfDyUuUdvgY%2B%2FL4RxGXOqrNQuOiZW9gBbJ8yL1oZv9rdzUx647NaKbEzZy%2BMy3q%2B10ugkD0ihjhjCYWBhxPb2FAemrNEMYTDxJZIHewlB7364yYcCXkFEkJmtsLj2L4Ia7T6UrhOttIliEG06QiTGGTYy1tnluNSjXkenNtJBYvgfSr8BVy%2FbgABctN4XL7Nd19upWD6x97pKqv8sVK%2BwrGMdtwppaHlhsCxNvbmArGz3a2g8YKG1CN1utAqJ92HTnTP656v24PH8afrj8OP1w9XwRLUcsDYqhK%2BtbpRxr1Gb590fv7d%2BXA%2FY8uPjywwsfH4Lk96legTJ%2F7JIhvYwyC%2FcbwqsZYUcduLSWYpZUZoBCeL%2BIDlgnVj2t0mZzRFC3NsUhizRRLML3yejAdNM2YtVmeoE4qgnXgxoHbcqXKgcMbABgCCCJjdhIEXWnscgjUDsDa7a2IGONOJH1SuL4c1eSuHgY9yFEvYJQwqdM1BLXglpSWKCm1yyOhuzu8%2FTLV%2FeeXJ09XT64LB2eHrcsbq0lBaPKaoISWa8IHcNmmdc6ZlDIXrHV5kBqkL4P99cg7TVeSxH%2B%2B29%2FDc5vkrvQevXw19dJ4rIfr0%2Bp0sba7WolCtDJ6%2Bsl%2Fklbr2CvePIyPnl273E3C%2FBSWIhUUlckgVIvhhOOQpN2Ef6ef1mEcEZUHlxLXD3oB5DQPkHo3EBQvV5hSnT%2BGPWTTD7NpDG1wXpH5hQnUuX6jgPJ3ASG%2Fgoyw9OI1%2FHML5NBgkSznNZzDz3M7F6ckypvGusl07nbJWpI7PAKcOFbA2TXklxrgXSv%2FpGHP5tFuEJN%2FeS5yLqXxEZ3raDkDtoitwONxkpSD%2BLRXZVO1ahG5nHODiFI%2FZ4nLottTxcBPbQD2nG3BFBmXo2bNTeRtEKs4EkDLIuLiUdJsDD95Eo5nusFSGiukzRNhqhsrJf9bjIaRd108SQnxVLpF%2Fiq%2BQU7isEpEaxqcnMziVpiEAzK%2FvN5vmHszX8Bp%2FY1vSS%2B63U8WtUXDwmZpfa4FM2NInMOiTOFdhZmTCJb8P5IHhyZel5eXmkgfxLQr9tdqqxuvf65jZ%2F4odYSe48rlUOhUslcV2zBLs6Pjdo4jB%2FNb1QgbhWJBG3owtY2tWasKLJQwUTKWgS0yiGQ%2F3IpCzNUGNvqT1mHVHeXE6JeZuEZIZRZeVnDgqYNpAcerwQWtA68toiILE4wUfGpWC4hFBmrliqeyNmciYpvCzsGfd68pI6wEHXTSJHlg0jLIRnlIlsHxULX7sT1qcjKpoNOwLYCp18pAptLipyqNUqKJw0nN3gpibh8WlY8nnrxPjZwJ16dkIRuRMl%2BRLK2uKtGA%2BsAwSxMpKxjgTZwgq1YkktbY%2BDXyoaUVLAsTq2OlX0PVVPK6ZuIvem%2FG1j9s4ve5a%2BPoz8jUljQjWsduNnQpI5UpA1GCYRtU1EgqKOXQCD9sGbIg0ZzIuvbO1fyRn4UI8Ye5kQxPEQ0PHlEGp8wuLOWXC3e6G7iculG%2B6SFBo1atlTSzACujr4H2u19KshHcwq59quWdzwnk8k0BsJkQrOcv1ztURxjI0h5bXXKrTB5kMRmphfCEQRxVR9B0P04NmNUoCx15PkSvLdfLazUVr6kWvyScsKPW1QEZRAnMm3ay%2BwWP8AqyLvRJJ219NLRrH3aWjWqpnFzr09B%2B7SPnPYTq2ipbtor4NTG5gBFas%2FQl8whNXEpQEpyCKvd3duen6hzoKq%2Fn4BngQwKslwPzBe%2FlCj7ZiHFMK0zIYIkQSAQ2bKw%2FvS2ZlpwiBrLPJhHoeVuV3%2FcWG5XYFRsnhxXBq6xQtf24gAoP2gXFCyQd0iBi4SjtKPVGNiv%2BvqkV0Pr%2BufWoPLRfKjgeUgk5gA1C3ws6OU14uZprrbYb7iiYUd%2Bmjmu9Q9e0rQvaWwy3ppQr8Hax9tCW1sRG8BKmIHHKtTyXfFYhckrheGtSgxK7%2BtkGI%2FMFF5q2SKJMRysYgtuZfyhNfH196KXfKn0RYLuqA5tqUangpsaHVOFa9tWUA9Z26YXwOn659ajLNNCE6ENWt0w4BHZVgyWGQ20YsSFxHUYlWbHcNoimL0m0tYGJVwPWespl7JUqYfYKifrONSv5mVBUHToabJGhvcdbOzIY8o68lY4D%2FOKzVbH921RINQtc6%2Bfv%2BsVTKxIgAxsBtAGgJPV7dNmmpVHkTPTvQohXf4FC1A1CtuZZNdHbWOaoUuqloO1ltO1jqXOFa%2BXZQWueHZp9r3C59IHFggzyzuLbdoAvIp5flm6alzB86FVV1Cb77lbcUX2w%2Fy5G%2B03JVQpnPOWsLFU54KEEUElz190sGy161DacB2xX5qd%2FKyIftpuvNIZu8sXZm1WIF1iKyfaO83gtYXD5Ii4vtPz4emSZH60Xdcyih8uMkQlmR%2F0gPmxRJUqYKZ8WJ6UzBB4%2FHpADAHwjxiQvWSGtD10ozVDPCoejVjKTRbsCz0gDQks%2FRjSdjeD1gzxBIZoEGPByabD4UemIUJHFVHOj0POCrOcWDuD5R1yUpjRX0RN8lTHWByLvYJX5w5y%2BueIyBXGuL%2BmCX%2FjdE7Cs%2BwD%2Fv3TjD787eynfv7fXnQTTUJ%2Bt%2Bzx5jecv3k4THfFOA4zi3Lh7j0YWHM2Te7D0U5MD0dJieXz2x0ay30R6RdjuSOX5TB0b4rlce8qns0PHzzXhXNen8%2BsKlN0vz3r3p1O0uQqGkXjfnzwRp5aFpiCwnS%2BrbWZK7gPC1qN%2BfaqmT8yvVB5GNDJNfQBxnSBI4Zsz7AAxBJG3na2Z6wg7v6sJkGI68CxTanEhcUsM4mLRAKqSYtFf3tCWiTIkkhaasFjVUNJ61KwzFg5cRFaat8gbhVg%2BIv%2BcE8dovN6md0IpMBHYjXp8qEmodO01ugd1F2nytrZpvriHlNf3LbqL4bIm%2Br%2FXCEszBxhWRqPIBCsRxYWaWU9ijhNgfztaD2UNgRXBEKZ7ZC0DiXLL0Sdbw9ueAW3zVsemqk%2FGC7TLXgocuDN6q%2BsMRwXCIIl782Uw%2FISeF7KCrvhwZfF4G51pNVSaiGUEqyy0AznM07cJ6NJ%2BBANroZR9kO%2FchJylICZBLiwt7OYWpYkArATpKnzL872qzCdhoNDPwaDzEegY32pvFeMTLNVJFCNAjwpYHArqFe3WEBsPWYaHTH0tFkl3axxgb1%2BohFxcc0ONK7nhJRSozX7d9JKqRGxEWrrjMjijPYo22YRF3G9ailrG1SxQ22vQsPLtDCntjgYYm%2BYEIcXUPuF5rR6QdWc1rnc4gcZsooNCAzavhgQDwEWlGlAbPMMSMeyhDJOPjqjVRmncHmqrYsIU2a764M1eMEC56G2sejQoPSPgbt1eKFIlvFAIHWPhanmM9NABC4p6kLKClPIooX23EabEX3ggt1HxS4cVY5Dn9Oe%2Bo6DFId93xeORLPTv0JkNyKE%2BMrK%2F6Mhu%2Fs8%2FfLVvSdXZ0%2BXDy5Lh6dqT4MkQMtts7cGpRRS70E%2FR7XiL6yNGLxdlFhwl5zM9aI%2Fe1GUJle9R%2BqTbz%2BmEfvf2%2FiUqO2naECFXg6sNMm0IH2p4ZSjLSsO3rP4uGOV%2FokThw6rvE3bCnXXEaGkpO%2BTn6vXG%2Bi4edAirCOCyUhe83hunTvPf36N336mT9%2F%2Bfvf1%2FdX3z6ew7f%2BABmtdD5hLG0Fpb2u0FmVI23tStGaI5QnwPjLxllB2HDRSBmCHTKgMfCUxYEca38N1v1pypJQ%2F%2Bw0xyOaN9ktkANgygQ2SiV11jTEI6sshMwipbzg2nOmRyiGqNB7fCt%2B24VWtKxlbjsbXbkQ3BaeZMuFcpmiwXYm6LF5B%2BI6appoU1hJ2X8HcLbGIHCAQLq1tA8JJfsiobNRxBM%2BJLfmVG9pA13k4qZgv7lz2JUIcoeww8ABZcJNyuv9w4iHFYBwPvPFJwa38JCm6%2FAv7vMFPBrZo0K1m3eTD96uzya8P%2Frtr53b4ZfDm%2Fun28ykyi3A4NptQD0way4T%2FXSvpJY6cZ%2FFHmEbyw5ZGaCwqgucQGKhYyIms47VFYhioHI5jDCgD0%2FUSXePk6eLm6dPri3%2Bd8PMp%2B21dXJ%2FGpwTaHN1XZajIIHHaQceIfk7Zsi38qWF6plIEjCki7CQCevTxEpsb%2B4X9cRuewsdpZHz0rb98NT7TvZuJ2Wxh0nEcjvozVm8IjXrxOOqmcTKaUXece8lmoiNf9MauD5sBecQkxRnDA9x%2FurkeZFwDBKwqSDjultv5XhptltsBaVNlskCsl3sObAcslow1fUK%2BzhOXCPw27N5lJNgD6roelN7WqHs2ePvLi%2Bz%2B9y%2Bvvz%2F%2Funt%2F%2Bvbsr1ON7Dw1zdAjq%2FZQGhOtDD1scHgdxsNneEZooj4hy2%2FkWit%2BeqNDbla7285xhLkXy6Ebtaqt%2FuW6MRUOXqJK1dYpvvHTZcQSpndcpKm1nSEBlK5qkQG2yn6r06lynBYuk4jXkpP%2B7qZK%2BzKpCXWJfxNFuqQ0AmxCl6hCZUKmavQqJ6597D1UJqQcIFGZUMSq%2FSBsAOsAMq2UefVujayUX9NKKatIrn3s%2FVMmj%2FkdIgufAdcnpWmq4RF0YKY6YVB6%2B6FOHmyRkKlL5jV057OGAty9w9RBnayNpdoevSRWYHeEZX%2BeRTp%2B9UbNjVjiQgQjx8%2BX785eA9HSviorri%2BVWpPFaQsDie%2Fh3fQ3nGDVnriOI7bgqScv7%2BTW4QzJq20AXwTS0J6Vo0gwsQKmU6togtaIJtT3CzBh7MN1kdY9Fxv4dlo7cDUR0STfWF9SF1JGStMjWsD0aK2j1USPeK%2BKDuJQs5fT6vh%2BsDfioGxVEi4Oe3PM4fqkw33WwvoyxPpKzNOcval6M0fcAsmQnnSZpA30CQFrR4CeJiGggyxmMsJ17c1hhxtAW6VWoRhCSu0VymWVNqLTvMrk6xUXOHV79jTTNWYiKqbniW1ldDOUm1xxQM7vTQgTeSBlvullPB%2FWI0Z01aZjW9pdT2iJtoijl55xphqnZxTo2Si7NZARLadfW8C7cgNLTDyQHWFtwSnhLIIDOAfNIoc5Ioss1SyCIzy9aNIdxzN0%2BwPlE7MFLjHIJVcql2Dp6cgl19ONS0oTAa0bd9pvFHDFSWyn49HqbeahEGgTQLsONt6s5Z4Dd28b7FyOy6koi9jfViuOPaKGsJ6BbYsGtFpxeZXRaiWIU2s7m3D52duJPI%2FvbVGkmErr1XurmJ600EZUTD%2BQq5gwiz8mH5aI%2FOMhMzgykw%2FvmMhv5hKGmCKXSzCRv72%2Fuk5G08mRScUAOzJ%2BI5VJsBnlyCSRSQGSbEhlEuxwODJJNHfIAYBcJsEqRi8cJQfPJlLVJQoNHrY0tT02wZpINIrG%2FTg8bE4FQZVRnkU7UKN8mazyYXfBUaMyjRLPPj0EvU2qTvkUMAqwx4xyBuMN2%2FycxSmgvdQUNHyNgPHqzzT5Rbsdx%2FHSrC%2BfS6yCRpAVlQ9Gq4DrzLe55G2ofbwYyZdRocd00X7WFJIvTnGYDca9KFPrzPPy1fK9%2BGG5Vn7%2B0vVYfCX765XPHagbAJbKrhf%2FNgFAizN4b8YaXLe67pA5lmInYGLXrQFOoJ3lbNDguq6QBFmCEjZl2cU%2FxBxHgmWHie%2FRsu9kfkQ4WeW2nYNumXSsVjU%2Be9Tt43gNdvsgN2v5iI1YMK03NFAA7T6O0jCB8Frbsba1vraFbROXWtkiloFYTftjUMXlHR51O9b2JhXsqkBu17pR3Zvsy2IitJBHbaQULdWwwgO4o2FFDKtHXNWHBsRSCmxzNK2C7gY7RavAtCK3a9207k8XNTStyLZrmYaVwFzgaFhnhhUc8vmqY1YCswteuckJUOGT%2B2ua8DdO5xQ9yz7g3z%2FN6z2Lt3mtJ43vk1IVaH67anEIqSDt%2BlfXVqKwZzCxQNWAMGYUdAVpJI4FxREb5mwCv%2B5nL4rS5Kr3SH3y7cc0Yv97i%2B0J%2FHBybp%2BckZu86mj9DO%2Bz7z8xEFrTtoXTBwo76lsD1kRJjbg73Xez5bukKlCBVifY6vRhJUe3gn5bJ8mq97sy3hlVZF2VRfbIQlixV796wc6HDSixDhHga5KJUPrSEy%2BUerYqkdzJ%2FsCZDEPjb8exxZMdaQvMUMrCOQpDKcscAb5HGmwarj9qty%2BabqYQcDQDzNTeQKZCM%2BUEatXJIDSsTVpRxssSxj4t0l6IitIVAfyUGKHCiNKh1fNUJhYzmiv1raPHPmhwtZnUUewOKSDssUNoJ%2FZWSwQOBlbYUn8QzuAj%2BJkQjgrNuS6s4bQFfYYz6DgxXSvO8eUNEeJ8UrpR%2BiVbOVYyoO0ogdpuDpmx%2FCdUponDKm%2FT6h%2Boe%2Fi4459pOVJBFrzCGHkXPcaim6qcNaCB1HYsQFWggLZUBYTNzEYS1taNsMWXMD64dn0R2ZTQAJ6GSYyvMVLqmh%2Bny%2BU9Alp04BcnNrvNhzRXiOIf3LwVTa9SFIXh3mXUTYb30Qg5Ej2UeA9ZBZRpLkyd2pqdxlm1P2XDwAM9K0rLDhT2xB6THieoloY8T3HKQ00cbvQdsXZrNQTZ16DzQo5RUOfF9PJde9Nu6QTVQ0mshU%2BiObRNPJT0PVHPGlrd06CeIY0%2BBuiZDROygwcVy5wjCGHkYb%2FhbKJ7aw4dv4PBH0q0iPvTWSTS1sYGcWSS1jHQ2bhB2dmcaultuD0wzdsoHXjdVh6qUf6plmG%2BjTR1miAQOPBs3sP%2Fyj7sGIRWTTmPL5VFIPCsaQ7DeOQV4JVDsJBGakHR2c9muSCoOGer47j%2BNqZ4B0Pr1zS0TtOGdsUJtQg%2FQhzb6QQ2c3zb96zA5YjEks6k7X1Z40StgIB5N2mbnHClVtsXsk34JJzueS%2Bfam8wRqpbomlcdXfzvPtSCkU1yoE9cTI1CqurzLtMJ%2FfhqELkF84VZ7fMiLpsWZ3fz6Se1WZYDrwTNKFYE2RrXaoOVu5phuXZf8NhrnCj60n%2Bn9I546GLATI7TpBzEKmCYN6RY8Wbbi5KtedK%2BWSBYa7U2ZdRR9SVcthXRa4Ua2Fpxq5ehuO4F%2FaioxkF3rTmeq%2FWjCgzaDNBi%2BZQ1n4A3xIEwJc8HOfsS3pPfBIIpGRqU5F9SfMyyvqib%2FLVjh5yUJwWfFPcu%2BrOIIeCwXQQHrqHynjvCpznMZcyD7UasGxX3g%2Bno3jGe2%2F2v%2FbB53m5O%2BoIY6mZXYWJHpMqAYgh1TVGKU46LK%2BAAZglex2LNrQ4o8Gwp3bPm9d0fLSbQGBpYGPuIHPMw4M3BC4VxwCIb8MYQK4daC9DPRZ7F0wXTb%2FiYi%2BD%2FSVNsbwXH4u7nO2ipjtItC%2BV7XuD4eJSEaw5oy5UKpm51N5UADDaMiRbkUdb18BItRylKj7gZ7Xj0cbrdbup1N6UfjCVctWqlInzThYVBguDYKs2t1aVDcGNk6Rss0tfvhaRiNHp4siqVahifihnlvxZdlX%2B8phDN%2Fmr24ipmbF39yY2JbYAo1AcRiky9dIi01eDsHsnjapqm049fWa46pkvoeVUZUDqIgHpaMjuPk%2B%2FfHXvydXZ0%2BWDy9IhX66gi4nSIh4dJ2n2XZO8DpI3l7SlXWqzaQ%2BhrObhASnPvy3m8T3twgMXCU8NUD3PoH6akjwI%2BAy2pd1ZlYuEiybIg7SNnq3GNJbQa%2BPyQ2JFVnd%2FYnBAWV5DVETZvakOQ8p6SgtZfDGTQZ7B6gRMmNe07OIFXTwDN7Flz3BunTvPf36N336mT9%2F%2Bfvf1%2FdX3z5qNzvsmFjYDR5QHx9FOHpDI0QR5MLHQGDBHkAeqnzwgkaMJ8rC6yWnXlal5z2v2lONuHI7S8lRGdV2qII172%2F9AbCFS8C3YSY5t6W2t%2F8Fvr9Mp4%2F0g%2BXlsdIZMR%2BYZpba3%2Be31OuVdjaNJOl%2BtO8rU%2FtjjiFfq4fmHXL3H8trm5hxQm3%2BgvLeEw2RXOe%2BxzLs53kfH8RaU7VghSyrbsbOaZtg%2BX9516BwnQj8TVgaS2tMctDfMduxpXiq6MMfmqt6ux0Hm9rGy6iudvA3MO3OzOtW9OaRjEe0wSbnEbt6bw6fa5ZdORv2fb3%2BSx4uzfpKwr7fDTzcfXHTVfGOVkzi3i2HVxh5k3SQAixcJC%2BrBZjZhZFHOy8SHmW8MbMfGBjYYv3MtWUeuKGUNBFvqWBUba3WIo9LGrhPYjSY2CLSysPtySozpGccVUaNnWrTutURZDANbHmUJlnftC2ltWUuJcNK2h9GRg5QfejYbOAxGAzDSaquKgbMcS2ebYfnt%2FZHhkOE2ZDi2%2Brc9hreHu%2Fp0ZDjCcApX%2F8hleHsoK8fKNM5yIq80jbPcvP0%2Befd6MbywuHLZlKRLmld31lGzNI%2BDwZktD56%2FeYZMsjzUBTrQTR7MqwJZnWCJabEotVsqV9SvzU2NE4h9LgRJm3HBSWvkvIDQHh7oZ3qJob6YtldjWbQHhnln4KGH5R7Hm13XDCz1TIub1LYYHw%2Fj%2FsGX2Dwm9Iv4VN56E5zt7dVbbu%2BvwnQaDg6e6a6IdSWxBxxnOtb430o81eK4sM%2BjWfm4Mng7iNJJO%2F7zLqh8VBIICi6TyHzlnTP556r34%2FL8afjh8uP0w9XzRXQaKANqWvvcxucmUJ%2BQXnWZ%2BqR0UrEJfVKqTsh4qhHqtC%2BYC1CdpEEI4eqE0NEsdZIFGovLJZLPG6FP%2B1I6g%2FokDYQZJ6zSwtl2%2BgQRO61Au0MsnpyYpml2e5n0cbJuZf0Ec6oyU2nbvLPLUmD6vfyeAq9qI7r%2ByZ8kX51PjH148%2F70%2BWza%2FUpvig0dmug6U5rrLzn9vfTORq7T6gGlZmw3wsTDutk%2FYW6Vs7%2Bf2ePHEZCKKs83hFcNGEjK7GqYFASw1kgoYiHd1iwkzOhgZr%2BLw8KoWqV7E4R1xKW6WSzVgc2Scp0PDO5lk3ZyF6Xd28WNu9PxQ3QRp2k86nOLFvf7syehDfHBdkU%2BeEQxF%2BQNU7SzJdz1hKhqhWgjRqMlkvJ2ROOzVoS2hCmmLXbCvye0Xa4TVERbpUW2rbtphHYaDQcYuY2t4DKvC9E0iRgd80ADkNZWe4nHqYtAOEgroxECoc%2BejJcIRLVi0GH6WQju1owTCJgeVRvlDqS0R10OTcszVx8LlAKZkb0D86tyL9uhcmZFftAWjh3OGph0FVXyq2Qc93PkycNlEJpkECKTQ3yps9l1H5%2BC%2BTl0VaVUysKTpo%2FmUZYyT6zkMMX1NCYT2KfN%2Faq%2B1yFV1FmP0Q5RmhszaU2n8onr0g4co5ZJWx%2BSUvOswuq4jpBVWJvPpNpLKtI3EXvTfzew%2BmcXvctfH0d%2FRqTI1jZj0y3Yr0lSwVdFGyYPYnOKSnlY6yBMkwcj11tDebBV7otb69SMEwi0WSkc5m52dD3J%2F5PG94n4WqNRZmspVcnr%2B005%2FcAR0gDPYVhAhQFp0LbiVRfGq3PMk4PlksAjxpC4rC0Wnf%2F7%2FtVf3%2F%2Fuffz27x%2F%2Fs%2Bn145P%2FXjG2RQNt1xstbiPGFacdrWlc1e1uX%2FvcJbV882sa38Ni7uQ2vM9%2FHN8mw%2BvpJFevkvNavFryZxvTIlGtm9AqxxW2GTg%2BBUrVVl0WJ7BSgJCtlErAiJU0yoBTz66rVo03Xc4uzb5Y%2BFz6wMKjLO%2F8KX%2BhJICMCRW4YFE5ulhxBSW8O3%2F7K7yFL1nK6fy5l1JbEGAHQYZhmNmWQoySCEOGCOXairZ75HQ%2BGSC2DThiI2PSbSH%2B4RyBRzcHzhEbQgBJ5QiF7XYHxBHXoiJHPCdAzs%2Fk8gQGkYfDE1rs%2Big44rVmtbJfx0k%2Bb7X07Jm7vP2Q9KL8E%2F8H%3C%2Fdiagram%3E%3C%2Fmxfile%3E">Versão 3 Final do DER</a></p>
+<p><center></p>
+<h2 id="historico-de-versao">Histórico de Versão</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Versão</th>
+<th style="text-align: center;">Data</th>
+<th style="text-align: center;">Descrição</th>
+<th style="text-align: center;">Autor(es)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><code>1.0</code></td>
+<td style="text-align: center;">20/11/2024</td>
+<td style="text-align: center;">Adição DER</td>
+<td style="text-align: center;"><a href="https://github.com/arthrfonsecaa">Arthur Fonseca</a>, <a href="https://github.com/DanNunes777">Daniel Nunes</a>, <a href="https://github.com/lucascaldasb">Lucas Caldas</a>, <a href="https://github.com/14luke08">Mateus Santos</a>, <a href="https://github.com/RudsonMartin">Rudson Martins</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>2.0</code></td>
+<td style="text-align: center;">08/01/2025</td>
+<td style="text-align: center;">Versão 2 DER</td>
+<td style="text-align: center;"><a href="https://github.com/arthrfonsecaa">Arthur Fonseca</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><code>3.0 Final</code></td>
+<td style="text-align: center;">08/01/2025</td>
+<td style="text-align: center;">Versão 3 DER</td>
+<td style="text-align: center;"><a href="https://github.com/arthrfonsecaa">Arthur Fonseca</a></td>
+</tr>
+</tbody>
+</table>
+<p></center></p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Voltar ao topo
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2024 <a href="https://github.com/SBD1/2024.2-Carbon-2185"  target="_blank" rel="noopener">Grupo 8 da disciplina Sistema de Banco de Dados 1, ministrada pelo professor Maurício Serrano.</a>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/SBD1/2024.2-Carbon-2185" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      
+    
+  </body>
+</html>
