@@ -42,6 +42,7 @@
 - Entrega do módulo 3
 
   - [Apresentação](./docs/entrega-3/Apresentação.md)
+  - [Apresentação com melhorias](./docs/entrega-3/Apresentação2.md)
 
 ## 🎮 Intruções para executar o jogo
 
